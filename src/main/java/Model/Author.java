@@ -11,13 +11,15 @@ import java.time.LocalDate;
  * @author franc
  */
 public class Author {
+    private static int counter = 0;
     private int id;
     private String name;
     private String address;
     private LocalDate birthDate;
 
-    public Author(int id, String name, String address, LocalDate birthDate) {
-        this.id = id;
+    public Author(String name, String address, LocalDate birthDate) {
+
+        this.id = counter++;
         this.name = name;
         this.address = address;
         this.birthDate = birthDate;

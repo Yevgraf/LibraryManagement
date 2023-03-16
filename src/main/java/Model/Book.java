@@ -12,6 +12,7 @@ import java.time.LocalDate;
  */
 public class Book {
 
+    private static int counter = 0;
     private int id;
     private String title;
     private String subtitle;
@@ -24,8 +25,8 @@ public class Book {
     private String isbn;
 
 
-    public Book(int id, String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn) {
-        this.id = id;
+    public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn) {
+        this.id = counter++;
         this.title = title;
         this.subtitle = subtitle;
         this.author = author;

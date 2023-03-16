@@ -11,14 +11,19 @@ import java.util.Date;
  * @author franc
  */
 public class Card {
+    private static int counter = 0;
     private int id;
     private User user;
     private int maxBorrowedBooks;
     private Date registrationDate;
 
-    public Card(int id) {
-        this.id = id;
+    public Card(User user, int maxBorrowedBooks, Date registrationDate) {
+        this.id = counter++;
+        this.user = user;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.registrationDate = registrationDate;
     }
+
     public Card(){
 
     }

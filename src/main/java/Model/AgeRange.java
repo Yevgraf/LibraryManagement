@@ -1,11 +1,12 @@
 package Model;
 
 public class AgeRange {
+    private static int counter = 0;
     private int id;
     private String description;
 
-    public AgeRange(int id, String description) {
-        this.id = id;
+    public AgeRange(String description) {
+        this.id = counter++;
         this.description = description;
     }
 

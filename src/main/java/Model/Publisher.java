@@ -3,12 +3,13 @@ package Model;
 import java.time.LocalDate;
 
 public class Publisher {
+    private static int counter = 0;
     private int id;
     private String name;
     private String address;
 
-    public Publisher(int id, String name, String address) {
-        this.id = id;
+    public Publisher(String name, String address) {
+        this.id = counter++;
         this.name = name;
         this.address = address;
     }

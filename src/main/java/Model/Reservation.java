@@ -11,14 +11,16 @@ import java.time.LocalDate;
  * @author franc
  */
 public class Reservation {
+    private static int counter = 0;
     private int id;
     private Book book;
     private User user;
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public Reservation(int id, Book book, User user, LocalDate startDate, LocalDate endDate) {
-        this.id = id;
+    public Reservation(Book book, User user, LocalDate startDate, LocalDate endDate) {
+
+        this.id = counter++;
         this.book = book;
         this.user = user;
         this.startDate = startDate;

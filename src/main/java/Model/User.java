@@ -8,10 +8,11 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
- *
  * @author franc
  */
 public class User implements Serializable {
+
+    private static int counter = 0;
     private int id;
     private String name;
     private String address;
@@ -21,17 +22,8 @@ public class User implements Serializable {
     private String password;
 
 
-    public User(int id, String name, String address, LocalDate birthDate, String phone, String email, String password) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.birthDate = birthDate;
-        this.phone = phone;
-        this.email = email;
-        this.password = password;
-    }
-
     public User(String name, String address, LocalDate birthDate, String phone, String email, String password) {
+        this.id = counter++;
         this.name = name;
         this.address = address;
         this.birthDate = birthDate;
@@ -40,9 +32,10 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public User(){
+    public User() {
 
     }
+
     public int getId() {
         return id;
     }

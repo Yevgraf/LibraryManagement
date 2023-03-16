@@ -1,18 +1,22 @@
 package Model;
 
 public class Category {
+
+
+    private static int counter = 0;
     private int categoryId;
     private String categoryName;
 
 
-    public Category(int categoryId, String categoryName) {
-        this.categoryId = categoryId;
+    public Category(String categoryName) {
+        this.categoryId = counter++;
         this.categoryName = categoryName;
     }
 
-    public  Category(){
+    public Category() {
 
     }
+
     public int getCategoryId() {
         return categoryId;
     }
