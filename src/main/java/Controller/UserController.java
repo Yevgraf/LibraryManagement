@@ -1,38 +1,38 @@
 package Controller;
 
-import Data.UserData;
-import Model.User;
-import View.CreateUserView;
+import Data.LibrarianData;
+import Model.Librarian;
+import View.CreateLibrarianView;
 
 import java.util.List;
 
 public class UserController {
-    private CreateUserView createUserView;
-    private UserData userData;
+    private CreateLibrarianView createLibrarianView;
+    private LibrarianData librarianData;
 
-    public UserController(CreateUserView createUserView, UserData userData) {
-        this.createUserView = createUserView;
-        this.userData = userData;
+    public UserController(CreateLibrarianView createLibrarianView, LibrarianData librarianData) {
+        this.createLibrarianView = createLibrarianView;
+        this.librarianData = librarianData;
     }
 
-    public User createUser() {
-        User user = createUserView.createUser();
-        List<User> userList = userData.load();
-        userList.add(user);
-        userData.save(userList);
-        createUserView.displayUser(user);
-        System.out.println("Utilizador criado e guardado com sucesso.");
-    return user;
+    public Librarian createLibrarian() {
+        Librarian librarian = createLibrarianView.createUser();
+        List<Librarian> userList = librarianData.load();
+        userList.add(librarian);
+        librarianData.save(userList);
+        createLibrarianView.displayUser(librarian);
+        System.out.println("Bibliotecário  criado e guardado com sucesso.");
+    return librarian;
     }
 
 
     public void listUsers() {
-        List<User> userList = userData.load();
+        List<Librarian> userList = librarianData.load();
         if (userList.isEmpty()) {
-            System.out.println("Não existem utilizadores guardados.");
+            System.out.println("Não existem Bibliotecário  guardados.");
         } else {
-            for (User user : userList) {
-                System.out.println(user);
+            for (Librarian librarian : userList) {
+                System.out.println(librarian);
             }
         }
     }

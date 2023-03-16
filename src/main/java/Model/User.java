@@ -19,17 +19,17 @@ public class User implements Serializable {
     private LocalDate birthDate;
     private String phone;
     private String email;
-    private String password;
 
 
-    public User(String name, String address, LocalDate birthDate, String phone, String email, String password) {
+
+    public User(String name, String address, LocalDate birthDate, String phone, String email) {
         this.id = counter++;
         this.name = name;
         this.address = address;
         this.birthDate = birthDate;
         this.phone = phone;
         this.email = email;
-        this.password = password;
+
     }
 
     public User() {
@@ -84,13 +84,7 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     @Override
     public String toString() {
@@ -99,9 +93,9 @@ public class User implements Serializable {
                         "\tAddress: %s\n" +
                         "\tBirth Date: %s\n" +
                         "\tPhone: %s\n" +
-                        "\tEmail: %s\n" +
-                        "\tPassword: %s\n",
-                name, address, birthDate, phone, email, password);
+                        "\tEmail: %s\n",
+
+                name, address, birthDate, phone, email);
     }
 
 }

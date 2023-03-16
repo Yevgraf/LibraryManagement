@@ -1,16 +1,16 @@
 package Data;
 
-import Model.User;
+import Model.Librarian;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserData {
+public class LibrarianData {
 
-    private static final String FILENAME = "users.ser";
+    private static final String FILENAME = "Librarian.ser";
 
-    public static void save(List<User> userList) {
+    public static void save(List<Librarian> userList) {
         try {
             FileOutputStream fos = null;
             ObjectOutputStream out = null;
@@ -32,10 +32,10 @@ public class UserData {
     }
 
 
-    public static List<User> load() {
-        List<User> userList = new ArrayList<>();
+    public static List<Librarian> load() {
+        List<Librarian> userList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
-            userList = (List<User>) in.readObject();
+            userList = (List<Librarian>) in.readObject();
             System.out.println("Utilizadores carregados do ficheiro.");
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontrados utilizadores guardados.");

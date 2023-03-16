@@ -7,56 +7,56 @@ package Model;
 import java.util.Date;
 
 /**
- *
  * @author franc
  */
 public class Card {
     private static int counter = 0;
     private int id;
-    private User user;
-    private int maxBorrowedBooks;
-    private Date registrationDate;
+    private Member member;
+    private String cardNumber;
+    private int borrowedBooks;
 
-    public Card(User user, int maxBorrowedBooks, Date registrationDate) {
+    public Card(Member member, String cardNumber) {
         this.id = counter++;
-        this.user = user;
-        this.maxBorrowedBooks = maxBorrowedBooks;
-        this.registrationDate = registrationDate;
-    }
-
-    public Card(){
-
+        this.member = member;
+        this.cardNumber = cardNumber;
+        this.borrowedBooks = 0;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public Member getMember() {
+        return member;
     }
 
-    public User getUser() {
-        return user;
+    public String getCardNumber() {
+        return cardNumber;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public int getBorrowedBooks() {
+        return borrowedBooks;
     }
 
-    public int getMaxBorrowedBooks() {
-        return maxBorrowedBooks;
+    public void setBorrowedBooks(int borrowedBooks) {
+        this.borrowedBooks = borrowedBooks;
     }
 
-    public void setMaxBorrowedBooks(int maxBorrowedBooks) {
-        this.maxBorrowedBooks = maxBorrowedBooks;
+    public boolean canBorrow() {
+        return borrowedBooks < member.getMaxBorrowedBooks();
     }
 
-    public Date getRegistrationDate() {
-        return registrationDate;
+    public void borrowBook() {
+
+        if (canBorrow()) {
+            borrowedBooks++;
+        } else {
+            throw new IllegalStateException("Membro já tem o máximo de livros reservados");
+        }
     }
 
-    public void setRegistrationDate(Date registrationDate) {
-        this.registrationDate = registrationDate;
+    public void returnBook() {
+        borrowedBooks--;
     }
 }

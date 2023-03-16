@@ -7,63 +7,60 @@ package Model;
 import java.time.LocalDate;
 
 /**
- *
  * @author franc
  */
+
 public class Reservation {
     private static int counter = 0;
     private int id;
     private Book book;
-    private User user;
+    private Card card;
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public Reservation(Book book, User user, LocalDate startDate, LocalDate endDate) {
-
+    public Reservation(Book book, Card card, LocalDate startDate, LocalDate endDate) {
         this.id = counter++;
         this.book = book;
-        this.user = user;
+        this.card = card;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public Reservation(){
-
-    }
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public Book getBook() {
         return book;
     }
 
-    public void setBook(Book book) {
-        this.book = book;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public Card getCard() {
+        return card;
     }
 
     public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
     public LocalDate getEndDate() {
         return endDate;
+    }
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
     public void setEndDate(LocalDate endDate) {

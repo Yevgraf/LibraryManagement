@@ -5,23 +5,30 @@
 
 package com.mycompany.biblioteca;
 
-import Controller.UserController;
-import Data.UserData;
-import Model.User;
-import View.CreateUserView;
+import Data.LibrarianData;
+import Model.Librarian;
+
+import java.util.List;
 
 /**
- *
  * @author franc
  */
 public class Biblioteca {
 
     public static void main(String[] args) {
-        CreateUserView createUserView = new CreateUserView();
-        UserData userData = new UserData();
-        UserController userController = new UserController(createUserView, userData);
+        // CreateLibrarianView createUserView = new CreateLibrarianView();
+        // LibrarianData librarianData = new LibrarianData();
+        // UserController userController = new UserController(createUserView, librarianData);
+//
+        // Librarian librarian = userController.createLibrarian();
 
-        User user = userController.createUser();
+
+        List<Librarian> librarians = LibrarianData.load();
+
+        for (Librarian librarian : librarians) {
+            System.out.println(librarian);
+            System.out.println("------------------------------");
+        }
 
     }
 }
