@@ -26,7 +26,7 @@ public class UserController {
     }
 
 
-    public void listUsers() {
+    public void listLibrarians() {
         List<Librarian> userList = librarianData.load();
         if (userList.isEmpty()) {
             System.out.println("Não existem Bibliotecário  guardados.");

@@ -5,8 +5,10 @@
 
 package com.mycompany.biblioteca;
 
+import Controller.UserController;
 import Data.LibrarianData;
 import Model.Librarian;
+import View.CreateLibrarianView;
 
 import java.util.List;
 
@@ -16,19 +18,12 @@ import java.util.List;
 public class Biblioteca {
 
     public static void main(String[] args) {
-        // CreateLibrarianView createUserView = new CreateLibrarianView();
-        // LibrarianData librarianData = new LibrarianData();
-        // UserController userController = new UserController(createUserView, librarianData);
-//
-        // Librarian librarian = userController.createLibrarian();
+        CreateLibrarianView createUserView = new CreateLibrarianView();
+        LibrarianData librarianData = new LibrarianData();
+        UserController userController = new UserController(createUserView, librarianData);
 
+        Librarian librarian = userController.createLibrarian();
 
-        List<Librarian> librarians = LibrarianData.load();
-
-        for (Librarian librarian : librarians) {
-            System.out.println(librarian);
-            System.out.println("------------------------------");
-        }
 
     }
 }
