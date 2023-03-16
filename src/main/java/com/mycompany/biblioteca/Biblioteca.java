@@ -5,6 +5,11 @@
 
 package com.mycompany.biblioteca;
 
+import Controller.UserController;
+import Data.UserData;
+import Model.User;
+import View.CreateUserView;
+
 /**
  *
  * @author franc
@@ -12,6 +17,12 @@ package com.mycompany.biblioteca;
 public class Biblioteca {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        CreateUserView createUserView = new CreateUserView();
+        UserData userData = new UserData();
+        UserController userController = new UserController(createUserView, userData);
+
+        User user = userController.createUser();
+
     }
 }
+

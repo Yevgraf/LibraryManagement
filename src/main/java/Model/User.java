@@ -4,13 +4,14 @@
  */
 package Model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
  *
  * @author franc
  */
-public class User {
+public class User implements Serializable {
     private int id;
     private String name;
     private String address;
@@ -22,6 +23,15 @@ public class User {
 
     public User(int id, String name, String address, LocalDate birthDate, String phone, String email, String password) {
         this.id = id;
+        this.name = name;
+        this.address = address;
+        this.birthDate = birthDate;
+        this.phone = phone;
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(String name, String address, LocalDate birthDate, String phone, String email, String password) {
         this.name = name;
         this.address = address;
         this.birthDate = birthDate;
@@ -88,4 +98,17 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public String toString() {
+        return String.format("User:\n" +
+                        "\tName: %s\n" +
+                        "\tAddress: %s\n" +
+                        "\tBirth Date: %s\n" +
+                        "\tPhone: %s\n" +
+                        "\tEmail: %s\n" +
+                        "\tPassword: %s\n",
+                name, address, birthDate, phone, email, password);
+    }
+
 }
