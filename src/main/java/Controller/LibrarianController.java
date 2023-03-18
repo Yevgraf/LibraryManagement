@@ -1,39 +1,27 @@
 package Controller;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import Data.LibrarianData;
 import Model.Librarian;
 import View.CreateLibrarianView;
 
-import java.util.List;
-
 public class LibrarianController {
-    private CreateLibrarianView createLibrarianView;
     private LibrarianData librarianData;
 
-    public LibrarianController(CreateLibrarianView createLibrarianView, LibrarianData librarianData) {
-        this.createLibrarianView = createLibrarianView;
+    public LibrarianController(LibrarianData librarianData) {
         this.librarianData = librarianData;
     }
-
-    public Librarian createLibrarian() {
-        Librarian librarian = createLibrarianView.createUser();
-        List<Librarian> userList = librarianData.load();
-        userList.add(librarian);
-        librarianData.save(userList);
-        createLibrarianView.displayUser(librarian);
-        System.out.println("Bibliotecário  criado e guardado com sucesso.");
-    return librarian;
+    public void createLibrarian(String name, String address, LocalDate birthDate, String phone, String email, String password) {
+        List<Librarian> librarianList = librarianData.load();
+        Librarian librarian = new Librarian(name, address, birthDate, phone, email, password);
+        librarianList.add(librarian);
+        librarianData.save(librarianList);
     }
 
 
-    public void listLibrarians() {
-        List<Librarian> userList = librarianData.load();
-        if (userList.isEmpty() || userList == null) {
-            System.out.println("Não existem Bibliotecário  guardados.");
-        } else {
-            for (Librarian librarian : userList) {
-                System.out.println(librarian);
-            }
-        }
+    public List<Librarian> listLibrarians() {
+        return librarianData.load();
     }
 }

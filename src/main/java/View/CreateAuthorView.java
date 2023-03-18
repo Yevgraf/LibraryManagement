@@ -5,6 +5,9 @@ import Model.Author;
 import java.time.LocalDate;
 import java.util.Scanner;
 
+import java.time.LocalDate;
+import java.util.Scanner;
+
 public class CreateAuthorView {
     private Scanner input;
 
@@ -37,3 +40,4 @@ public class CreateAuthorView {
         System.out.println(author);
     }
 }
+

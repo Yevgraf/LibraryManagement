@@ -8,6 +8,7 @@ package com.mycompany.biblioteca;
 import Controller.LibrarianController;
 import Data.LibrarianData;
 import View.CreateLibrarianView;
+import View.LibrarianMenu;
 
 /**
  * @author franc
@@ -15,14 +16,8 @@ import View.CreateLibrarianView;
 public class Biblioteca {
 
     public static void main(String[] args) {
-        CreateLibrarianView createUserView = new CreateLibrarianView();
-        LibrarianData librarianData = new LibrarianData();
-        LibrarianController librarianController = new LibrarianController(createUserView, librarianData);
-
-        //Librarian librarian = librarianController.createLibrarian();
-
-        librarianController.listLibrarians();
-
+        LibrarianMenu librarianMenu = new LibrarianMenu();
+        librarianMenu.start();
 
     }
 }

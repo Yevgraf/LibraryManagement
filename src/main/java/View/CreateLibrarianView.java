@@ -3,17 +3,19 @@ package View;
 import java.time.LocalDate;
 import java.util.Scanner;
 
+import Controller.LibrarianController;
 import Model.Librarian;
-import Model.User;
 
 public class CreateLibrarianView {
     private Scanner input;
+    private LibrarianController controller;
 
-    public CreateLibrarianView() {
+    public CreateLibrarianView(LibrarianController controller) {
         input = new Scanner(System.in);
+        this.controller = controller;
     }
 
-    public Librarian createUser() {
+    public Librarian createLibrarian() {
         System.out.println("Criar novo utilizador");
         System.out.println("--------------------");
 
@@ -36,15 +38,12 @@ public class CreateLibrarianView {
         System.out.print("Password: ");
         String password = input.nextLine();
 
-        Librarian user = new Librarian(name, address, birthDate, phone, email, password);
-        System.out.println("Utilizador criado: " + user);
-
-
-        return user;
+        return new Librarian(name, address, birthDate, phone, email, password);
     }
 
-    public void displayUser(User user) {
-        System.out.println("Utilizador criado:");
-        System.out.println(user);
+
+    public void displayLibrarian(Librarian librarian) {
+        System.out.println("Bibliotecário criado:");
+        System.out.println(librarian);
     }
 }
