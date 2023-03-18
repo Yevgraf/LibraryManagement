@@ -1,30 +1,39 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
- */
-
 package com.mycompany.biblioteca;
 
-import Controller.UserController;
-import Data.LibrarianData;
-import Model.Librarian;
-import View.CreateLibrarianView;
+import java.util.Scanner;
 
-import java.util.List;
+import Model.Book;
+import Model.BookList;
+import View.CreateBookView;
 
-/**
- * @author franc
- */
 public class Biblioteca {
-
     public static void main(String[] args) {
-        CreateLibrarianView createUserView = new CreateLibrarianView();
-        LibrarianData librarianData = new LibrarianData();
-        UserController userController = new UserController(createUserView, librarianData);
+        Scanner scanner = new Scanner(System.in);
+        BookList bookList = new BookList();
 
-        Librarian librarian = userController.createLibrarian();
+        while (true) {
+            System.out.println("Select an option:");
+            System.out.println("1 - Add book");
+            System.out.println("2 - List books");
+            System.out.println("0 - Quit");
 
+            int option = scanner.nextInt();
+            scanner.nextLine();
 
+            if (option == 1) {
+                CreateBookView createBookView = new CreateBookView(scanner);
+                Book book = createBookView.show();
+                bookList.addBook(book);
+                System.out.println("Book added successfully!");
+            } else if (option == 2) {
+                bookList.listBooks();
+            } else if (option == 0) {
+                break;
+            } else {
+                System.out.println("Invalid option, try again.");
+            }
+
+            System.out.println();
+        }
     }
 }
-
