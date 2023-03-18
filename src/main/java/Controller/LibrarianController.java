@@ -6,11 +6,11 @@ import View.CreateLibrarianView;
 
 import java.util.List;
 
-public class UserController {
+public class LibrarianController {
     private CreateLibrarianView createLibrarianView;
     private LibrarianData librarianData;
 
-    public UserController(CreateLibrarianView createLibrarianView, LibrarianData librarianData) {
+    public LibrarianController(CreateLibrarianView createLibrarianView, LibrarianData librarianData) {
         this.createLibrarianView = createLibrarianView;
         this.librarianData = librarianData;
     }
@@ -28,7 +28,7 @@ public class UserController {
 
     public void listLibrarians() {
         List<Librarian> userList = librarianData.load();
-        if (userList.isEmpty()) {
+        if (userList.isEmpty() || userList == null) {
             System.out.println("Não existem Bibliotecário  guardados.");
         } else {
             for (Librarian librarian : userList) {

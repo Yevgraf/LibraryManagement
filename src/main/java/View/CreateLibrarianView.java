@@ -40,9 +40,9 @@ public class CreateLibrarianView {
         System.out.println("Utilizador criado: " + user);
 
 
-
         return user;
     }
+
     public void displayUser(User user) {
         System.out.println("Utilizador criado:");
         System.out.println(user);

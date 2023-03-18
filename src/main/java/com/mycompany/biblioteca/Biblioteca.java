@@ -5,12 +5,9 @@
 
 package com.mycompany.biblioteca;
 
-import Controller.UserController;
+import Controller.LibrarianController;
 import Data.LibrarianData;
-import Model.Librarian;
 import View.CreateLibrarianView;
-
-import java.util.List;
 
 /**
  * @author franc
@@ -20,9 +17,11 @@ public class Biblioteca {
     public static void main(String[] args) {
         CreateLibrarianView createUserView = new CreateLibrarianView();
         LibrarianData librarianData = new LibrarianData();
-        UserController userController = new UserController(createUserView, librarianData);
+        LibrarianController librarianController = new LibrarianController(createUserView, librarianData);
 
-        Librarian librarian = userController.createLibrarian();
+        //Librarian librarian = librarianController.createLibrarian();
+
+        librarianController.listLibrarians();
 
 
     }

@@ -60,4 +60,15 @@ public class Author {
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Author:\n" +
+                        "\tID: %d\n" +
+                        "\tName: %s\n" +
+                        "\tAddress: %s\n" +
+                        "\tBirth Date: %s\n",
+                id, name, address, birthDate);
+    }
+
 }
