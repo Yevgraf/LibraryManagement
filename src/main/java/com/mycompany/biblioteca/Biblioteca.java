@@ -9,6 +9,7 @@ import Controller.LibrarianController;
 import Data.LibrarianData;
 import View.CreateLibrarianView;
 import View.LibrarianMenu;
+import View.MainMenu;
 
 /**
  * @author franc
@@ -16,8 +17,8 @@ import View.LibrarianMenu;
 public class Biblioteca {
 
     public static void main(String[] args) {
-        LibrarianMenu librarianMenu = new LibrarianMenu();
-        librarianMenu.start();
+        MainMenu mainMenu = new MainMenu();
+        mainMenu.displayMenu();
 
     }
 }

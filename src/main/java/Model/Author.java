@@ -4,13 +4,14 @@
  */
 package Model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
  *
  * @author franc
  */
-public class Author {
+public class Author implements Serializable {
     private static int counter = 0;
     private int id;
     private String name;

@@ -1,49 +1,49 @@
 package View;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 
 import Controller.LibrarianController;
 import Model.Librarian;
 
 public class CreateLibrarianView {
-    private Scanner input;
-    private LibrarianController controller;
+    private Scanner scanner;
+    private LibrarianController librarianController;
 
     public CreateLibrarianView(LibrarianController controller) {
-        input = new Scanner(System.in);
-        this.controller = controller;
+        scanner = new Scanner(System.in);
+        librarianController = controller;
     }
 
-    public Librarian createLibrarian() {
-        System.out.println("Criar novo utilizador");
-        System.out.println("--------------------");
-
+    public void createLibrarian() {
         System.out.print("Nome: ");
-        String name = input.nextLine();
+        String name = scanner.nextLine();
 
         System.out.print("Morada: ");
-        String address = input.nextLine();
+        String address = scanner.nextLine();
 
         System.out.print("Data de nascimento (AAAA-MM-DD): ");
-        String birthDateStr = input.nextLine();
+        String birthDateStr = scanner.nextLine();
         LocalDate birthDate = LocalDate.parse(birthDateStr);
 
         System.out.print("Telefone: ");
-        String phone = input.nextLine();
+        String phone = scanner.nextLine();
 
         System.out.print("Email: ");
-        String email = input.nextLine();
+        String email = scanner.nextLine();
 
         System.out.print("Password: ");
-        String password = input.nextLine();
+        String password = scanner.nextLine();
 
-        return new Librarian(name, address, birthDate, phone, email, password);
+        librarianController.createLibrarian(name, address, birthDate, phone, email, password);
+        System.out.println("Bibliotecário criado e guardado com sucesso.");
     }
 
-
-    public void displayLibrarian(Librarian librarian) {
-        System.out.println("Bibliotecário criado:");
-        System.out.println(librarian);
+    public void listLibrarians() {
+        List<Librarian> librarians = librarianController.listLibrarians();
+        for (Librarian librarian : librarians) {
+            System.out.println(librarian);
+        }
     }
 }

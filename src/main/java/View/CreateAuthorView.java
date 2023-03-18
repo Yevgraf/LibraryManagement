@@ -1,43 +1,40 @@
 package View;
 
+import Controller.AuthorController;
 import Model.Author;
 
 import java.time.LocalDate;
-import java.util.Scanner;
-
-import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 
 public class CreateAuthorView {
-    private Scanner input;
+    private Scanner scanner;
+    private AuthorController authorController;
 
-    public CreateAuthorView() {
-        input = new Scanner(System.in);
+    public CreateAuthorView(AuthorController controller) {
+        scanner = new Scanner(System.in);
+        authorController = controller;
     }
 
-    public Author createAuthor() {
-        System.out.println("Criar novo autor");
-        System.out.println("--------------------");
-
+    public void createAuthor() {
         System.out.print("Nome: ");
-        String name = input.nextLine();
+        String name = scanner.nextLine();
 
         System.out.print("Morada: ");
-        String address = input.nextLine();
+        String address = scanner.nextLine();
 
         System.out.print("Data de nascimento (AAAA-MM-DD): ");
-        String birthDateStr = input.nextLine();
+        String birthDateStr = scanner.nextLine();
         LocalDate birthDate = LocalDate.parse(birthDateStr);
 
-        Author author = new Author(name, address, birthDate);
-        System.out.println("Autor criado: " + author);
-
-        return author;
+        authorController.createAuthor(name, address, birthDate);
+        System.out.println("Autor criado e guardado com sucesso.");
     }
 
-    public void displayAuthor(Author author) {
-        System.out.println("Autor criado:");
-        System.out.println(author);
+    public void listAuthors() {
+        List<Author> authors = authorController.getAllAuthors();
+        for (Author author : authors) {
+            System.out.println(author);
+        }
     }
 }
-
