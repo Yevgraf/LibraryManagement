@@ -4,17 +4,22 @@
  */
 package Model;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * @author franc
  */
-public class Card {
+public class Card implements Serializable {
     private static int counter = 0;
     private int id;
     private Member member;
     private String cardNumber;
     private int borrowedBooks;
+    private static final long serialVersionUID = 1L;
+
+
 
     public Card(Member member, String cardNumber) {
         this.id = counter++;
@@ -59,4 +64,19 @@ public class Card {
     public void returnBook() {
         borrowedBooks--;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Card{%n" +
+                        "    member=%s%n" +
+                        "    cardNumber='%s'%n" +
+                        "    borrowedBooks=%s%n" +
+                        "}",
+                member,
+                cardNumber,
+                borrowedBooks
+        );
+    }
+
 }

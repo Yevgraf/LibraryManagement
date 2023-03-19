@@ -4,13 +4,14 @@
  */
 package Model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
  *
  * @author franc
  */
-public class Author {
+public class Author implements Serializable {
     private static int counter = 0;
     private int id;
     private String name;
@@ -60,4 +61,15 @@ public class Author {
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Author:\n" +
+                        "\tID: %d\n" +
+                        "\tName: %s\n" +
+                        "\tAddress: %s\n" +
+                        "\tBirth Date: %s\n",
+                id, name, address, birthDate);
+    }
+
 }

@@ -5,12 +5,11 @@
 
 package com.mycompany.biblioteca;
 
-import Controller.UserController;
+import Controller.LibrarianController;
 import Data.LibrarianData;
-import Model.Librarian;
 import View.CreateLibrarianView;
-
-import java.util.List;
+import View.LibrarianMenu;
+import View.MainMenu;
 
 /**
  * @author franc
@@ -18,12 +17,8 @@ import java.util.List;
 public class Biblioteca {
 
     public static void main(String[] args) {
-        CreateLibrarianView createUserView = new CreateLibrarianView();
-        LibrarianData librarianData = new LibrarianData();
-        UserController userController = new UserController(createUserView, librarianData);
-
-        Librarian librarian = userController.createLibrarian();
-
+        MainMenu mainMenu = new MainMenu();
+        mainMenu.displayMenu();
 
     }
 }

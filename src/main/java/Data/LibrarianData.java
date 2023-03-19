@@ -31,7 +31,6 @@ public class LibrarianData {
         }
     }
 
-
     public static List<Librarian> load() {
         List<Librarian> userList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
@@ -44,4 +43,5 @@ public class LibrarianData {
         }
         return userList;
     }
+
 }
