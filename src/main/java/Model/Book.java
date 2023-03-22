@@ -48,9 +48,12 @@ public class Book {
 
     @Override
     public String toString() {
+        String firstLetter = this.genre.substring(0, 1).toUpperCase();
+        String restOfGenre = this.genre.substring(1).toLowerCase();
+        String formattedGenre = firstLetter + restOfGenre;
         return "Title: " + this.title +
                 ", Author: " + this.author +
-                ", Genre: " + this.genre +
+                ", Genre: " + formattedGenre +
                 ", Publication Date: " + dateFormat.format(this.publicationDate);
     }
 }
