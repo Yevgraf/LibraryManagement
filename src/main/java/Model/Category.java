@@ -32,4 +32,8 @@ public class Category {
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
+
+    public static Category valueOf(String input) {
+        return null;
+    }
 }

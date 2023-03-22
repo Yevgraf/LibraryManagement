@@ -29,4 +29,8 @@ public class AgeRange {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public static AgeRange valueOf(String upperCase) {
+        return null;
+    }
 }

@@ -1,40 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Model;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- *
- * @author franc
- */
 public class Author {
-    private static int counter = 0;
-    private int id;
     private String name;
-    private String address;
-    private LocalDate birthDate;
+    private List<Book> books;
 
-    public Author(String name, String address, LocalDate birthDate) {
-
-        this.id = counter++;
+    public Author(String name) {
         this.name = name;
-        this.address = address;
-        this.birthDate = birthDate;
-    }
-
-    public Author(){
-
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        this.books = new ArrayList<>();
     }
 
     public String getName() {
@@ -45,19 +20,16 @@ public class Author {
         this.name = name;
     }
 
-    public String getAddress() {
-        return address;
+    public void addBook(Book book) {
+        books.add(book);
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public List<Book> getBooks() {
+        return books;
     }
 
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
+    @Override
+    public String toString() {
+        return name;
     }
 }

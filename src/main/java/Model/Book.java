@@ -1,14 +1,19 @@
 package Model;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Book {
     private String title;
     private String author;
-    private int publicationYear;
+    private String genre;
+    private Date publicationDate;
 
-    public Book(String title, String author, int publicationYear) {
+    public Book(String title, String author, String genre, Date publicationDate) {
         this.title = title;
         this.author = author;
-        this.publicationYear = publicationYear;
+        this.genre = genre;
+        this.publicationDate = publicationDate;
     }
 
     public String getTitle() {
@@ -19,7 +24,33 @@ public class Book {
         return author;
     }
 
-    public int getPublicationYear() {
-        return publicationYear;
+    public String getGenre() {
+        return genre;
+    }
+
+    public Date getPublicationDate() {
+        return publicationDate;
+    }
+
+    public static boolean isValidGenre(String genre) {
+        String[] validGenres = { "Romance", "Mystery", "Science Fiction", "Fantasy", "Horror", "Historical Fiction",
+                "Thriller", "Biography", "Autobiography", "Memoir", "Self-Help", "Travel",
+                "Cookbooks", "Poetry", "Drama" };
+        for (String validGenre : validGenres) {
+            if (validGenre.equalsIgnoreCase(genre)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+    @Override
+    public String toString() {
+        return "Title: " + this.title +
+                ", Author: " + this.author +
+                ", Genre: " + this.genre +
+                ", Publication Date: " + dateFormat.format(this.publicationDate);
     }
 }

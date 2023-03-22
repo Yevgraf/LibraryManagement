@@ -1,39 +1,42 @@
 package com.mycompany.biblioteca;
 
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 import Model.Book;
-import Model.BookList;
 import View.CreateBookView;
 
 public class Biblioteca {
+    private static List<Book> books = new ArrayList<Book>();
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        BookList bookList = new BookList();
-
         while (true) {
-            System.out.println("Select an option:");
-            System.out.println("1 - Add book");
-            System.out.println("2 - List books");
-            System.out.println("0 - Quit");
+            System.out.println("Welcome to the Library!");
+            System.out.println("1. Add book");
+            System.out.println("2. List books");
+            System.out.println("3. Quit");
 
-            int option = scanner.nextInt();
-            scanner.nextLine();
+            int choice = Integer.parseInt(System.console().readLine());
 
-            if (option == 1) {
-                CreateBookView createBookView = new CreateBookView(scanner);
-                Book book = createBookView.show();
-                bookList.addBook(book);
-                System.out.println("Book added successfully!");
-            } else if (option == 2) {
-                bookList.listBooks();
-            } else if (option == 0) {
-                break;
-            } else {
-                System.out.println("Invalid option, try again.");
+            switch (choice) {
+                case 1:
+                    CreateBookView createBookView = new CreateBookView();
+                    Book book = createBookView.createBook();
+                    books.add(book);
+                    System.out.println("Book added successfully!");
+                    break;
+                case 2:
+                    for (Book b : books) {
+                        System.out.println(b);
+                    }
+                    break;
+                case 3:
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please choose again.");
+                    break;
             }
-
-            System.out.println();
         }
     }
 }
