@@ -1,10 +1,13 @@
 package Data;
 
 import Model.AgeRange;
+import Model.Category;
+import View.AgeRangeMenu;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AgeRangeData {
     private static final String FILENAME = "FaixaEtaria.ser";
@@ -42,4 +45,15 @@ public class AgeRangeData {
         }
         return ageRanges;
     }
+
+    public AgeRange findByName(String name) {
+        List<AgeRange> ageRangeList = load();
+        for (AgeRange ageRange : ageRangeList) {
+            if (ageRange.getDescription().equals(name)) {
+                return ageRange;
+            }
+        }
+        return null;
+    }
+
 }

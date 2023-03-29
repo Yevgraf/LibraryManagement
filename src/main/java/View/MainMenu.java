@@ -17,6 +17,7 @@ public class MainMenu {
     private PublisherMenu publisherMenu;
     private CategoryMenu categoryMenu;
     private AgeRangeMenu ageRangeMenu;
+    private BookMenu bookMenu;
 
     public MainMenu() {
         scanner = new Scanner(System.in);
@@ -30,6 +31,7 @@ public class MainMenu {
         publisherMenu = new PublisherMenu(this);
         categoryMenu = new CategoryMenu(this);
         ageRangeMenu = new AgeRangeMenu(this);
+        bookMenu = new BookMenu(this);
 
     }
 
@@ -46,7 +48,7 @@ public class MainMenu {
             System.out.println("4 - Gestão de editoras");
             System.out.println("5 - Gestão de categorias");
             System.out.println("6 - Gestão de faixa etária");
-            System.out.println("7 - Reserva de livros");
+            System.out.println("7 - Gestão de livros");
             System.out.println("0 - Sair");
 
             option = scanner.nextInt();
@@ -72,7 +74,7 @@ public class MainMenu {
                     ageRangeMenu.start();
                     break;
                 case 7:
-                    //LivrosMenu
+                     bookMenu.displayMenu();
                     break;
                 case 0:
                     System.out.println("Até logo!");

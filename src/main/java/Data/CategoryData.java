@@ -7,34 +7,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryData {
+    private static final String FILENAME = "Category.ser";
 
-    private static final String FILENAME = "categories.ser";
-
-    public static void save(List<Category> categories) {
+    public static void save(List<Category> categoryList) {
         try {
-            FileOutputStream fos = new FileOutputStream(FILENAME);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(categories);
-            oos.close();
-            System.out.println("Categories saved to file.");
+            FileOutputStream fos = null;
+            ObjectOutputStream out = null;
+            File file = new File(FILENAME);
+
+            if (!file.exists()) {
+                file.createNewFile();
+                System.out.println("Ficheiro de categorias criado.");
+            }
+
+            fos = new FileOutputStream(file);
+            out = new ObjectOutputStream(fos);
+            out.writeObject(categoryList);
+            System.out.println("Categorias guardadas no ficheiro.");
+            out.close();
         } catch (IOException e) {
-            System.err.println("Error saving categories to file: " + e.getMessage());
+            System.err.println("Erro ao guardar categorias no ficheiro: " + e.getMessage());
         }
     }
 
     public static List<Category> load() {
-        List<Category> categories = new ArrayList<>();
-        try {
-            FileInputStream fis = new FileInputStream(FILENAME);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            categories = (List<Category>) ois.readObject();
-            ois.close();
-            System.out.println("Categories loaded from file.");
+        List<Category> categoryList = new ArrayList<>();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
+            categoryList = (List<Category>) in.readObject();
+            System.out.println("Categorias carregadas do ficheiro.");
         } catch (FileNotFoundException e) {
-            System.out.println("No categories saved to file.");
+            System.out.println("Não foram encontradas categorias guardadas.");
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Error loading categories from file: " + e.getMessage());
+            System.err.println("Erro ao carregar categorias do ficheiro: " + e.getMessage());
         }
-        return categories;
+        return categoryList;
+    }
+
+    public static Category findByName(String name) {
+        List<Category> categoryList = load();
+        return categoryList.stream()
+                .filter(category -> category.getCategoryName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 }
+

@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import Model.AgeRange;
 import Model.Publisher;
 
 public class PublisherData {
@@ -42,4 +43,13 @@ public class PublisherData {
         }
         return publisherList;
     }
+
+    public static Publisher findByName(String name) {
+        List<Publisher> publisherList = load();
+        return publisherList.stream()
+                .filter(publisher -> publisher.getName().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
 }

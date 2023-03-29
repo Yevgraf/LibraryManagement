@@ -7,11 +7,10 @@ package Model;
 import java.time.LocalDate;
 
 /**
- *
  * @author franc
  */
 public class Book {
-
+    private static final long serialVersionUID = 1L;
     private static int counter = 0;
     private int id;
     private String title;
@@ -37,9 +36,11 @@ public class Book {
         this.publisher = publisher;
         this.isbn = isbn;
     }
-public Book(){
 
-}
+    public Book() {
+
+    }
+
     public int getId() {
         return id;
     }
