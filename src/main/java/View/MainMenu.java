@@ -15,6 +15,7 @@ public class MainMenu {
     private MemberMenu memberMenu;
     private CardController cardController;
     private PublisherMenu publisherMenu;
+    private CategoryMenu categoryMenu;
 
     public MainMenu() {
         scanner = new Scanner(System.in);
@@ -26,6 +27,7 @@ public class MainMenu {
         librarianMenu = new LibrarianMenu(this);
         memberMenu = new MemberMenu(this, cardController);
         publisherMenu = new PublisherMenu(this);
+        categoryMenu = new CategoryMenu(this);
 
     }
 
@@ -61,7 +63,7 @@ public class MainMenu {
                     publisherMenu.start();
                     break;
                 case 5:
-                    // chamar gestao categorias
+                    categoryMenu.start();
                     break;
                 case 6:
                     // chamar gestao reserva
