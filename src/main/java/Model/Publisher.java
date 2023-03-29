@@ -1,8 +1,10 @@
 package Model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Publisher {
+public class Publisher implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static int counter = 0;
     private int id;
     private String name;
@@ -13,7 +15,8 @@ public class Publisher {
         this.name = name;
         this.address = address;
     }
-    public Publisher(){
+
+    public Publisher() {
 
     }
 
@@ -40,4 +43,13 @@ public class Publisher {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Editora:\n" +
+                        "\tNome: %s\n" +
+                        "\tMorada: %s\n",
+                name, address);
+    }
+
 }

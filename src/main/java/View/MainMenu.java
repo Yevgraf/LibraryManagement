@@ -14,6 +14,7 @@ public class MainMenu {
     private LibrarianMenu librarianMenu;
     private MemberMenu memberMenu;
     private CardController cardController;
+    private PublisherMenu publisherMenu;
 
     public MainMenu() {
         scanner = new Scanner(System.in);
@@ -24,6 +25,8 @@ public class MainMenu {
         authorMenu = new AuthorMenu(this);
         librarianMenu = new LibrarianMenu(this);
         memberMenu = new MemberMenu(this, cardController);
+        publisherMenu = new PublisherMenu(this);
+
     }
 
 
@@ -55,7 +58,7 @@ public class MainMenu {
                     memberMenu.start();
                     break;
                 case 4:
-                    // chamar gestao de editoras
+                    publisherMenu.start();
                     break;
                 case 5:
                     // chamar gestao categorias
@@ -65,6 +68,7 @@ public class MainMenu {
                     break;
                 case 0:
                     System.out.println("Até logo!");
+                    System.exit(0);
                     break;
                 default:
                     System.out.println("Opção inválida. Tente novamente.");

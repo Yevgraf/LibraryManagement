@@ -1,0 +1,58 @@
+package View;
+
+import java.util.List;
+import java.util.Scanner;
+
+import Controller.PublisherController;
+import Data.PublisherData;
+import Model.Publisher;
+
+public class PublisherMenu {
+    private Scanner scanner;
+    private PublisherController publisherController;
+    private CreatePublisherView createPublisherView;
+    private MainMenu mainMenu;
+
+    public PublisherMenu(MainMenu mainMenu) {
+        this.mainMenu = mainMenu;
+        scanner = new Scanner(System.in);
+        PublisherData publisherData = new PublisherData();
+        publisherController = new PublisherController(publisherData);
+        createPublisherView = new CreatePublisherView(publisherController);
+    }
+
+    public void start() {
+        while (true) {
+            System.out.println("Escolha uma opção:");
+            System.out.println("1. Criar editora");
+            System.out.println("2. Listar editoras");
+            System.out.println("3. Voltar");
+
+            int option = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (option) {
+                case 1:
+                    createPublisherView.createPublisher();
+                    break;
+                case 2:
+                    listPublishers();
+                    break;
+                case 3:
+                    System.out.println("Voltando...");
+                    mainMenu.displayMenu();
+                    return;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        }
+    }
+
+    private void listPublishers() {
+        List<Publisher> publishers = publisherController.listPublishers();
+        System.out.println("Lista de editoras:");
+        for (Publisher publisher : publishers) {
+            System.out.println(publisher.toString());
+        }
+    }
+}
