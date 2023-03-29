@@ -15,27 +15,34 @@ public class CreateMemberView {
     }
 
     public Member getMemberInfo() {
-        System.out.println("--- Cadastrar Novo Membro ---");
-        System.out.print("Nome completo: ");
+        System.out.println("--- Register New Member ---");
+        System.out.print("Full Name: ");
         String name = capitalizeWords(scanner.nextLine());
 
-        System.out.print("Endereço: ");
+        System.out.print("Address: ");
         String address = capitalizeWords(scanner.nextLine());
 
         LocalDate birthDate = null;
         boolean isValidDate = false;
         while (!isValidDate) {
             try {
-                System.out.print("Data de Nascimento (yyyy-mm-dd): ");
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                System.out.print("Date of Birth (dd/MM/yyyy): ");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 birthDate = LocalDate.parse(scanner.nextLine(), formatter);
-                isValidDate = true;
+
+                // Check that the member is at least 6 years old
+                LocalDate sixYearsAgo = LocalDate.now().minusYears(6);
+                if (birthDate.isBefore(sixYearsAgo)) {
+                    isValidDate = true;
+                } else {
+                    System.out.println("The member must be at least 6 years old.");
+                }
             } catch (DateTimeParseException e) {
-                System.out.println("Data inválida. Tente novamente.");
+                System.out.println("Invalid date format. Please try again.");
             }
         }
 
-        System.out.print("Telefone: ");
+        System.out.print("Phone: ");
         String phone = scanner.nextLine();
 
         System.out.print("Email: ");
@@ -58,5 +65,4 @@ public class CreateMemberView {
         }
         return sb.toString().trim();
     }
-
 }

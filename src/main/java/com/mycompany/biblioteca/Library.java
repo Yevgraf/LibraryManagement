@@ -7,6 +7,7 @@ import Model.Book;
 import Model.Member;
 import View.CreateBookView;
 import View.CreateMemberView;
+import View.CreateRequestBookView;
 
 public class Library {
     private static List<Book> books = new ArrayList<Book>();
@@ -18,8 +19,9 @@ public class Library {
             System.out.println("1. Register book");
             System.out.println("2. Register member");
             System.out.println("3. View book list");
-            System.out.println("4. Return book");
-            System.out.println("5. Quit");
+            System.out.println("4. Request book");
+            System.out.println("5. Return book");
+            System.out.println("6. Quit");
 
             int choice = Integer.parseInt(System.console().readLine());
 
@@ -31,8 +33,8 @@ public class Library {
                     System.out.println("Book registered successfully!");
                     break;
                 case 2:
-                     CreateMemberView createMemberView = new CreateMemberView();
-                     Member member = createMemberView.getMemberInfo();
+                    CreateMemberView createMemberView = new CreateMemberView();
+                    Member member = createMemberView.getMemberInfo();
                     members.add(member);
                     System.out.println("Member registered successfully!");
                     break;
@@ -43,10 +45,15 @@ public class Library {
                     }
                     break;
                 case 4:
+                CreateRequestBookView createRequestBookView = new CreateRequestBookView();
+                createRequestBookView.getRequestBookInfo(books, members);
+                System.out.println("Book request registered successfully!");                
+                break;              
+                case 5:
                     // To be implemented
                     System.out.println("Return book selected!");
                     break;
-                case 5:
+                case 6:
                     System.exit(0);
                     break;
                 default:

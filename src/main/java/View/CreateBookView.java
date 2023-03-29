@@ -63,10 +63,22 @@ public class CreateBookView {
         while (!isValidDate) {
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                dateFormat.setLenient(false);
                 publicationDate = dateFormat.parse(dateString);
+
+                // Check if publication date is before current date
+                Date currentDate = new Date();
+                if (publicationDate.after(currentDate)) {
+                    throw new IllegalArgumentException("Invalid date. Publication date cannot be in the future.");
+                }
+
                 isValidDate = true;
             } catch (ParseException e) {
                 System.out.println("Invalid date format. Please try again.");
+                System.out.println("Enter book publication date (dd/MM/yyyy):");
+                dateString = scanner.nextLine();
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
                 System.out.println("Enter book publication date (dd/MM/yyyy):");
                 dateString = scanner.nextLine();
             }
