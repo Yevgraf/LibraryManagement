@@ -8,6 +8,7 @@ import Model.Member;
 import View.CreateBookView;
 import View.CreateMemberView;
 import View.CreateRequestBookView;
+import View.ReturnBookView;
 
 public class Library {
     private static List<Book> books = new ArrayList<Book>();
@@ -23,7 +24,15 @@ public class Library {
             System.out.println("5. Return book");
             System.out.println("6. Quit");
 
-            int choice = Integer.parseInt(System.console().readLine());
+            String choiceStr = System.console().readLine();
+            int choice;
+
+            try {
+                choice = Integer.parseInt(choiceStr);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid choice. Please choose again.");
+                continue;
+            }
 
             switch (choice) {
                 case 1:
@@ -45,13 +54,14 @@ public class Library {
                     }
                     break;
                 case 4:
-                CreateRequestBookView createRequestBookView = new CreateRequestBookView();
-                createRequestBookView.getRequestBookInfo(books, members);
-                System.out.println("Book request registered successfully!");                
-                break;              
+                    CreateRequestBookView createRequestBookView = new CreateRequestBookView();
+                    createRequestBookView.getRequestBookInfo(books, members);
+                    System.out.println("Book request registered successfully!");
+                    break;
                 case 5:
-                    // To be implemented
-                    System.out.println("Return book selected!");
+                    ReturnBookView returnBookView = new ReturnBookView();
+                    returnBookView.getReturnBookInfo(members);
+                    System.out.println("Book returned successfully!");
                     break;
                 case 6:
                     System.exit(0);

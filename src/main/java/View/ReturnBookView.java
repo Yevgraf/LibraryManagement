@@ -3,7 +3,6 @@ package View;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -12,152 +11,77 @@ import Model.Member;
 
 public class ReturnBookView {
     private Scanner scanner;
-    private List<Book> books;
-    private List<Member> members;
-    private List<Loan> loans;
 
-    public ReturnBookView(List<Book> books, List<Member> members) {
+    public ReturnBookView() {
         scanner = new Scanner(System.in);
-        this.books = books;
-        this.members = members;
-        this.loans = new ArrayList<>();
     }
 
-    public void showReturnBookMenu() {
-        System.out.println("--- Return Book Menu ---");
-        System.out.println("1. Search for book");
-        System.out.println("2. Search for member");
-        System.out.println("3. Show all loans");
-        System.out.println("4. Go back to main menu");
+    public void getReturnBookInfo(List<Member> members) {
+        System.out.println("--- Return a book ---");
 
-        int option = getValidOption("Enter an option: ", 1, 4);
-
-        switch (option) {
-            case 1:
-                searchForBook();
-                break;
-            case 2:
-                searchForMember();
-                break;
-            case 3:
-                showAllLoans();
-                break;
-            case 4:
-                break;
+        // Display list of members
+        System.out.println("Registered members:");
+        for (int i = 0; i < members.size(); i++) {
+            System.out.println((i + 1) + ". " + members.get(i).getName());
         }
-    }
 
-    private void searchForBook() {
-        System.out.println("--- Search for book ---");
-
-        int bookIndex = getValidIndex("Enter the index of the book you want to return: ", books.size());
-        Book book = books.get(bookIndex);
-
-        int loanIndex = getLoanIndexByBookId(book.getId());
-        if (loanIndex == -1) {
-            System.out.println("This book is not currently on loan.");
-        } else {
-            Loan loan = loans.get(loanIndex);
-            Member member = getMemberById(loan.getMemberId());
-
-            System.out.println("Book: " + book.getTitle());
-            System.out.println("Author: " + book.getAuthor());
-            System.out.println("Publication Date: " + book.getPublicationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            System.out.println("Loaned to: " + member.getName());
-            System.out.println("Loan Date: " + loan.getLoanDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            System.out.println("Return Date: " + loan.getReturnDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-
-            LocalDate currentDate = LocalDate.now();
-            int daysOverdue = (int) Math.max(currentDate.toEpochDay() - loan.getReturnDate().toEpochDay(), 0);
-            if (daysOverdue == 0) {
-                System.out.println("Book returned on time.");
-            } else {
-                double fine = 3 + daysOverdue * 1;
-                System.out.println("Book is " + daysOverdue + " days overdue. You owe a fine of " + String.format("%.2f", fine) + " euros.");
-            }
-
-            loans.remove(loanIndex);
-        }
-    }
-
-    private void searchForMember() {
-        System.out.println("--- Search for member ---");
-    
-        int memberIndex = getValidIndex("Enter the index of the member: ", members.size());
+        // Select member
+        int memberIndex = getValidIndex("Select the member who wants to return a book (enter the corresponding number): ", members.size());
         Member member = members.get(memberIndex);
-    
-        boolean loanFound = false;
-    
-        for (Loan loan : loans) {
-            if (loan.getMemberId() == member.getId()) {
-                loanFound = true;
-                Book book = getBookById(loan.getBookId());
-    
-                System.out.println("Book: " + book.getTitle());
-                System.out.println("Author: " + book.getAuthor());
-                System.out.println("Publication Date: " + book.getPublicationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                System.out.println("Loan Date: " + loan.getLoanDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                System.out.println("Return Date: " + loan.getReturnDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-    
-                LocalDate currentDate = LocalDate.now();
-                int daysOverdue = (int) Math.max(currentDate.toEpochDay() - loan.getReturnDate().toEpochDay(), 0);
-                if (daysOverdue == 0) {
-                    System.out.println("Book returned on time.");
-                } else {
-                    double fine = 3 + daysOverdue * 1;
-                    System.out.println("Book is " + daysOverdue + " days overdue. You owe a fine of " + String.format("%.2f", fine) + " euros.");
+
+        // Display list of book loans for the selected member
+        List<Book> memberBooks = member.getBooks();
+        System.out.println("Books loaned by " + member.getName() + ":");
+        for (int i = 0; i < memberBooks.size(); i++) {
+            Book book = memberBooks.get(i);
+            LocalDate loanDate = member.getLoanDate(book);
+            System.out.println((i + 1) + ". " + book.getTitle() + " (loaned on " + loanDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ")");
+        }
+
+        // Select book
+        int bookIndex = getValidIndex("Select the book to return (enter the corresponding number): ", memberBooks.size());
+        Book book = memberBooks.get(bookIndex);
+
+        // Get return date
+        LocalDate returnDate = null;
+        while (returnDate == null) {
+            System.out.print("Enter the return date (in the format dd/MM/yyyy): ");
+            String dateString = scanner.nextLine();
+            try {
+                returnDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                LocalDate loanDate = member.getLoanDate(book);
+                if (returnDate.isBefore(loanDate) || returnDate.isAfter(LocalDate.now())) {
+                    throw new DateTimeParseException("", "", 0);
                 }
-    
-                loans.remove(loan);
-                break;
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date. Date should be on or after the loan date and before or on today's date. Please try again.");
+                returnDate = null;
             }
         }
-    
-        if (!loanFound) {
-            System.out.println("No loans found for this member.");
-        }
+
+        // Remove book loan from member's book loans
+        member.returnBook(book);
+
+        System.out.println("Book returned successfully.");
     }
-    private void showAllLoans() {
-        System.out.println("--- All Loans ---");
-    
-        for (Loan loan : loans) {
-            Book book = getBookById(loan.getBookId());
-            Member member = getMemberById(loan.getMemberId());
-    
-            System.out.println("Book: " + book.getTitle());
-            System.out.println("Author: " + book.getAuthor());
-            System.out.println("Publication Date: " + book.getPublicationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            System.out.println("Loaned to: " + member.getName());
-            System.out.println("Loan Date: " + loan.getLoanDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            System.out.println("Return Date: " + loan.getReturnDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-    
-            LocalDate currentDate = LocalDate.now();
-            int daysOverdue = (int) Math.max(currentDate.toEpochDay() - loan.getReturnDate().toEpochDay(), 0);
-            if (daysOverdue == 0) {
-                System.out.println("Book returned on time.");
-            } else {
-                double fine = 3 + daysOverdue * 1;
-                System.out.println("Book is " + daysOverdue + " days overdue. You owe a fine of " + String.format("%.2f", fine) + " euros.");
+
+    private int getValidIndex(String message, int size) {
+        while (true) {
+            System.out.print(message);
+            try {
+                int index = Integer.parseInt(scanner.nextLine()) - 1;
+                if (index >= 0 && index < size) {
+                    return index;
+                } else {
+                    displayErrorMessage("Invalid index. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                displayErrorMessage("Invalid input. Please try again.");
             }
         }
     }
-    
-    private int getLoanIndexByBookId(int bookId) {
-        for (int i = 0; i < loans.size(); i++) {
-            if (loans.get(i).getBookId() == bookId) {
-                return i;
-            }
-        }
-        return -1;
+
+    private void displayErrorMessage(String message) {
+        System.out.println("Error: " + message);
     }
-    
-    private Member getMemberById(int memberId) {
-        for (Member member : members) {
-            if (member.getId() == memberId) {
-                return member;
-            }
-        }
-        return null;
-    }
-        
-    
+}
