@@ -1,68 +1,46 @@
 package View;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
 
+import Controller.MemberController;
 import Model.Member;
 
 public class CreateMemberView {
     private Scanner scanner;
+    private MemberController memberController;
 
-    public CreateMemberView() {
+    public CreateMemberView(MemberController controller) {
         scanner = new Scanner(System.in);
+        memberController = controller;
     }
 
-    public Member getMemberInfo() {
-        System.out.println("--- Register New Member ---");
-        System.out.print("Full Name: ");
-        String name = capitalizeWords(scanner.nextLine());
+    public void createMember() {
+        System.out.print("Nome: ");
+        String name = scanner.nextLine();
 
-        System.out.print("Address: ");
-        String address = capitalizeWords(scanner.nextLine());
+        System.out.print("Morada: ");
+        String address = scanner.nextLine();
 
-        LocalDate birthDate = null;
-        boolean isValidDate = false;
-        while (!isValidDate) {
-            try {
-                System.out.print("Date of Birth (dd/MM/yyyy): ");
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                birthDate = LocalDate.parse(scanner.nextLine(), formatter);
+        System.out.print("Data de nascimento (AAAA-MM-DD): ");
+        String birthDateStr = scanner.nextLine();
+        LocalDate birthDate = LocalDate.parse(birthDateStr);
 
-                // Check that the member is at least 6 years old
-                LocalDate sixYearsAgo = LocalDate.now().minusYears(6);
-                if (birthDate.isBefore(sixYearsAgo)) {
-                    isValidDate = true;
-                } else {
-                    System.out.println("The member must be at least 6 years old.");
-                }
-            } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format. Please try again.");
-            }
-        }
-
-        System.out.print("Phone: ");
+        System.out.print("Telefone: ");
         String phone = scanner.nextLine();
 
         System.out.print("Email: ");
         String email = scanner.nextLine();
 
-        Member member = new Member(name, address, birthDate, phone, email);
-
-        return member;
+        memberController.createMember(name, address, birthDate, phone, email);
+        System.out.println("Membro criado e guardado com sucesso.");
     }
 
-    private String capitalizeWords(String str) {
-        StringBuilder sb = new StringBuilder();
-        String[] words = str.split("\\s");
-        for (String word : words) {
-            if (word.length() > 0) {
-                sb.append(Character.toUpperCase(word.charAt(0)));
-                sb.append(word.substring(1).toLowerCase());
-                sb.append(" ");
-            }
+    public void listMembers() {
+        List<Member> members = memberController.listMembers();
+        for (Member member : members) {
+            System.out.println(member);
         }
-        return sb.toString().trim();
     }
 }

@@ -1,8 +1,10 @@
 package Model;
 
-public class Category {
+import java.io.Serializable;
 
+public class Category implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private static int counter = 0;
     private int categoryId;
     private String categoryName;
@@ -32,8 +34,10 @@ public class Category {
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
-
-    public static Category valueOf(String input) {
-        return null;
+    @Override
+    public String toString() {
+        return categoryName;
     }
+
+
 }

@@ -1,6 +1,9 @@
 package Model;
 
-public class AgeRange {
+import java.io.Serializable;
+
+public class AgeRange implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static int counter = 0;
     private int id;
     private String description;
@@ -29,8 +32,8 @@ public class AgeRange {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public static AgeRange valueOf(String upperCase) {
-        return null;
+    @Override
+    public String toString() {
+        return description;
     }
 }

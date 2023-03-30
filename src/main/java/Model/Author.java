@@ -1,15 +1,41 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package Model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
+import java.time.LocalDate;
 
-public class Author {
+/**
+ *
+ * @author franc
+ */
+public class Author implements Serializable {
+    private static int counter = 0;
+    private int id;
     private String name;
-    private List<Book> books;
+    private String address;
+    private LocalDate birthDate;
 
-    public Author(String name) {
+    public Author(String name, String address, LocalDate birthDate) {
+
+        this.id = counter++;
         this.name = name;
-        this.books = new ArrayList<>();
+        this.address = address;
+        this.birthDate = birthDate;
+    }
+
+    public Author(){
+
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -20,16 +46,30 @@ public class Author {
         this.name = name;
     }
 
-    public void addBook(Book book) {
-        books.add(book);
+    public String getAddress() {
+        return address;
     }
 
-    public List<Book> getBooks() {
-        return books;
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     @Override
     public String toString() {
-        return name;
+        return String.format("Author:\n" +
+                        "\tID: %d\n" +
+                        "\tName: %s\n" +
+                        "\tAddress: %s\n" +
+                        "\tBirth Date: %s\n",
+                id, name, address, birthDate);
     }
+
 }

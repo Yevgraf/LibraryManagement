@@ -1,19 +1,56 @@
 package Model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class Member extends User {
+public class Member extends User implements Serializable {
     private int maxBorrowedBooks;
-    private Map<Book, LocalDate> bookLoans;
+    private Card card;
 
     public Member(String name, String address, LocalDate birthDate, String phone, String email) {
         super(name, address, birthDate, phone, email);
         this.maxBorrowedBooks = 3;
-        this.bookLoans = new HashMap<>();
+
+    }
+
+    public String getName() {
+        return super.getName();
+    }
+
+    public void setName(String name) {
+        super.setName(name);
+    }
+
+    public String getAddress() {
+        return super.getAddress();
+    }
+
+    public void setAddress(String address) {
+        super.setAddress(address);
+    }
+
+    public LocalDate getBirthDate() {
+        return super.getBirthDate();
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        super.setBirthDate(birthDate);
+    }
+
+    public String getPhone() {
+        return super.getPhone();
+    }
+
+    public void setPhone(String phone) {
+        super.setPhone(phone);
+    }
+
+    public String getEmail() {
+        return super.getEmail();
+    }
+
+    public void setEmail(String email) {
+        super.setEmail(email);
     }
 
     public int getMaxBorrowedBooks() {
@@ -24,28 +61,12 @@ public class Member extends User {
         this.maxBorrowedBooks = maxBorrowedBooks;
     }
 
-    public List<Book> getBooks() {
-        return new ArrayList<>(bookLoans.keySet());
+    public Card getCard() {
+        return card;
     }
 
-    public void borrowBook(Book book) {
-        if (bookLoans.size() >= maxBorrowedBooks) {
-            throw new IllegalStateException("Maximum number of borrowed books reached");
-        }
-        bookLoans.put(book, LocalDate.now());
-    }
-
-    public void returnBook(Book book) {
-        if (!bookLoans.containsKey(book)) {
-            throw new IllegalArgumentException("Book not loaned");
-        }
-        bookLoans.remove(book);
-    }
-
-    public LocalDate getLoanDate(Book book) {
-        if (!bookLoans.containsKey(book)) {
-            throw new IllegalArgumentException("Book not loaned");
-        }
-        return bookLoans.get(book);
+    public void setCard(Card card) {
+        this.card = card;
     }
 }
+
