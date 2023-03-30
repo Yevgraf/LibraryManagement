@@ -4,14 +4,14 @@
  */
 package Model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
- *
  * @author franc
  */
-public class Book {
-
+public class Book implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static int counter = 0;
     private int id;
     private String title;
@@ -37,9 +37,11 @@ public class Book {
         this.publisher = publisher;
         this.isbn = isbn;
     }
-public Book(){
 
-}
+    public Book() {
+
+    }
+
     public int getId() {
         return id;
     }
@@ -119,4 +121,21 @@ public Book(){
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("ID: ").append(id).append("\n")
+                .append("Title: ").append(title).append("\n")
+                .append("Subtitle: ").append(subtitle).append("\n")
+                .append("Author: ").append(author).append("\n")
+                .append("Number of Pages: ").append(numPages).append("\n")
+                .append("Category: ").append(category).append("\n")
+                .append("Publication Date: ").append(publicationDate).append("\n")
+                .append("Age Range: ").append(ageRange).append("\n")
+                .append("Publisher: ").append(publisher).append("\n")
+                .append("ISBN: ").append(isbn).append("\n");
+        return sb.toString();
+    }
+
 }

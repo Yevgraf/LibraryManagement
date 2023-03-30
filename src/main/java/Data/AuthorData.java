@@ -44,4 +44,11 @@ public class AuthorData {
         }
         return authorList;
     }
+    public Author findByName(String name) {
+        List<Author> authorList = load();
+        return authorList.stream()
+                .filter(author -> author.getName().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
 }
