@@ -5,6 +5,7 @@ import Data.AuthorData;
 import Model.Librarian;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AuthorController {
@@ -21,6 +22,16 @@ public class AuthorController {
         AuthorData.save(authorList);
 
     }
+    public Author findByName(String name) {
+        List<Author> authors = authorData.load();
+        for (Author author : authors) {
+            if (author.getName().equalsIgnoreCase(name)) {
+                return author;
+            }
+        }
+        return null;
+    }
+
 
 
     public List<Author> getAllAuthors() {

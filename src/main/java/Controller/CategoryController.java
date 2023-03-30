@@ -22,4 +22,15 @@ public class CategoryController {
     public List<Category> listCategories() {
         return categoryData.load();
     }
+
+    public Category findByName(String name) {
+        List<Category> categories = categoryData.load();
+        for (Category category : categories) {
+            if (category.getCategoryName().equalsIgnoreCase(name)) {
+                return category;
+            }
+        }
+        return null;
+    }
+
 }

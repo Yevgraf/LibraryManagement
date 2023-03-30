@@ -23,4 +23,15 @@ public class AgeRangeController {
     public List<AgeRange> listAgeRanges() {
         return ageRangeData.load();
     }
+
+    public AgeRange findByDescription(String description) {
+        List<AgeRange> ageRangeList = listAgeRanges();
+        for (AgeRange ageRange : ageRangeList) {
+            if (ageRange.getDescription().equalsIgnoreCase(description)) {
+                return ageRange;
+            }
+        }
+        return null;
+    }
+
 }

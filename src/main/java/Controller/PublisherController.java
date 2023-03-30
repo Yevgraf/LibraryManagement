@@ -24,5 +24,14 @@ public class PublisherController {
     public List<Publisher> listPublishers() {
         return publisherData.load();
     }
+    public Publisher findByName(String name) {
+        List<Publisher> publishers = publisherData.load();
+        for (Publisher publisher : publishers) {
+            if (publisher.getName().equalsIgnoreCase(name)) {
+                return publisher;
+            }
+        }
+        return null;
+    }
 
 }

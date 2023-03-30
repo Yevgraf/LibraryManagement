@@ -19,7 +19,7 @@ import Model.Publisher;
 import View.CreateBookView;
 
 public class BookController {
-    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     private BookData bookData;
     private AuthorData authorData;
     private AgeRangeData ageRangeData;
@@ -68,6 +68,8 @@ public class BookController {
         bookList.add(book);
         bookData.save(bookList);
     }
+
+
 
 
     public List<Book> listBooks() {

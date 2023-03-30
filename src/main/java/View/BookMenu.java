@@ -1,6 +1,6 @@
 package View;
 
-import Controller.BookController;
+import Controller.*;
 import Data.*;
 import Model.Book;
 
@@ -15,6 +15,12 @@ public class BookMenu {
     private CreateBookView createBookView;
     private MainMenu mainMenu;
     private DateTimeFormatter dateFormatter;
+    private AuthorController authorController;
+    private AgeRangeController ageRangeController;
+    private CategoryController categoryController;
+    private PublisherController publisherController;
+
+
 
     public BookMenu(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
@@ -26,8 +32,13 @@ public class BookMenu {
         CategoryData categoryData = new CategoryData();
         PublisherData publisherData = new PublisherData();
         bookController = new BookController(bookData, authorData, ageRangeData, categoryData, publisherData, scanner);
-        createBookView = new CreateBookView(bookController, scanner);
+        authorController = new AuthorController(authorData);
+        ageRangeController = new AgeRangeController(ageRangeData);
+        categoryController = new CategoryController(categoryData);
+        publisherController = new PublisherController(publisherData);
+        createBookView = new CreateBookView(bookController, authorController, ageRangeController, categoryController, publisherController, scanner);
     }
+
     public void displayMenu() {
         int choice = -1;
         while (choice != 0) {
