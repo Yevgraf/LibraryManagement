@@ -4,6 +4,7 @@ import Controller.AuthorController;
 import Model.Author;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -23,9 +24,9 @@ public class CreateAuthorView {
         System.out.print("Morada: ");
         String address = scanner.nextLine();
 
-        System.out.print("Data de nascimento (AAAA-MM-DD): ");
+        System.out.print("Data de nascimento (DD/MM/AAAA): ");
         String birthDateStr = scanner.nextLine();
-        LocalDate birthDate = LocalDate.parse(birthDateStr);
+        LocalDate birthDate = LocalDate.parse(birthDateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         authorController.createAuthor(name, address, birthDate);
         System.out.println("Autor criado e guardado com sucesso.");
