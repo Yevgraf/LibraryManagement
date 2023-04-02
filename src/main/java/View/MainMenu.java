@@ -35,56 +35,55 @@ public class MainMenu {
 
     }
 
-
-
     public void displayMenu() {
-        int option = 0;
-        do {
-            System.out.println("Bem-vindo à biblioteca!");
-            System.out.println("Selecione uma opção:");
-            System.out.println("1 - Gestão de autores");
-            System.out.println("2 - Gestão de bibliotecários");
-            System.out.println("3 - Gestão de membros");
-            System.out.println("4 - Gestão de editoras");
-            System.out.println("5 - Gestão de categorias");
-            System.out.println("6 - Gestão de faixa etária");
-            System.out.println("7 - Gestão de livros");
-            System.out.println("0 - Sair");
+        System.out.println("===================================");
+        System.out.println("| Bem-vindo à biblioteca!        |");
+        System.out.println("| Selecione uma opção:           |");
+        System.out.println("===================================");
+        System.out.println("| 1 - Gestão de autores          |");
+        System.out.println("| 2 - Gestão de bibliotecários   |");
+        System.out.println("| 3 - Gestão de membros          |");
+        System.out.println("| 4 - Gestão de editoras         |");
+        System.out.println("| 5 - Gestão de categorias       |");
+        System.out.println("| 6 - Gestão de faixa etária     |");
+        System.out.println("| 7 - Gestão de livros           |");
+        System.out.println("| 0 - Sair                       |");
+        System.out.println("===================================");
 
-            option = scanner.nextInt();
-            scanner.nextLine();
+        int option = scanner.nextInt();
+        scanner.nextLine();
 
-            switch (option) {
-                case 1:
-                    authorMenu.start();
-                    break;
-                case 2:
-                    librarianMenu.start();
-                    break;
-                case 3:
-                    memberMenu.start();
-                    break;
-                case 4:
-                    publisherMenu.start();
-                    break;
-                case 5:
-                    categoryMenu.start();
-                    break;
-                case 6:
-                    ageRangeMenu.start();
-                    break;
-                case 7:
-                     bookMenu.displayMenu();
-                    break;
-                case 0:
-                    System.out.println("Até logo!");
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Opção inválida. Tente novamente.");
-                    break;
-            }
+        switch (option) {
+            case 1:
+                authorMenu.start();
+                break;
+            case 2:
+                librarianMenu.start();
+                break;
+            case 3:
+                memberMenu.start();
+                break;
+            case 4:
+                publisherMenu.start();
+                break;
+            case 5:
+                categoryMenu.start();
+                break;
+            case 6:
+                ageRangeMenu.start();
+                break;
+            case 7:
+                bookMenu.displayMenu();
+                break;
+            case 0:
+                System.out.println("Até logo!");
+                System.exit(0);
+                break;
+            default:
+                System.out.println("Opção inválida. Tente novamente.");
+                break;
+        }
 
-        } while (option != 0);
+        displayMenu();
     }
 }

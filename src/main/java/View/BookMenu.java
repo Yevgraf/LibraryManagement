@@ -43,9 +43,10 @@ public class BookMenu {
         int choice = -1;
         while (choice != 0) {
             System.out.println("==== Livros ====");
-            System.out.println("1. Listar livros");
-            System.out.println("2. Adicionar livro");
+            System.out.println("1. Adicionar livro");
+            System.out.println("2. Listar livros");
             System.out.println("3. Remover livro");
+            //System.out.println("4. Procurar livro");
             System.out.println("0. Voltar ao menu principal");
             System.out.print("Escolha uma opção: ");
             choice = scanner.nextInt();
@@ -53,14 +54,17 @@ public class BookMenu {
 
             switch (choice) {
                 case 1:
-                    listBooks();
+                    createBookView.createBook();
                     break;
                 case 2:
-                    createBookView.createBook();
+                    listBooks();
                     break;
                 case 3:
                     removeBook();
                     break;
+            /*case 4:
+                    searchbookView.searchBook()
+                break;*/
                 case 0:
                     mainMenu.displayMenu();
                     break;
