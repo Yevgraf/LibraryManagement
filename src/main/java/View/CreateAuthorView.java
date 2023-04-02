@@ -33,7 +33,7 @@ public class CreateAuthorView {
     }
 
     public void listAuthors() {
-        List<Author> authors = authorController.getAllAuthors();
+        List<Author> authors = authorController.listAuthors();
         for (Author author : authors) {
             System.out.println(author);
         }
