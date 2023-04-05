@@ -1,10 +1,8 @@
 package View;
 
-import Controller.CardController;
-import Controller.MemberController;
-import Data.CardData;
-import Data.MemberData;
-import Model.Member;
+import Controller.*;
+import Data.*;
+import Model.*;
 
 import java.util.Scanner;
 
@@ -18,12 +16,22 @@ public class MainMenu {
     private CategoryMenu categoryMenu;
     private AgeRangeMenu ageRangeMenu;
     private BookMenu bookMenu;
+    private ReservationMenu reservationMenu;
 
     public MainMenu() {
         scanner = new Scanner(System.in);
         MemberData memberData = new MemberData();
         CardData cardData = new CardData();
+        BookData bookData = new BookData();
+        AuthorData authorData = new AuthorData();
+        AgeRangeData ageRangeData = new AgeRangeData();
+        CategoryData categoryData = new CategoryData();
+        PublisherData publisherData = new PublisherData();
         CardController cardController = new CardController(cardData);
+        ReservationData reservationData = new ReservationData();
+        ReservationController reservationController = new ReservationController(reservationData);
+        MemberController memberController = new MemberController(memberData, scanner);
+        BookController bookController = new BookController(bookData, authorData, ageRangeData, categoryData, publisherData, scanner);
 
         authorMenu = new AuthorMenu(this);
         librarianMenu = new LibrarianMenu(this);
@@ -32,21 +40,23 @@ public class MainMenu {
         categoryMenu = new CategoryMenu(this);
         ageRangeMenu = new AgeRangeMenu(this);
         bookMenu = new BookMenu(this);
-
+        reservationMenu = new ReservationMenu(this, memberController, bookController, reservationController);
     }
+
 
     public void displayMenu() {
         System.out.println("===================================");
         System.out.println("| Bem-vindo à biblioteca!        |");
         System.out.println("| Selecione uma opção:           |");
         System.out.println("===================================");
-        System.out.println("| 1 - Gestão de autores          |");
-        System.out.println("| 2 - Gestão de bibliotecários   |");
-        System.out.println("| 3 - Gestão de membros          |");
-        System.out.println("| 4 - Gestão de editoras         |");
-        System.out.println("| 5 - Gestão de categorias       |");
-        System.out.println("| 6 - Gestão de faixa etária     |");
-        System.out.println("| 7 - Gestão de livros           |");
+        System.out.println("| 1 - Gestão de reservas         |");
+        System.out.println("| 2 - Gestão de autores          |");
+        System.out.println("| 3 - Gestão de bibliotecários   |");
+        System.out.println("| 4 - Gestão de membros          |");
+        System.out.println("| 5 - Gestão de editoras         |");
+        System.out.println("| 6 - Gestão de categorias       |");
+        System.out.println("| 7 - Gestão de faixa etária     |");
+        System.out.println("| 8 - Gestão de livros           |");
         System.out.println("| 0 - Sair                       |");
         System.out.println("===================================");
 
@@ -55,24 +65,27 @@ public class MainMenu {
 
         switch (option) {
             case 1:
-                authorMenu.start();
+                reservationMenu.start();
                 break;
             case 2:
-                librarianMenu.start();
+                authorMenu.start();
                 break;
             case 3:
-                memberMenu.start();
+                librarianMenu.start();
                 break;
             case 4:
-                publisherMenu.start();
+                memberMenu.start();
                 break;
             case 5:
-                categoryMenu.start();
+                publisherMenu.start();
                 break;
             case 6:
-                ageRangeMenu.start();
+                categoryMenu.start();
                 break;
             case 7:
+                ageRangeMenu.start();
+                break;
+            case 8:
                 bookMenu.displayMenu();
                 break;
             case 0:

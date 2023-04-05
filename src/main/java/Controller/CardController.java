@@ -4,6 +4,7 @@ import Data.CardData;
 import Model.Card;
 import Model.Member;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
@@ -27,7 +28,10 @@ public class CardController {
         return card;
     }
     public String generateCardNumber(int memberId) {
-        List<Card> cards = CardData.load();
+        List<Card> cards = cardData.load();
+        if (cards == null) {
+            cards = new ArrayList<>();
+        }
         String cardNumber = "";
         boolean isUnique = false;
         int year = Calendar.getInstance().get(Calendar.YEAR) % 100;
@@ -50,21 +54,6 @@ public class CardController {
 
 
 
-    public void borrowBook(Card card) {
-        if (card.canBorrow()) {
-            card.borrowBook();
-            List<Card> cards = cardData.load();
-            saveCards(cards);
-        } else {
-            throw new IllegalStateException("Membro já tem o máximo de livros reservados");
-        }
-    }
-
-    public void returnBook(Card card) {
-        card.returnBook();
-        List<Card> cards = cardData.load();
-        saveCards(cards);
-    }
 
     public List<Card> getAllCards() {
         return cardData.load();
