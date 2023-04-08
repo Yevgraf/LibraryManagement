@@ -142,6 +142,4 @@ public class CreateBookView {
         return scanner.nextLine();
     }
 
-
-
 }
