@@ -1,69 +1,53 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-/**
- * @author franc
- */
-
-public class Reservation {
+public class Reservation implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static int counter = 0;
     private int id;
     private Book book;
-    private Card card;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Member member;
+    private LocalDate date;
 
-    public Reservation(Book book, Card card, LocalDate startDate, LocalDate endDate) {
+    public Reservation(Book book, Member member, LocalDate date) {
         this.id = counter++;
         this.book = book;
-        this.card = card;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-
-    public int getId() {
-        return id;
+        this.member = member;
+        this.date = date;
     }
 
     public Book getBook() {
         return book;
     }
 
-    public Card getCard() {
-        return card;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public void setBook(Book book) {
         this.book = book;
     }
 
-    public void setCard(Card card) {
-        this.card = card;
+    public Member getMember() {
+        return member;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public LocalDate getDate() {
+        return date;
     }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation #" + id + ":\n" +
+                "Book: " + book.getTitle() + " by " + book.getAuthor() + "\n" +
+                "Reserved by: " + member.getName() + "\n" +
+                "Reserved on: " + date + "\n";
+    }
+
 }

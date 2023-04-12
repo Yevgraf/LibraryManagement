@@ -34,4 +34,13 @@ public class PublisherController {
         return null;
     }
 
+    public void listPublishersView() {
+        List<Publisher> publisherList = listPublishers();
+        System.out.println("Lista de editoras:");
+        for (int i = 0; i < publisherList.size(); i++) {
+            Publisher publisher = publisherList.get(i);
+            System.out.println((i+1) + ". " + publisher.getName() + " - " + publisher.getAddress());
+        }
+    }
+
 }
