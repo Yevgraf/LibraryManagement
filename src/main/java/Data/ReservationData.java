@@ -16,9 +16,9 @@ public class ReservationData {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME));
             oos.writeObject(reservations);
             oos.close();
-            System.out.println("Reservations saved to file.");
+            System.out.println("Reserva foi gravada no ficheiro.");
         } catch (IOException e) {
-            System.err.println("Error saving reservations to file: " + e.getMessage());
+            System.err.println("Erro ao gravar reserva no ficheiro: " + e.getMessage());
         }
     }
 
@@ -28,11 +28,11 @@ public class ReservationData {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME));
             reservations = (List<Reservation>) ois.readObject();
             ois.close();
-            System.out.println("Reservations loaded from file.");
+            System.out.println("Reservas carregadas do ficheiro.");
         } catch (FileNotFoundException e) {
-            System.out.println("No saved reservations found.");
+            System.out.println("Não foram encontradas reservas gravadas.");
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Error loading reservations from file: " + e.getMessage());
+            System.err.println("Erro ao carregar reservas do ficheiro: " + e.getMessage());
         }
         return reservations;
     }

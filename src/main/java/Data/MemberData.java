@@ -17,16 +17,16 @@ public class MemberData {
 
             if (!file.exists()) {
                 file.createNewFile();
-                System.out.println("Member file created.");
+                System.out.println("Ficheiro de membro criado.");
             }
 
             fos = new FileOutputStream(file);
             out = new ObjectOutputStream(fos);
             out.writeObject(memberList);
-            System.out.println("Members saved to file.");
+            System.out.println("Membros foram gravados no ficheiro.");
             out.close();
         } catch (IOException e) {
-            System.err.println("Error saving members to file: " + e.getMessage());
+            System.err.println("Erro ao gravar membros no ficheiro: " + e.getMessage());
         }
     }
 
@@ -34,11 +34,11 @@ public class MemberData {
         List<Member> memberList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             memberList = (List<Member>) in.readObject();
-            System.out.println("Members loaded from file.");
+            System.out.println("Membros carregados do ficheiro");
         } catch (FileNotFoundException e) {
-            System.out.println("No saved members found.");
+            System.out.println("Não foram encontrados membros gravados");
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Error loading members from file: " + e.getMessage());
+            System.err.println("Erro ao carregar membros do ficheiro: " + e.getMessage());
         }
         return memberList;
     }
