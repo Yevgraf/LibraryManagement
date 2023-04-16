@@ -32,5 +32,13 @@ public class CategoryController {
         }
         return null;
     }
+    public void listCategoriesView() {
+        List<Category> categoryList = categoryData.load();
+        System.out.println("Lista de categorias:");
+        for (int i = 0; i < categoryList.size(); i++) {
+            Category category = categoryList.get(i);
+            System.out.println((i+1) + ". " + category.getCategoryName());
+        }
+    }
 
 }

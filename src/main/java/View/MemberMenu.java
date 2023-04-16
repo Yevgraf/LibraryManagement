@@ -19,7 +19,7 @@ public class MemberMenu {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
         MemberData memberData = new MemberData();
-        memberController = new MemberController(memberData);
+        memberController = new MemberController(memberData, scanner);
         createMemberView = new CreateMemberView(memberController);
         this.cardController = cardController;
     }

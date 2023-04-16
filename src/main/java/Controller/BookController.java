@@ -70,8 +70,6 @@ public class BookController {
     }
 
 
-
-
     public List<Book> listBooks() {
         return bookData.load();
     }
@@ -88,15 +86,15 @@ public class BookController {
 
     public Book findBookByIdOrName(String searchTerm) {
         List<Book> books = listBooks();
-        Book bookById = null;
+        Book bookByIsbn = null;
         for (Book book : books) {
-            if (Integer.toString(book.getId()).equals(searchTerm)) {
-                bookById = book;
+            if (book.getIsbn().equals(searchTerm)) {
+                bookByIsbn = book;
                 break;
             }
         }
-        if (bookById != null) {
-            return bookById;
+        if (bookByIsbn != null) {
+            return bookByIsbn;
         }
         List<Book> booksByName = books.stream()
                 .filter(book -> book.getTitle().toLowerCase().contains(searchTerm.toLowerCase()))
@@ -107,16 +105,16 @@ public class BookController {
         if (booksByName.size() == 1) {
             return booksByName.get(0);
         }
-        System.out.println("Há mais de um livro com esse nome, selecione o ID correto:");
+        System.out.println("Há mais de um livro com esse nome, selecione o ISBN correto:");
         for (Book book : booksByName) {
-            System.out.println("ID: " + book.getId() + ", Título: " + book.getTitle());
+            System.out.println("ISBN: " + book.getIsbn() + ", Título: " + book.getTitle());
         }
-        int selectedId = scanner.nextInt();
-        scanner.nextLine();
+        String selectedIsbn = scanner.nextLine();
         return booksByName.stream()
-                .filter(book -> book.getId() == selectedId)
+                .filter(book -> book.getIsbn().equals(selectedIsbn))
                 .findFirst()
                 .orElse(null);
     }
+
 
 }

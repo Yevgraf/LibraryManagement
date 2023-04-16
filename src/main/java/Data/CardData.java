@@ -32,8 +32,9 @@ public class CardData {
         }
     }
 
+
     public static List<Card> load() {
-        List<Card> cardList = null;
+        List<Card> cardList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             cardList = (List<Card>) in.readObject();
             System.out.println("Cartões carregados do ficheiro.");
@@ -44,5 +45,6 @@ public class CardData {
         }
         return cardList;
     }
+
 
 }

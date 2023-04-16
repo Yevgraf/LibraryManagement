@@ -18,16 +18,16 @@ public class PublisherData {
 
             if (!file.exists()) {
                 file.createNewFile();
-                System.out.println("Publisher file created.");
+                System.out.println("Ficheiro da Editoras criados");
             }
 
             fos = new FileOutputStream(file);
             out = new ObjectOutputStream(fos);
             out.writeObject(publisherList);
-            System.out.println("Publishers saved to file.");
+            System.out.println("Editoras gravados no ficheiros.");
             out.close();
         } catch (IOException e) {
-            System.err.println("Error saving publishers to file: " + e.getMessage());
+            System.err.println("Erro ao gravar ficheiro de editores: " + e.getMessage());
         }
     }
 
@@ -35,11 +35,11 @@ public class PublisherData {
         List<Publisher> publisherList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             publisherList = (List<Publisher>) in.readObject();
-            System.out.println("Publishers loaded from file.");
+            System.out.println("Editoras foram gravados no ficheiro.");
         } catch (FileNotFoundException e) {
-            System.out.println("No saved publishers found.");
+            System.out.println("Não foram encontrados edititoras gravados no ficheiro");
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Error loading publishers from file: " + e.getMessage());
+            System.err.println("Erro ao carregar editoras do ficheiro: " + e.getMessage());
         }
         return publisherList;
     }
@@ -51,5 +51,6 @@ public class PublisherData {
                 .findFirst()
                 .orElse(null);
     }
+
 
 }
