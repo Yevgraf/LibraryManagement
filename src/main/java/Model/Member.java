@@ -7,16 +7,21 @@ import java.util.List;
 
 public class Member extends User implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static int counter = 1;
+    private int id;
     private int maxBorrowedBooks;
     private Card card;
     private List<Book> borrowedBooks;
-    private List<Book> reservedBooks;
 
     public Member(String name, String address, LocalDate birthDate, String phone, String email) {
         super(name, address, birthDate, phone, email);
+        this.id = counter++;
         this.maxBorrowedBooks = 3;
         this.borrowedBooks = new ArrayList<Book>();
-        this.reservedBooks = new ArrayList<Book>();
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getMaxBorrowedBooks() {
@@ -39,41 +44,8 @@ public class Member extends User implements Serializable {
         return borrowedBooks;
     }
 
-    public List<Book> getReservedBooks() {
-        return reservedBooks;
+    public void setBorrowedBooks(List<Book> borrowedBooks) {
+        this.borrowedBooks = borrowedBooks;
     }
-
-    public void borrowBook(Book book) throws Exception {
-        if (borrowedBooks.size() == maxBorrowedBooks) {
-            throw new Exception("O número máximo de livros emprestados foi atingido.");
-        }
-        borrowedBooks.add(book);
-    }
-
-    public void returnBook(Book book) {
-        borrowedBooks.remove(book);
-    }
-
-    public void addReservation(Reservation reservation) throws Exception {
-        if (reservedBooks.contains(reservation.getBook())) {
-            throw new Exception("O livro já foi reservado pelo membro.");
-        }
-        reservedBooks.add(reservation.getBook());
-    }
-
-    public void removeReservation(Reservation reservation) {
-        reservedBooks.remove(reservation.getBook());
-    }
-
-    public void addReservedBook(Book book) throws Exception {
-        if (reservedBooks.contains(book)) {
-            throw new Exception("O livro já foi reservado pelo membro.");
-        }
-        reservedBooks.add(book);
-    }
-
-    public void removeReservedBook(Book book) {
-        reservedBooks.remove(book);
-    }
-
 }
+

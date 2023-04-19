@@ -10,9 +10,10 @@ import java.time.LocalDate;
 /**
  * @author franc
  */
+
 public class Book implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static int counter = 0;
+    private static transient int counter = 0;
     private int id;
     private String title;
     private String subtitle;
@@ -23,10 +24,10 @@ public class Book implements Serializable {
     private AgeRange ageRange;
     private Publisher publisher;
     private String isbn;
-
+    private boolean borrowed;
 
     public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn) {
-        this.id = counter++;
+        this.id = ++counter;
         this.title = title;
         this.subtitle = subtitle;
         this.author = author;
@@ -36,8 +37,8 @@ public class Book implements Serializable {
         this.ageRange = ageRange;
         this.publisher = publisher;
         this.isbn = isbn;
+        this.borrowed = false;
     }
-
     public Book() {
 
     }
@@ -121,6 +122,14 @@ public class Book implements Serializable {
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
+    public boolean isBorrowed() {
+        return borrowed;
+    }
+
+    public void setBorrowed(boolean borrowed) {
+        this.borrowed = borrowed;
+    }
+
 
     @Override
     public String toString() {
@@ -134,7 +143,8 @@ public class Book implements Serializable {
                 .append("Publication Date: ").append(publicationDate).append("\n")
                 .append("Age Range: ").append(ageRange).append("\n")
                 .append("Publisher: ").append(publisher).append("\n")
-                .append("ISBN: ").append(isbn).append("\n");
+                .append("ISBN: ").append(isbn).append("\n")
+                .append("Borrowed: ").append(borrowed ? "Yes" : "No").append("\n"); // Include borrowed field
         return sb.toString();
     }
 

@@ -32,7 +32,7 @@ public class MainMenu {
         PublisherData publisherData = new PublisherData();
         CardController cardController = new CardController(cardData);
         ReservationData reservationData = new ReservationData();
-        ReservationController reservationController = new ReservationController(reservationData);
+        ReservationController reservationController = new ReservationController(reservationData, memberData, bookData);
         MemberController memberController = new MemberController(memberData, scanner);
         BookController bookController = new BookController(bookData, authorData, ageRangeData, categoryData, publisherData, scanner);
 

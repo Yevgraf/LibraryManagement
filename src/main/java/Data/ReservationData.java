@@ -60,15 +60,19 @@ public class ReservationData {
         save(reservations);
     }
 
-    public void removeReservation(Book book) {
+    public Reservation getReservationByBookNameOrIsbn(String searchTerm) {
         List<Reservation> reservations = load();
-        List<Reservation> reservationsToRemove = new ArrayList<>();
-        for (Reservation r : reservations) {
-            if (r.getBook().equals(book)) {
-                reservationsToRemove.add(r);
+
+        for (Reservation reservation : reservations) {
+            Book book = reservation.getBook();
+
+            if (book.getTitle().equalsIgnoreCase(searchTerm) || book.getIsbn().equalsIgnoreCase(searchTerm)) {
+                return reservation;
             }
         }
-        reservations.removeAll(reservationsToRemove);
-        save(reservations);
+
+        return null;
     }
+
+
 }

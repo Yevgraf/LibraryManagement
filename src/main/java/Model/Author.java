@@ -12,7 +12,7 @@ import java.time.LocalDate;
  * @author franc
  */
 public class Author implements Serializable {
-    private static int counter = 0;
+    private static transient int counter = 0;
     private int id;
     private String name;
     private String address;

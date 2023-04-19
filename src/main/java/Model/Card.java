@@ -52,18 +52,6 @@ public class Card implements Serializable {
         return borrowedBooks < member.getMaxBorrowedBooks();
     }
 
-    public void borrowBook() {
-
-        if (canBorrow()) {
-            borrowedBooks++;
-        } else {
-            throw new IllegalStateException("Membro já tem o máximo de livros reservados");
-        }
-    }
-
-    public void returnBook() {
-        borrowedBooks--;
-    }
 
     @Override
     public String toString() {
