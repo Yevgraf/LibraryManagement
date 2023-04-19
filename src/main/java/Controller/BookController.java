@@ -38,8 +38,26 @@ public class BookController {
     }
 
     public void createBook(String title, String subtitle, String authorName, int numPages, String categoryName, LocalDate publicationDate, String ageRangeName, String publisherName, String isbn) {
+        // Validations
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Título do livro inválido.");
+        }
+        if (numPages < 0) {
+            throw new IllegalArgumentException("Número de páginas do livro inválido.");
+        }
+        if (publicationDate == null || publicationDate.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Data de publicação do livro inválida.");
+        }
+        
         List<Book> bookList = listBooks();
-
+        Book bookByIsbn = bookList.stream()
+               .filter(b -> b.getIsbn().equals(isbn))
+                .findFirst()
+                .orElse(null);
+        if (bookByIsbn != null) {
+            throw new IllegalArgumentException("Já existe um livro com esse ISBN.");
+        }
+        
         Author author = authorData.findByName(authorName);
         if (author == null) {
             System.out.println("Autor não encontrado.");

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 public class CardController {
     private CardData cardData;
@@ -21,8 +22,24 @@ public class CardController {
     }
 
     public Card createCard(Member member, String cardNumber) {
+        if (member == null) {
+            throw new IllegalArgumentException("Membro não pode ser nulo");
+        }
+
+        if (!Pattern.matches("\\d{2}\\d{6}", cardNumber)) {
+            throw new IllegalArgumentException("O número do cartão deve ter o formato YY######");
+        }
+
+         List<Card> cards = cardData.load();
+        if (cards == null) {
+            cards = new ArrayList<>();
+        }
+
+        if (cards.stream().anyMatch(card -> card.getCardNumber().equals(cardNumber))) {
+            throw new IllegalArgumentException("O número do cartão já existe");
+        }
+
         Card card = new Card(member, cardNumber);
-        List<Card> cards = cardData.load();
         cards.add(card);
         saveCards(cards);
         return card;

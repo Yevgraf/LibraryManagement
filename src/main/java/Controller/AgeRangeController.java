@@ -13,6 +13,12 @@ public class AgeRangeController {
     }
 
     public void createAgeRange(String description) {
+         if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("A descrição não pode ser vazia.");
+        }
+        if (description.length() < 3 || description.length() > 50) {
+            throw new IllegalArgumentException("A descrição deve ter entre 3 e 50 caracteres.");
+        }
         List<AgeRange> ageRangeList = listAgeRanges();
         AgeRange ageRange = new AgeRange(description);
         ageRangeList.add(ageRange);
