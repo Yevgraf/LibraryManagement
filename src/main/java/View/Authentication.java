@@ -4,8 +4,9 @@
  */
 package View;
 
-import Controller.*;
-import View.*;
+import Data.LibrarianData;
+import Model.Librarian;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -14,22 +15,23 @@ import java.util.Scanner;
  */
 public class Authentication {
 
-    private String username;
-    private String password;
-
     public boolean login() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Digite o seu username:");
-        username = scanner.nextLine();
+        System.out.println("Digite o seu E-mail:");
+        String Email = scanner.nextLine();
         System.out.println("Digite a sua password:");
-        password = scanner.nextLine();
+        String password = scanner.nextLine();
 
-        if (username.equals("bibliotecario") && password.equals("livro")) {
-            System.out.println("Login bem-sucedido!");
-            return true;
-        } else {
-            System.out.println("Credenciais inválidas. Tente novamente.");
-            return false;
+        List<Librarian> librarians = (List<Librarian>) LibrarianData.load();
+
+        for (Librarian librarian : librarians) {
+            if (librarian.getEmail().equals(Email) && librarian.getPassword().equals(password)) {
+                System.out.println("Login bem-sucedido!");
+                return true;
+            }
         }
+
+        System.out.println("Credenciais inválidas. Tente novamente.");
+        return false;
     }
 }

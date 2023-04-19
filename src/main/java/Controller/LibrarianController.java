@@ -14,7 +14,7 @@ public class LibrarianController {
         this.librarianData = librarianData;
     }
     public void createLibrarian(String name, String address, LocalDate birthDate, String phone, String email, String password) {
-        List<Librarian> librarianList = librarianData.load();
+        List<Librarian> librarianList = (List<Librarian>) librarianData.load();
         Librarian librarian = new Librarian(name, address, birthDate, phone, email, password);
         librarianList.add(librarian);
         librarianData.save(librarianList);
@@ -22,6 +22,6 @@ public class LibrarianController {
 
 
     public List<Librarian> listLibrarians() {
-        return librarianData.load();
+        return (List<Librarian>) librarianData.load();
     }
 }
