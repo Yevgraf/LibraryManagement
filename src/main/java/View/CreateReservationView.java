@@ -6,6 +6,8 @@ import Controller.ReservationController;
 import Model.Book;
 import Model.Member;
 import Model.Reservation;
+
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.time.LocalDate;
 import java.util.Scanner;
@@ -40,10 +42,21 @@ public class CreateReservationView {
             System.out.println("Livro não encontrado.");
             return;
         }
-        Reservation reservation = new Reservation(book, member, LocalDate.now());
-        reservationController.addReservation(reservation);
+
+        // Start date is set to current date
+        LocalDate startDate = LocalDate.now();
+
+        System.out.print("Data de término da reserva (dd/MM/yyyy): ");
+        String endDateString = scanner.nextLine();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate endDate = LocalDate.parse(endDateString, formatter);
+
+        Reservation reservation = new Reservation(book, member, startDate, endDate);
+        reservationController.addReservation(reservation, endDate);
         System.out.println("Reserva adicionada com sucesso!");
     }
+
+
 
     public void listAllReservations(){
         List<Reservation> reservations = reservationController.getAllReservations();

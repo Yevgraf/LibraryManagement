@@ -54,25 +54,4 @@ public class ReservationData {
         return memberReservations;
     }
 
-    public void removeReservation(Reservation reservation) {
-        List<Reservation> reservations = load();
-        reservations.remove(reservation);
-        save(reservations);
-    }
-
-    public Reservation getReservationByBookNameOrIsbn(String searchTerm) {
-        List<Reservation> reservations = load();
-
-        for (Reservation reservation : reservations) {
-            Book book = reservation.getBook();
-
-            if (book.getTitle().equalsIgnoreCase(searchTerm) || book.getIsbn().equalsIgnoreCase(searchTerm)) {
-                return reservation;
-            }
-        }
-
-        return null;
-    }
-
-
 }

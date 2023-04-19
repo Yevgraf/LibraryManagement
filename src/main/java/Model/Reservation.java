@@ -9,13 +9,14 @@ public class Reservation implements Serializable {
     private int id;
     private Book book;
     private Member member;
-    private LocalDate date;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-    public Reservation(Book book, Member member, LocalDate date) {
-        this.id = counter++;
+    public Reservation(Book book, Member member, LocalDate startDate, LocalDate endDate) {
         this.book = book;
         this.member = member;
-        this.date = date;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public Book getBook() {
@@ -34,12 +35,20 @@ public class Reservation implements Serializable {
         this.member = member;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     @Override
@@ -47,7 +56,8 @@ public class Reservation implements Serializable {
         return "Reservation #" + id + ":\n" +
                 "Book: " + book.getTitle() + " by " + book.getAuthor() + "\n" +
                 "Reserved by: " + member.getName() + "\n" +
-                "Reserved on: " + date + "\n";
+                "Reserved on: " + startDate + "\n" +
+                "Ends on: " + endDate + "\n";
     }
 
 }

@@ -37,7 +37,7 @@ public class ReservationController {
         this.bookData = bookData;
     }
 
-    public void addReservation(Reservation reservation) {
+    public void addReservation(Reservation reservation, LocalDate endDate) {
         Book book = reservation.getBook();
         Member member = reservation.getMember();
 
@@ -54,26 +54,16 @@ public class ReservationController {
         member.getBorrowedBooks().add(book);
 
         updateBookStatus(book, true);
+        reservation.setEndDate(endDate);
         reservationData.addReservation(reservation);
         updateMember(member);
-
     }
 
-    public void removeReservation(Reservation reservation) {
-        Book book = reservation.getBook();
-        Member member = reservation.getMember();
 
-        reservationData.removeReservation(reservation);
-        updateBookStatus(book, false);
-        updateMember(member);
-    }
 
-    public Reservation getReservationByMemberNameOrBookIsbn(String searchTerm) {
 
-        Reservation reservation = reservationData.getReservationByBookNameOrIsbn(searchTerm);
 
-        return reservation;
-    }
+
 
     public List<Reservation> getReservationsForMember(Member member) {
         return reservationData.getReservationsForMember(member);
@@ -86,7 +76,7 @@ public class ReservationController {
     private void updateMember(Member member) {
         List<Member> members = memberData.load();
         for (Member m : members) {
-            if (m.getId() == member.getId()) {
+            if (m.getEmail() == member.getEmail()) {
                 m.setBorrowedBooks(member.getBorrowedBooks());
                 break;
             }
@@ -105,6 +95,34 @@ public class ReservationController {
         bookData.save(books);
     }
 
+    public void removeReservationByBookNameOrIsbn(String bookNameOrIsbn) {
+        ReservationData reservationData = new ReservationData();
+        BookData bookData = new BookData();
+        MemberData memberData = new MemberData();
+        List<Reservation> reservations = reservationData.load();
+        String searchInput = bookNameOrIsbn.trim().toLowerCase();
 
+        Reservation reservationToRemove = null;
+        for (Reservation reservation : reservations) {
+            String bookTitle = reservation.getBook().getTitle().trim().toLowerCase();
+            String bookISBN = reservation.getBook().getIsbn().trim().toLowerCase();
+            if (bookTitle.equalsIgnoreCase(searchInput) || bookISBN.equalsIgnoreCase(searchInput)) {
+                reservationToRemove = reservation;
+                System.out.println("Reserva removida: " + reservation.toString());
+                break;
+            }
+        }
+
+        if (reservationToRemove != null) {
+            reservations.remove(reservationToRemove);
+            reservationData.save(reservations);
+            updateBookStatus(reservationToRemove.getBook(), false);
+            Member member = reservationToRemove.getMember();
+            member.getBorrowedBooks().remove(reservationToRemove.getBook());
+            updateMember(member);
+        } else {
+            System.out.println("Reserva não encontrada para remoção.");
+        }
+    }
 
 }
