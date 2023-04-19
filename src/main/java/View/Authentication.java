@@ -17,7 +17,7 @@ public class Authentication {
 
     public boolean login() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Digite o seu E-mail:");
+        System.out.println("Digite o seu e-mail:");
         String Email = scanner.nextLine();
         System.out.println("Digite a sua password:");
         String password = scanner.nextLine();
