@@ -18,7 +18,6 @@ public class ReservationController {
     private MemberData memberData;
     private BookData bookData;
 
-
     public ReservationController(ReservationData reservationData, MemberData memberData, BookData bookData) {
         this.reservationData = reservationData;
         this.memberData = memberData;
@@ -40,17 +39,32 @@ public class ReservationController {
     public void addReservation(Reservation reservation, LocalDate endDate) {
         Book book = reservation.getBook();
         Member member = reservation.getMember();
+        if (book == null) {
+            System.out.println("Erro: Livro não pode ser nulo");
+            return;
+        }
+
+        if (member == null) {
+            System.out.println("Erro: Membro não pode ser nulo");
+            return;
+        }
 
         if (book.isBorrowed()) {
             System.out.println("Erro: Livro já está emprestado e não disponível para reserva");
             return;
         }
-
+        if (member.getBorrowedBooks().contains(book)) {
+            System.out.println("Erro: Membro já possui uma reserva deste livro");
+            return;
+        }
         if (member.getBorrowedBooks().size() >= 3) {
             System.out.println("Erro: Número máximo de livros reservados atingido para este membro");
             return;
         }
-
+        if (endDate == null) {
+            System.out.println("Erro: Data final da reserva não pode ser nula");
+            return;
+        }
         member.getBorrowedBooks().add(book);
 
         updateBookStatus(book, true);
@@ -58,12 +72,6 @@ public class ReservationController {
         reservationData.addReservation(reservation);
         updateMember(member);
     }
-
-
-
-
-
-
 
     public List<Reservation> getReservationsForMember(Member member) {
         return reservationData.getReservationsForMember(member);
