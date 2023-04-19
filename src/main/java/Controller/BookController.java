@@ -17,6 +17,7 @@ import Model.Book;
 import Model.Category;
 import Model.Publisher;
 import View.CreateBookView;
+import java.util.ArrayList;
 
 public class BookController {
 
@@ -27,8 +28,7 @@ public class BookController {
     private PublisherData publisherData;
     private Scanner scanner;
 
-    public BookController(BookData bookData, AuthorData authorData, AgeRangeData ageRangeData,
-            CategoryData categoryData, PublisherData publisherData, Scanner scanner) {
+    public BookController(BookData bookData, AuthorData authorData, AgeRangeData ageRangeData, CategoryData categoryData, PublisherData publisherData, Scanner scanner) {
         this.bookData = bookData;
         this.authorData = authorData;
         this.ageRangeData = ageRangeData;
@@ -37,8 +37,7 @@ public class BookController {
         this.scanner = scanner;
     }
 
-    public void createBook(String title, String subtitle, String authorName, int numPages, String categoryName,
-            LocalDate publicationDate, String ageRangeName, String publisherName, String isbn) {
+    public void createBook(String title, String subtitle, String authorName, int numPages, String categoryName, LocalDate publicationDate, String ageRangeName, String publisherName, String isbn) {
         // Validations
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Título do livro inválido.");
@@ -49,30 +48,34 @@ public class BookController {
         if (publicationDate == null || publicationDate.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Data de publicação do livro inválida.");
         }
+        
         List<Book> bookList = listBooks();
         Book bookByIsbn = bookList.stream()
-                .filter(b -> b.getIsbn().equals(isbn))
+               .filter(b -> b.getIsbn().equals(isbn))
                 .findFirst()
                 .orElse(null);
         if (bookByIsbn != null) {
             throw new IllegalArgumentException("Já existe um livro com esse ISBN.");
         }
-
+        
         Author author = authorData.findByName(authorName);
         if (author == null) {
             System.out.println("Autor não encontrado.");
             return;
         }
+
         Category category = categoryData.findByName(categoryName);
         if (category == null) {
             System.out.println("Categoria não encontrada.");
             return;
         }
+
         AgeRange ageRange = ageRangeData.findByName(ageRangeName);
         if (ageRange == null) {
             System.out.println("Faixa etária não encontrada.");
             return;
         }
+
         Publisher publisher = publisherData.findByName(publisherName);
         if (publisher == null) {
             System.out.println("Editora não encontrada.");
@@ -130,4 +133,16 @@ public class BookController {
                 .orElse(null);
     }
 
+    public List<Book> searchBooks(String searchTerm) {
+        List<Book> results = new ArrayList<Book>();
+        List<Book> books = listBooks();
+        for (Book book : books) {
+            if (book.getTitle().contains(searchTerm)
+                    || book.getSubtitle().contains(searchTerm)
+                    || book.getIsbn().contains(searchTerm)) {
+                results.add(book);
+            }
+        }
+        return results;
+    }
 }

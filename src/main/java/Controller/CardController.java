@@ -7,6 +7,7 @@ import Model.Member;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 public class CardController {
@@ -29,7 +30,7 @@ public class CardController {
             throw new IllegalArgumentException("O número do cartão deve ter o formato YY######");
         }
 
-        List<Card> cards = cardData.load();
+         List<Card> cards = cardData.load();
         if (cards == null) {
             cards = new ArrayList<>();
         }
@@ -67,6 +68,7 @@ public class CardController {
         }
         return cardNumber;
     }
+
 
     public List<Card> getAllCards() {
         return cardData.load();

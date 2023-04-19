@@ -1,8 +1,8 @@
+
 package Controller;
 
 import java.util.List;
 import java.util.regex.Pattern;
-
 import Data.PublisherData;
 import Model.Publisher;
 
@@ -34,7 +34,6 @@ public class PublisherController {
     public List<Publisher> listPublishers() {
         return publisherData.load();
     }
-
     public Publisher findByName(String name) {
         List<Publisher> publishers = publisherData.load();
         for (Publisher publisher : publishers) {

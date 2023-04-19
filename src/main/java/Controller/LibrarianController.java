@@ -3,9 +3,9 @@ package Controller;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import Data.LibrarianData;
 import Model.Librarian;
+import View.CreateLibrarianView;
 
 public class LibrarianController {
     private LibrarianData librarianData;
@@ -13,7 +13,6 @@ public class LibrarianController {
     public LibrarianController(LibrarianData librarianData) {
         this.librarianData = librarianData;
     }
-
     public void createLibrarian(String name, String address, LocalDate birthDate, String phone, String email, String password) {
         // Verificar se todos os campos obrigatórios foram preenchidos
         if (name == null || name.isEmpty()) {
@@ -52,18 +51,18 @@ public class LibrarianController {
             throw new IllegalArgumentException("Telefone inválido");
         }
 
-        // Verificar se já existe um bibliotecário com o mesmo email antes de criar um novo bibliotecário com esse email
-        List<Librarian> librarianList = librarianData.load();
-        if (librarianList.stream().anyMatch(librarian -> librarian.getEmail().equals(email))) {
+       // Verificar se já existe um bibliotecário com o mesmo email antes de criar um novo bibliotecário com esse email
+        List<Librarian> librarianList = (List<Librarian>) librarianData.load();
+       if (librarianList.stream().anyMatch(librarian -> librarian.getEmail().equals(email))) {
             throw new IllegalArgumentException("Já existe um bibliotecário com esse email");
         }
-
         Librarian librarian = new Librarian(name, address, birthDate, phone, email, password);
         librarianList.add(librarian);
         librarianData.save(librarianList);
     }
 
+
     public List<Librarian> listLibrarians() {
-        return librarianData.load();
+        return (List<Librarian>) librarianData.load();
     }
 }

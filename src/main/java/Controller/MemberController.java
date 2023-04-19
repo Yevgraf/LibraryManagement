@@ -1,5 +1,4 @@
 package Controller;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -21,8 +20,9 @@ public class MemberController {
         this.scanner = scanner;
     }
 
+
     public void createMember(String name, String address, LocalDate birthDate, String phone, String email) {
-        // Validations
+         // Validations
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do membro inválido.");
         }
@@ -51,14 +51,12 @@ public class MemberController {
         memberList.add(member);
         memberData.save(memberList);
     }
-
-    // Validation methods
+// Validation methods
     private boolean isValidEmail(String email) {
         Pattern pattern = Pattern.compile("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
     }
-
     public Member getMemberByName(String name) {
         List<Member> members = listMembers();
         List<Member> matchingMembers = members.stream()
@@ -72,8 +70,7 @@ public class MemberController {
         }
         System.out.println("Há mais de um membro com esse nome, selecione o ID correto:");
         for (Member member : matchingMembers) {
-            System.out.println("ID: " + member.getId() + ", Nome: " + member.getName() + ", Telefone: "
-                    + member.getPhone() + ", Email: " + member.getEmail());
+            System.out.println("ID: " + member.getId() + ", Nome: " + member.getName() + ", Telefone: " + member.getPhone() + ", Email: " + member.getEmail());
         }
         int selectedId = scanner.nextInt();
         scanner.nextLine();
@@ -82,6 +79,7 @@ public class MemberController {
                 .findFirst()
                 .orElse(null);
     }
+
 
     public List<Member> listMembers() {
         return memberData.load();
