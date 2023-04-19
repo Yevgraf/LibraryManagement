@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class BookMenu {
+
     private Scanner scanner;
     private BookController bookController;
     private CreateBookView createBookView;
@@ -19,8 +20,6 @@ public class BookMenu {
     private AgeRangeController ageRangeController;
     private CategoryController categoryController;
     private PublisherController publisherController;
-
-
 
     public BookMenu(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
@@ -46,7 +45,7 @@ public class BookMenu {
             System.out.println("1. Adicionar livro");
             System.out.println("2. Listar livros");
             System.out.println("3. Remover livro");
-            //System.out.println("4. Procurar livro");
+            System.out.println("4. Procurar livro");
             System.out.println("0. Voltar ao menu principal");
             System.out.print("Escolha uma opção: ");
             choice = scanner.nextInt();
@@ -62,15 +61,29 @@ public class BookMenu {
                 case 3:
                     removeBook();
                     break;
-            /*case 4:
-                    searchbookView.searchBook()
-                break;*/
+                case 4:
+                    searchBooks();
+                    break;
                 case 0:
                     mainMenu.displayMenu();
                     break;
                 default:
                     System.out.println("Opção inválida.");
                     break;
+            }
+        }
+    }
+
+    private void searchBooks() {
+        System.out.print("Digite o ISBN ou nome do livro que deseja procurar: ");
+        String searchTerm = scanner.nextLine();
+        List<Book> bookList = bookController.searchBooks(searchTerm);
+        if (bookList.isEmpty()) {
+            System.out.println("Nenhum livro encontrado.");
+        } else {
+            System.out.println("==== Livros encontrados ====");
+            for (Book book : bookList) {
+                System.out.println(book.toString());
             }
         }
     }

@@ -33,7 +33,7 @@ public class LibrarianData {
 
     public static List<Librarian> load() {
         List<Librarian> userList = new ArrayList<>();
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
+        try ( ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             userList = (List<Librarian>) in.readObject();
             System.out.println("Utilizadores carregados do ficheiro.");
         } catch (FileNotFoundException e) {
@@ -44,4 +44,4 @@ public class LibrarianData {
         return userList;
     }
 
-}
+}   
