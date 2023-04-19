@@ -17,6 +17,7 @@ import Model.Book;
 import Model.Category;
 import Model.Publisher;
 import View.CreateBookView;
+import java.util.ArrayList;
 
 public class BookController {
 
@@ -35,7 +36,6 @@ public class BookController {
         this.publisherData = publisherData;
         this.scanner = scanner;
     }
-
 
     public void createBook(String title, String subtitle, String authorName, int numPages, String categoryName, LocalDate publicationDate, String ageRangeName, String publisherName, String isbn) {
         List<Book> bookList = listBooks();
@@ -68,7 +68,6 @@ public class BookController {
         bookList.add(book);
         bookData.save(bookList);
     }
-
 
     public List<Book> listBooks() {
         return bookData.load();
@@ -116,5 +115,16 @@ public class BookController {
                 .orElse(null);
     }
 
-
+    public List<Book> searchBooks(String searchTerm) {
+        List<Book> results = new ArrayList<Book>();
+        List<Book> books = listBooks();
+        for (Book book : books) {
+            if (book.getTitle().contains(searchTerm)
+                    || book.getSubtitle().contains(searchTerm)
+                    || book.getIsbn().contains(searchTerm)) {
+                results.add(book);
+            }
+        }
+        return results;
+    }
 }
