@@ -1,6 +1,8 @@
 package Controller;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -22,24 +24,49 @@ public class MemberController {
     }
 
     public void createMember(String name, String address, LocalDate birthDate, String phone, String email) {
-        // Validations
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome do membro inválido.");
+        Scanner scanner = new Scanner(System.in);
+
+        while (name == null || name.isEmpty()) {
+            System.out.print("Digite o nome do membro: ");
+            name = scanner.nextLine().trim();
+            if (name.isEmpty()) {
+                System.out.println("Nome não pode ser vazio");
+            }
         }
-        if (address == null || address.trim().isEmpty()) {
-            throw new IllegalArgumentException("Endereço do membro inválido.");
+
+        while (address == null || address.isEmpty()) {
+            System.out.print("Digite o endereço do membro: ");
+            address = scanner.nextLine().trim();
+            if (address.isEmpty()) {
+                System.out.println("Endereço não pode ser vazio");
+            }
         }
-        if (birthDate == null) {
-            throw new IllegalArgumentException("Data de nascimento inválida.");
+
+        while (birthDate == null || birthDate.isAfter(LocalDate.now())) {
+            System.out.print("Digite a data de nascimento do membro (no formato DD/MM/AAAA): ");
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                String input = scanner.nextLine().trim();
+                birthDate = LocalDate.parse(input, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Data de nascimento inválida");
+            }
         }
-        if (birthDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Data de nascimento inválida.");
+
+        while (phone == null || !Pattern.matches("^(9[1236]\\d{7})$", phone)) {
+            System.out.print("Digite o telefone do membro (no formato 9XXXXXXXX): ");
+            phone = scanner.nextLine().trim();
+            if (!Pattern.matches("^(9[1236]\\d{7})$", phone)) {
+                System.out.println("Número de telefone inválido");
+            }
         }
-        if (phone == null || !phone.matches("\\d{10,11}")) {
-            throw new IllegalArgumentException("Número de telefone inválido.");
-        }
-        if (email == null || !isValidEmail(email)) {
-            throw new IllegalArgumentException("Endereço de email inválido.");
+
+        while (email == null || !isValidEmail(email)) {
+            System.out.print("Digite o email do membro: ");
+            email = scanner.nextLine().trim();
+            if (!isValidEmail(email)) {
+                System.out.println("Endereço de email inválido");
+            }
         }
 
         List<Member> memberList = listMembers();
@@ -50,7 +77,10 @@ public class MemberController {
         member.setCard(card);
         memberList.add(member);
         memberData.save(memberList);
+
+        System.out.println("Membro registrado com sucesso!");
     }
+
 
     // Validation methods
     private boolean isValidEmail(String email) {

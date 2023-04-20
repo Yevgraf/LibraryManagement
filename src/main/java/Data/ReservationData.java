@@ -28,7 +28,6 @@ public class ReservationData {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME));
             reservations = (List<Reservation>) ois.readObject();
             ois.close();
-            System.out.println("Reservas carregadas do ficheiro.");
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontradas reservas gravadas.");
         } catch (IOException | ClassNotFoundException e) {

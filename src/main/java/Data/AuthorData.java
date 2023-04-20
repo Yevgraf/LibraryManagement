@@ -37,7 +37,6 @@ public class AuthorData {
         List<Author> authorList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             authorList = (List<Author>) in.readObject();
-            System.out.println("Autores carregados do ficheiro.");
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontrados autores guardados.");
         } catch (IOException | ClassNotFoundException e) {

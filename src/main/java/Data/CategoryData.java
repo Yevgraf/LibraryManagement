@@ -34,7 +34,6 @@ public class CategoryData {
         List<Category> categoryList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             categoryList = (List<Category>) in.readObject();
-            System.out.println("Categorias carregadas do ficheiro.");
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontradas categorias guardadas.");
         } catch (IOException | ClassNotFoundException e) {

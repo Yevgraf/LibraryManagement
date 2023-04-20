@@ -37,7 +37,6 @@ public class AgeRangeData {
         List<AgeRange> ageRanges = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             ageRanges = (List<AgeRange>) in.readObject();
-            System.out.println("Faixas etárias carregadas do ficheiro.");
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontradas faixas etárias guardadas.");
         } catch (IOException | ClassNotFoundException e) {
