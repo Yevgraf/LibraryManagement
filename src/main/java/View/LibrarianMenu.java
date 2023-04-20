@@ -27,7 +27,8 @@ public class LibrarianMenu {
             System.out.println("Escolha uma opção:");
             System.out.println("1. Criar bibliotecário");
             System.out.println("2. Listar bibliotecários");
-            System.out.println("3. Voltar");
+            System.out.println("3. Remover bibliotecário");
+            System.out.println("4. Voltar");
 
             int option = scanner.nextInt();
             scanner.nextLine(); // consume new line
@@ -40,6 +41,9 @@ public class LibrarianMenu {
                     createLibrarianView.listLibrarians();
                     break;
                 case 3:
+                    librarianController.deleteLibrarian();
+                    break;
+                case 4:
                     System.out.println("Voltando...");
                     mainMenu.displayMenu();
                     return;
@@ -48,4 +52,5 @@ public class LibrarianMenu {
             }
         }
     }
+
 }

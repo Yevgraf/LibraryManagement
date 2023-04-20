@@ -1,6 +1,7 @@
 package Data;
 
 import Model.Book;
+import Model.Category;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -44,5 +45,7 @@ public class BookData {
         return bookList;
     }
 
-
+    public List<Book> listBooks() {
+        return load();
+    }
 }

@@ -50,5 +50,10 @@ public class CategoryData {
                 .findFirst()
                 .orElse(null);
     }
+
+    public List<Category> listCategories() {
+        return load();
+    }
+
 }
 

@@ -1,6 +1,7 @@
 package Data;
 
 import Model.Author;
+import Model.Category;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -50,5 +51,8 @@ public class AuthorData {
                 .filter(author -> author.getName().equals(name))
                 .findFirst()
                 .orElse(null);
+    }
+    public List<Author> listAuthors() {
+        return load();
     }
 }

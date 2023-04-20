@@ -2,6 +2,8 @@ package Controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -28,7 +30,7 @@ public class BookController {
     private Scanner scanner;
 
     public BookController(BookData bookData, AuthorData authorData, AgeRangeData ageRangeData,
-            CategoryData categoryData, PublisherData publisherData, Scanner scanner) {
+                          CategoryData categoryData, PublisherData publisherData, Scanner scanner) {
         this.bookData = bookData;
         this.authorData = authorData;
         this.ageRangeData = ageRangeData;
@@ -38,7 +40,7 @@ public class BookController {
     }
 
     public void createBook(String title, String subtitle, String authorName, int numPages, String categoryName,
-            LocalDate publicationDate, String ageRangeName, String publisherName, String isbn) {
+                           LocalDate publicationDate, String ageRangeName, String publisherName, String isbn) {
         // Validations
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Título do livro inválido.");
@@ -128,6 +130,110 @@ public class BookController {
                 .filter(book -> book.getIsbn().equals(selectedIsbn))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<Book> searchBooksByCategory() {
+        List<Category> categories = categoryData.listCategories();
+
+        if (categories.isEmpty()) {
+            System.out.println("Não há categorias cadastradas.");
+            return Collections.emptyList();
+        }
+
+        System.out.println("Selecione uma categoria:");
+        for (int i = 0; i < categories.size(); i++) {
+            System.out.println((i + 1) + ". " + categories.get(i).getCategoryName());
+        }
+
+        int selectedCategoryIndex = scanner.nextInt();
+        scanner.nextLine();
+
+        if (selectedCategoryIndex < 1 || selectedCategoryIndex > categories.size()) {
+            System.out.println("Opção inválida.");
+            return Collections.emptyList();
+        }
+
+        Category selectedCategory = categories.get(selectedCategoryIndex - 1);
+
+        List<Book> books = searchBooksByCategoryWithName(selectedCategory.getCategoryName());
+
+        if (books.isEmpty()) {
+            System.out.println("Não há livros cadastrados nesta categoria.");
+            return Collections.emptyList();
+        }
+
+        System.out.println("Livros da categoria " + selectedCategory.getCategoryName() + ":");
+        for (Book book : books) {
+            System.out.println(book);
+        }
+
+        return books;
+    }
+
+    public List<Book> searchBooksByCategoryWithName(String categoryName) {
+        List<Book> books = new ArrayList<>();
+
+        List<Book> allBooks = bookData.listBooks();
+
+        for (Book book : allBooks) {
+            if (book.getCategory().getCategoryName().equals(categoryName)) {
+                books.add(book);
+            }
+        }
+
+        return books;
+    }
+
+    public List<Book> searchBooksByAuthor() {
+        List<Author> authors = authorData.listAuthors();
+
+        if (authors.isEmpty()) {
+            System.out.println("Não há autores cadastrados.");
+            return Collections.emptyList();
+        }
+
+        System.out.println("Selecione um autor:");
+        for (int i = 0; i < authors.size(); i++) {
+            System.out.println((i + 1) + ". " + authors.get(i).getName());
+        }
+
+        int selectedAuthorIndex = scanner.nextInt();
+        scanner.nextLine();
+
+        if (selectedAuthorIndex < 1 || selectedAuthorIndex > authors.size()) {
+            System.out.println("Opção inválida.");
+            return Collections.emptyList();
+        }
+
+        Author selectedAuthor = authors.get(selectedAuthorIndex - 1);
+
+        List<Book> books = searchBooksByAuthorWithName(selectedAuthor.getName());
+
+        if (books.isEmpty()) {
+            System.out.println("Não há livros cadastrados para este autor.");
+            return Collections.emptyList();
+        }
+
+        System.out.println("Livros do autor " + selectedAuthor.getName() + ":");
+        for (Book book : books) {
+            System.out.println(book);
+        }
+
+        return books;
+    }
+
+    public List<Book> searchBooksByAuthorWithName(String authorName) {
+        List<Book> books = new ArrayList<>();
+
+        List<Book> allBooks = bookData.listBooks();
+
+        for (Book book : allBooks) {
+            if (book.getAuthor().getName().equals(authorName)) {
+                books.add(book);
+            }
+        }
+
+        return books;
     }
 
 }

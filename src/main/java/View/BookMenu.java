@@ -21,7 +21,6 @@ public class BookMenu {
     private PublisherController publisherController;
 
 
-
     public BookMenu(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
@@ -46,11 +45,11 @@ public class BookMenu {
             System.out.println("1. Adicionar livro");
             System.out.println("2. Listar livros");
             System.out.println("3. Remover livro");
-            //System.out.println("4. Procurar livro");
+            System.out.println("4. Procurar livro");
             System.out.println("0. Voltar ao menu principal");
             System.out.print("Escolha uma opção: ");
             choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -62,9 +61,11 @@ public class BookMenu {
                 case 3:
                     removeBook();
                     break;
-            /*case 4:
-                    searchbookView.searchBook()
-                break;*/
+                case 4:
+                    SearchBooksView searchBooksView = new SearchBooksView(bookController);
+                    searchBooksView.searchBooks();
+                    break;
+
                 case 0:
                     mainMenu.displayMenu();
                     break;
