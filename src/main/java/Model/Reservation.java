@@ -2,10 +2,11 @@ package Model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Reservation implements Serializable {
     private static final long serialVersionUID = 1L;
-    private int counter = 0;
+    private static int counter = 0;
     private int id;
     private Book book;
     private Member member;
@@ -13,6 +14,7 @@ public class Reservation implements Serializable {
     private LocalDate endDate;
 
     public Reservation(Book book, Member member, LocalDate startDate, LocalDate endDate) {
+        this.id = counter++;
         this.book = book;
         this.member = member;
         this.startDate = startDate;
@@ -51,6 +53,14 @@ public class Reservation implements Serializable {
         this.endDate = endDate;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "Reservation #" + id + ":\n" +
@@ -59,5 +69,11 @@ public class Reservation implements Serializable {
                 "Reserved on: " + startDate + "\n" +
                 "Ends on: " + endDate + "\n";
     }
+
+    public static void resetIdCounter(List<Reservation> reservationList) {
+        int maxId = reservationList.stream().mapToInt(Reservation::getId).max().orElse(0);
+        counter = maxId;
+    }
+
 
 }

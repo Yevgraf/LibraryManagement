@@ -35,7 +35,7 @@ public class PublisherData {
         List<Publisher> publisherList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             publisherList = (List<Publisher>) in.readObject();
-
+            Publisher.resetIdCounter(publisherList);
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontrados edititoras gravados no ficheiro");
         } catch (IOException | ClassNotFoundException e) {

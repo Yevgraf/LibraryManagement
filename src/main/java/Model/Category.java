@@ -1,11 +1,12 @@
 package Model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private int counter = 0;
+    private static int counter = 0;
     private int categoryId;
     private String categoryName;
 
@@ -40,5 +41,9 @@ public class Category implements Serializable {
         return categoryName;
     }
 
+    public static void resetIdCounter(List<Category> categoryList) {
+        int maxId = categoryList.stream().mapToInt(Category::getCategoryId).max().orElse(0);
+        counter = maxId;
+    }
 
 }

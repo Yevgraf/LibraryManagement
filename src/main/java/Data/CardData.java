@@ -1,5 +1,6 @@
 package Data;
 
+import Model.Book;
 import Model.Card;
 import Model.Member;
 
@@ -37,6 +38,7 @@ public class CardData {
         List<Card> cardList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             cardList = (List<Card>) in.readObject();
+            Card.resetIdCounter(cardList);
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontrados cartões guardados.");
         } catch (IOException | ClassNotFoundException e) {

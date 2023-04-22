@@ -6,13 +6,14 @@ package Model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * @author franc
  */
 public class Author implements Serializable {
     private static final long serialVersionUID = 1L;
-    private int counter = 0;
+    private static int counter = 0;
     private int id;
     private String name;
     private String address;
@@ -29,6 +30,8 @@ public class Author implements Serializable {
     public Author() {
 
     }
+
+
 
     public int getId() {
         return id;
@@ -72,4 +75,8 @@ public class Author implements Serializable {
                 id, name, address, birthDate);
     }
 
+    public static void resetIdCounter(List<Author> authorList) {
+        int maxId = authorList.stream().mapToInt(Author::getId).max().orElse(0);
+        counter = maxId;
+    }
 }

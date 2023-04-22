@@ -2,10 +2,11 @@ package Model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Publisher implements Serializable {
     private static final long serialVersionUID = 1L;
-    private int counter = 0;
+    private static int counter = 0;
     private int id;
     private String name;
     private String address;
@@ -50,6 +51,10 @@ public class Publisher implements Serializable {
                         "\tNome: %s\n" +
                         "\tMorada: %s\n",
                 name, address);
+    }
+    public static void resetIdCounter(List<Publisher> publisherList) {
+        int maxId = publisherList.stream().mapToInt(Publisher::getId).max().orElse(0);
+        counter = maxId;
     }
 
 }

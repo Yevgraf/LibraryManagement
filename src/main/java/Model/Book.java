@@ -6,6 +6,7 @@ package Model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * @author franc
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 
 public class Book implements Serializable {
     private static final long serialVersionUID = 1L;
-    private int counter = 0;
+    private static int counter = 0;
     private int id;
     private String title;
     private String subtitle;
@@ -151,5 +152,12 @@ public class Book implements Serializable {
                 .append("Emprestado: ").append(borrowed ? "Sim" : "Não").append("\n");
         return sb.toString();
     }
+
+    public static void resetIdCounter(List<Book> books) {
+        int maxId = books.stream().mapToInt(Book::getId).max().orElse(0);
+        counter = maxId;
+    }
+
+
 
 }

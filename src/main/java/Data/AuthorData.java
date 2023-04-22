@@ -1,6 +1,7 @@
 package Data;
 
 import Model.Author;
+import Model.Book;
 import Model.Category;
 
 import java.io.*;
@@ -37,6 +38,7 @@ public class AuthorData {
         List<Author> authorList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             authorList = (List<Author>) in.readObject();
+            Author.resetIdCounter(authorList);
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontrados autores guardados.");
         } catch (IOException | ClassNotFoundException e) {

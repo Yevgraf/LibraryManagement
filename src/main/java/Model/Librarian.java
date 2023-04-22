@@ -2,6 +2,7 @@ package Model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Librarian extends User implements Serializable {
 
@@ -60,5 +61,8 @@ public class Librarian extends User implements Serializable {
     public void setEmail(String email) {
         super.setEmail(email);
     }
+
+
+
 
 }

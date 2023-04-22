@@ -6,6 +6,7 @@ package Model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Random;
  */
 public class Card implements Serializable {
 
-    private int counter = 0;
+    private static int counter = 0;
     private int id;
     private Member member;
     private String cardNumber;
@@ -27,6 +28,12 @@ public class Card implements Serializable {
         this.cardNumber = cardNumber;
         this.borrowedBooks = 0;
     }
+
+    public static void resetIdCounter(List<Card> cardList) {
+        int maxId = cardList.stream().mapToInt(Card::getId).max().orElse(0);
+        counter = maxId;
+    }
+
 
     public int getId() {
         return id;
