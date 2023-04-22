@@ -13,21 +13,24 @@ public class LoginView {
 
     public void login() {
         Scanner scanner = new Scanner(System.in);
+        boolean success = false;
 
-        System.out.println("Por favor, insira seu email: ");
-        String email = scanner.nextLine();
+        while (!success) {
+            System.out.println("Por favor, insira seu email: ");
+            String email = scanner.nextLine();
 
-        System.out.println("Por favor, insira sua senha: ");
-        String password = scanner.nextLine();
+            System.out.println("Por favor, insira sua senha: ");
+            String password = scanner.nextLine();
 
-        boolean success = librarianController.login(email, password);
+            success = librarianController.login(email, password);
 
-        if (success) {
-            System.out.println("Login bem sucedido!");
-            MainMenu mainMenu = new MainMenu();
-            mainMenu.displayMenu();
-        } else {
-            System.out.println("Email ou senha incorretos. Por favor, tente novamente.");
+            if (success) {
+                System.out.println("Login bem sucedido!");
+                MainMenu mainMenu = new MainMenu();
+                mainMenu.displayMenu();
+            } else {
+                System.out.println("Email ou senha incorretos. Por favor, tente novamente.");
+            }
         }
     }
 

@@ -8,11 +8,11 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
- *
  * @author franc
  */
 public class Author implements Serializable {
-    private static transient int counter = 0;
+    private static final long serialVersionUID = 1L;
+    private int counter = 0;
     private int id;
     private String name;
     private String address;
@@ -26,7 +26,7 @@ public class Author implements Serializable {
         this.birthDate = birthDate;
     }
 
-    public Author(){
+    public Author() {
 
     }
 

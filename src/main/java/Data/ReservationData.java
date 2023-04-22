@@ -22,7 +22,7 @@ public class ReservationData {
         }
     }
 
-    public List<Reservation> load() {
+    public static List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME));

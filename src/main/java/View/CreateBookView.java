@@ -136,7 +136,6 @@ public class CreateBookView {
 
 
 
-
     private String getIsbn() {
         System.out.print("ISBN: ");
         return scanner.nextLine();

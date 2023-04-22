@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public class Publisher implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static int counter = 0;
+    private int counter = 0;
     private int id;
     private String name;
     private String address;

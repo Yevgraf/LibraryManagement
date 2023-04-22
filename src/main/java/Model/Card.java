@@ -12,13 +12,13 @@ import java.util.Random;
  * @author franc
  */
 public class Card implements Serializable {
-    private static int counter = 0;
+
+    private int counter = 0;
     private int id;
     private Member member;
     private String cardNumber;
     private int borrowedBooks;
     private static final long serialVersionUID = 1L;
-
 
 
     public Card(Member member, String cardNumber) {

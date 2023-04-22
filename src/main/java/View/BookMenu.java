@@ -62,7 +62,7 @@ public class BookMenu {
                     removeBook();
                     break;
                 case 4:
-                    SearchBooksView searchBooksView = new SearchBooksView(bookController);
+                    SearchBooksView searchBooksView = new SearchBooksView(bookController, scanner);
                     searchBooksView.searchBooks();
                     break;
 
@@ -89,15 +89,21 @@ public class BookMenu {
     }
 
     private void removeBook() {
-        System.out.print("Digite o ISBN ou nome do livro que deseja remover: ");
-        String searchTerm = scanner.nextLine();
-        Book book = bookController.findBookByIdOrName(searchTerm);
-        if (book == null) {
-            System.out.println("Livro não encontrado.");
-        } else {
-            bookController.removeBook(book);
+        System.out.print("Digite o ID do livro que deseja remover: ");
+        int bookId = scanner.nextInt();
+        scanner.nextLine();
+
+        Book borrowedBook = bookController.isBookBorrowed(bookId);
+        if (borrowedBook != null) {
+            System.out.println("Este livro não pode ser removido, pois está atualmente emprestado.");
+        } else if (bookController.removeBook(bookId)) {
             System.out.println("Livro removido com sucesso.");
+        } else {
+            System.out.println("Não foi possível remover o livro.");
         }
     }
+
+
+
 
 }

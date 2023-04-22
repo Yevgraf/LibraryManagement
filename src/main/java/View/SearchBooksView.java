@@ -1,8 +1,8 @@
 package View;
 
 import Controller.BookController;
+import Model.Author;
 import Model.Book;
-
 
 import java.util.List;
 import java.util.Scanner;
@@ -11,9 +11,9 @@ public class SearchBooksView {
     private final BookController bookController;
     private final Scanner scanner;
 
-    public SearchBooksView(BookController bookController) {
+    public SearchBooksView(BookController bookController, Scanner scanner) {
         this.bookController = bookController;
-        this.scanner = new Scanner(System.in);
+        this.scanner = scanner;
     }
 
     public void searchBooks() {
@@ -63,30 +63,26 @@ public class SearchBooksView {
     }
 
     private void searchBooksByCategory() {
+        System.out.println("Categorias:");
 
         List<Book> result = bookController.searchBooksByCategory();
 
         if (result.isEmpty()) {
-            System.out.println("Livros não foram encontrados");
-        } else {
-            System.out.println("Livros encontrados:");
-            for (Book book : result) {
-                System.out.println(book);
-            }
+            System.out.println("Nenhum livro encontrado nesta categoria.");
+
         }
     }
 
     private void searchBooksByAuthor() {
+        System.out.println("Autores:");
 
         List<Book> result = bookController.searchBooksByAuthor();
 
         if (result.isEmpty()) {
-            System.out.println("Livros não foram encontrados");
-        } else {
-            System.out.println("Livros encontrados:");
-            for (Book book : result) {
-                System.out.println(book);
-            }
+            System.out.println("Nenhum livro encontrado para este autor.");
+
         }
     }
 }
+
+

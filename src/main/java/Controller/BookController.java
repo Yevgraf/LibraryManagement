@@ -2,10 +2,7 @@ package Controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import Data.AuthorData;
@@ -81,24 +78,35 @@ public class BookController {
             return;
         }
 
+
         Book book = new Book(title, subtitle, author, numPages, category, publicationDate, ageRange, publisher, isbn);
         bookList.add(book);
         bookData.save(bookList);
     }
 
+
     public List<Book> listBooks() {
         return bookData.load();
     }
 
-    public void removeBook(Book book) {
+    public boolean removeBook(int bookId) {
         List<Book> bookList = listBooks();
-        boolean removed = bookList.removeIf(b -> b.getId() == book.getId());
-        if (removed) {
+        Optional<Book> bookToRemove = bookList.stream().filter(b -> b.getId() == bookId).findFirst();
+        if (bookToRemove.isPresent()) {
+            Book book = bookToRemove.get();
+            if (book.isBorrowed()) {
+                return false;
+            }
+            bookList.remove(book);
             bookData.save(bookList);
+            return true;
         } else {
             System.out.println("Livro não encontrado.");
+            return false;
         }
     }
+
+
 
     public Book findBookByIdOrName(String searchTerm) {
         List<Book> books = listBooks();
@@ -132,6 +140,7 @@ public class BookController {
                 .orElse(null);
     }
 
+
     public List<Book> searchBooksByCategory() {
         List<Category> categories = categoryData.listCategories();
 
@@ -155,7 +164,7 @@ public class BookController {
 
         Category selectedCategory = categories.get(selectedCategoryIndex - 1);
 
-        List<Book> books = searchBooksByCategoryWithName(selectedCategory.getCategoryName());
+        List<Book> books = searchBooksByCategoryWithName(selectedCategory);
 
         if (books.isEmpty()) {
             System.out.println("Não há livros cadastrados nesta categoria.");
@@ -170,19 +179,20 @@ public class BookController {
         return books;
     }
 
-    public List<Book> searchBooksByCategoryWithName(String categoryName) {
-        List<Book> books = new ArrayList<>();
-
+    private List<Book> searchBooksByCategoryWithName(Category category) {
         List<Book> allBooks = bookData.listBooks();
 
-        for (Book book : allBooks) {
-            if (book.getCategory().getCategoryName().equals(categoryName)) {
-                books.add(book);
-            }
-        }
-
-        return books;
+        return allBooks.stream()
+                .filter(book -> book.getCategory().getCategoryName() != null && book.getCategory().getCategoryName().equals(category.getCategoryName()))
+                .distinct()
+                .collect(Collectors.toList());
     }
+
+
+
+
+
+
 
     public List<Book> searchBooksByAuthor() {
         List<Author> authors = authorData.listAuthors();
@@ -234,6 +244,16 @@ public class BookController {
         }
 
         return books;
+    }
+
+    public Book isBookBorrowed(int bookId) {
+        List<Book> allBooks = bookData.listBooks();
+        for (Book book : allBooks) {
+            if (book.getId() == bookId && book.isBorrowed()) {
+                return book;
+            }
+        }
+        return null;
     }
 
 }
