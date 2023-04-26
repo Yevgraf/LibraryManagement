@@ -1,11 +1,15 @@
 package Controller;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import Data.LibrarianData;
 import Model.Librarian;
-import View.CreateLibrarianView;
 
 public class LibrarianController {
     private LibrarianData librarianData;
@@ -13,56 +17,128 @@ public class LibrarianController {
     public LibrarianController(LibrarianData librarianData) {
         this.librarianData = librarianData;
     }
+
     public void createLibrarian(String name, String address, LocalDate birthDate, String phone, String email, String password) {
-        // Verificar se todos os campos obrigatórios foram preenchidos
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Nome não pode ser nulo ou vazio");
-        }
-        if (address == null || address.isEmpty()) {
-            throw new IllegalArgumentException("Endereço não pode ser nulo ou vazio");
-        }
-        if (phone == null || phone.isEmpty()) {
-            throw new IllegalArgumentException("Telefone não pode ser nulo ou vazio");
-        }
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email não pode ser nulo ou vazio");
-        }
-        if (password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("Senha não pode ser nula ou vazia");
+        Scanner scanner = new Scanner(System.in);
+
+        while (name == null || name.isEmpty()) {
+            System.out.print("Digite o nome do bibliotecário: ");
+            name = scanner.nextLine().trim();
+            if (name.isEmpty()) {
+                System.out.println("Nome não pode ser vazio");
+            }
         }
 
-        // Verificar se o email tem formato válido
-        if (!Pattern.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", email)) {
-            throw new IllegalArgumentException("Email inválido");
+        while (address == null || address.isEmpty()) {
+            System.out.print("Digite o endereço do bibliotecário: ");
+            address = scanner.nextLine().trim();
+            if (address.isEmpty()) {
+                System.out.println("Endereço não pode ser vazio");
+            }
         }
 
-        // Verificar se a senha tem pelo menos 8 caracteres, uma letra minúscula, uma letra maiúscula, um número e um caractere especial
-        if (!Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", password)) {
-            throw new IllegalArgumentException("Senha deve ter pelo menos 8 caracteres, uma letra minúscula, uma letra maiúscula, um número e um caractere especial");
+        while (birthDate == null || birthDate.isAfter(LocalDate.now())) {
+            System.out.print("Digite a data de nascimento do bibliotecário (no formato DD/MM/AAAA): ");
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                String input = scanner.nextLine().trim();
+                birthDate = LocalDate.parse(input, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Data de nascimento inválida");
+            }
         }
 
-        // Verificar se a data de nascimento não é nula e é anterior à data atual
-        if (birthDate == null || birthDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Data de nascimento inválida");
+        while (phone == null || !Pattern.matches("^(9[1236]\\d{7})$", phone)) {
+            System.out.print("Digite o telefone do bibliotecário (no formato 9XXXXXXXX): ");
+            phone = scanner.nextLine().trim();
+            if (!Pattern.matches("^(9[1236]\\d{7})$", phone)) {
+                System.out.println("Telefone inválido");
+            }
         }
 
-        // Verificar se o telefone tem formato válido
-        if (!Pattern.matches("\\(\\d{2}\\)\\d{4}-\\d{4}", phone)) {
-            throw new IllegalArgumentException("Telefone inválido");
+
+        while (email == null || !Pattern.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", email)) {
+            System.out.print("Digite o email do bibliotecário: ");
+            email = scanner.nextLine().trim();
+            if (!Pattern.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", email)) {
+                System.out.println("Email inválido");
+            }
         }
 
-       // Verificar se já existe um bibliotecário com o mesmo email antes de criar um novo bibliotecário com esse email
-        List<Librarian> librarianList = (List<Librarian>) librarianData.load();
-       if (librarianList.stream().anyMatch(librarian -> librarian.getEmail().equals(email))) {
-            throw new IllegalArgumentException("Já existe um bibliotecário com esse email");
+        while (password == null || !Pattern.matches("^[^\\s]{0,16}$", password)) {
+            System.out.print("Digite a senha do bibliotecário (máximo 16 caracteres e sem espaços): ");
+            password = scanner.nextLine().trim();
+            if (!Pattern.matches("^[^\\s]{0,16}$", password)) {
+                System.out.println("Senha inválida");
+            }
         }
+
+        // Verificar se já existe um bibliotecário com o mesmo email antes de criar um novo bibliotecário com esse email
+        List<Librarian> librarianList = librarianData.load();
+        final String emailToCheck = email;
+        if (librarianList.stream().anyMatch(librarian -> librarian.getEmail().equals(emailToCheck))) {
+            System.out.println("Já existe um bibliotecário com esse email");
+            return;
+        }
+
+
         Librarian librarian = new Librarian(name, address, birthDate, phone, email, password);
         librarianList.add(librarian);
         librarianData.save(librarianList);
+
+        System.out.println("Bibliotecário registrado com sucesso!");
     }
 
+    public static boolean login(String email, String password) {
+        List<Librarian> userList = LibrarianData.load();
+
+        for (Librarian user : userList) {
+            if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void deleteLibrarian() {
+        List<Librarian> librarianList = librarianData.load();
+
+        System.out.print("Digite o nome do bibliotecário: ");
+        Scanner scanner = new Scanner(System.in);
+        String name = scanner.nextLine().trim();
+
+        List<Librarian> matchingLibrarians = librarianList.stream()
+                .filter(librarian -> librarian.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toList());
+
+        if (matchingLibrarians.isEmpty()) {
+            System.out.println("Não foi encontrado nenhum bibliotecário com esse nome.");
+            return;
+        }
+
+        System.out.println("Bibliotecários encontrados: ");
+        for (int i = 0; i < matchingLibrarians.size(); i++) {
+            System.out.println((i + 1) + ". " + matchingLibrarians.get(i).getName());
+        }
+
+        System.out.print("Digite o número do bibliotecário que deseja remover: ");
+        int selection = scanner.nextInt();
+
+        if (selection < 1 || selection > matchingLibrarians.size()) {
+            System.out.println("Seleção inválida.");
+            return;
+        }
+
+        Librarian librarianToRemove = matchingLibrarians.get(selection - 1);
+        librarianList.remove(librarianToRemove);
+
+        librarianData.save(librarianList);
+
+        System.out.println("Bibliotecário removido com sucesso.");
+    }
 
     public List<Librarian> listLibrarians() {
-        return (List<Librarian>) librarianData.load();
+        return librarianData.load();
     }
 }

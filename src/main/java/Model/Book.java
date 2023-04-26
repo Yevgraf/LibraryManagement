@@ -6,6 +6,7 @@ package Model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * @author franc
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 
 public class Book implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static transient int counter = 0;
+    private static int counter = 0;
     private int id;
     private String title;
     private String subtitle;
@@ -39,9 +40,11 @@ public class Book implements Serializable {
         this.isbn = isbn;
         this.borrowed = false;
     }
+
     public Book() {
 
     }
+
 
     public int getId() {
         return id;
@@ -122,6 +125,7 @@ public class Book implements Serializable {
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
+
     public boolean isBorrowed() {
         return borrowed;
     }
@@ -135,17 +139,25 @@ public class Book implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("ID: ").append(id).append("\n")
-                .append("Title: ").append(title).append("\n")
-                .append("Subtitle: ").append(subtitle).append("\n")
-                .append("Author: ").append(author).append("\n")
-                .append("Number of Pages: ").append(numPages).append("\n")
-                .append("Category: ").append(category).append("\n")
-                .append("Publication Date: ").append(publicationDate).append("\n")
-                .append("Age Range: ").append(ageRange).append("\n")
-                .append("Publisher: ").append(publisher).append("\n")
+                .append("Título: ").append(title).append("\n")
+                .append("Subtítulo: ").append(subtitle).append("\n")
+                .append("Autor: ").append(author).append("\n")
+                .append("Número de Páginas: ").append(numPages).append("\n")
+                .append("Categoria: ").append(category.getCategoryName()).append("\n")
+                .append("Data de Publicação: ").append(publicationDate).append("\n")
+                .append("Faixa Etária: ").append(ageRange).append("\n")
+                .append("Editora: ").append(publisher.getName()).append("\n")
+                .append("Morada: ").append(publisher.getAddress()).append("\n")
                 .append("ISBN: ").append(isbn).append("\n")
-                .append("Borrowed: ").append(borrowed ? "Yes" : "No").append("\n"); // Include borrowed field
+                .append("Emprestado: ").append(borrowed ? "Sim" : "Não").append("\n");
         return sb.toString();
     }
+
+    public static void resetIdCounter(List<Book> books) {
+        int maxId = books.stream().mapToInt(Book::getId).max().orElse(0);
+        counter = maxId;
+    }
+
+
 
 }

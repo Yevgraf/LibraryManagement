@@ -22,13 +22,13 @@ public class ReservationData {
         }
     }
 
-    public List<Reservation> load() {
+    public static List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME));
             reservations = (List<Reservation>) ois.readObject();
+            Reservation.resetIdCounter(reservations);
             ois.close();
-            System.out.println("Reservas carregadas do ficheiro.");
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontradas reservas gravadas.");
         } catch (IOException | ClassNotFoundException e) {

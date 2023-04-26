@@ -1,18 +1,17 @@
-
 package Controller;
 
 import java.util.List;
 import java.util.regex.Pattern;
+
 import Data.PublisherData;
 import Model.Publisher;
 
 public class PublisherController {
     private PublisherData publisherData;
-    private Pattern validAddressPattern;
 
     public PublisherController(PublisherData publisherData) {
         this.publisherData = publisherData;
-        this.validAddressPattern = Pattern.compile("^\\d+\\s+([A-Za-z]+\\s?)+,\\s+[A-Za-z]{2}$");
+
     }
 
     public void createPublisher(String name, String address) throws IllegalArgumentException {
@@ -23,9 +22,7 @@ public class PublisherController {
         if (address == null || address.isBlank()) {
             throw new IllegalArgumentException("O endereço da editora não pode ser nulo ou vazio");
         }
-        if (!validAddressPattern.matcher(address).matches()) {
-            throw new IllegalArgumentException("O endereço deve estar no formato 'número rua, cidade' (Exemplo: '123 Main St, New York, NY')");
-        }
+
         Publisher publisher = new Publisher(name, address);
         publisherList.add(publisher);
         publisherData.save(publisherList);
@@ -34,6 +31,7 @@ public class PublisherController {
     public List<Publisher> listPublishers() {
         return publisherData.load();
     }
+
     public Publisher findByName(String name) {
         List<Publisher> publishers = publisherData.load();
         for (Publisher publisher : publishers) {

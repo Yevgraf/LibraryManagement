@@ -6,9 +6,10 @@
 package com.mycompany.biblioteca;
 
 import Controller.LibrarianController;
-import Data.LibrarianData;
+import Data.*;
 import View.CreateLibrarianView;
 import View.LibrarianMenu;
+import View.LoginView;
 import View.MainMenu;
 
 /**
@@ -17,8 +18,25 @@ import View.MainMenu;
 public class Biblioteca {
 
     public static void main(String[] args) {
-        MainMenu mainMenu = new MainMenu();
-        mainMenu.displayMenu();
+        LibrarianData.load();
+        BookData.load();
+        AgeRangeData.load();
+        AuthorData.load();
+        CardData.load();
+        CategoryData.load();
+        MemberData.load();
+        PublisherData.load();
+        ReservationData.load();
+
+        LibrarianData librarianData = new LibrarianData();
+        LibrarianController librarianController = new LibrarianController(librarianData);
+        LoginView loginView = new LoginView(librarianController);
+        loginView.login();
+//       MainMenu mainMenu = new MainMenu();
+//       mainMenu.displayMenu();
+
     }
 }
+
+
 
