@@ -63,15 +63,16 @@ public class Card implements Serializable {
     @Override
     public String toString() {
         return String.format(
-                "Card{%n" +
-                        "    member=%s%n" +
-                        "    cardNumber='%s'%n" +
-                        "    borrowedBooks=%s%n" +
+                "Cartão{%n" +
+                        "    membro=%s%n" +
+                        "    número do cartão='%s'%n" +
+                        "    livros emprestados=%s%n" +
                         "}",
                 member,
                 cardNumber,
                 borrowedBooks
         );
     }
+
 
 }
