@@ -1,6 +1,7 @@
 package Model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Category implements Serializable {
 
@@ -34,10 +35,15 @@ public class Category implements Serializable {
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
+
     @Override
     public String toString() {
         return categoryName;
     }
 
+    public static void resetIdCounter(List<Category> categoryList) {
+        int maxId = categoryList.stream().mapToInt(Category::getCategoryId).max().orElse(0);
+        counter = maxId;
+    }
 
 }

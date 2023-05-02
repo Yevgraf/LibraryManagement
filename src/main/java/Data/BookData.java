@@ -1,6 +1,7 @@
 package Data;
 
 import Model.Book;
+import Model.Category;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class BookData {
         List<Book> bookList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             bookList = (List<Book>) in.readObject();
-            System.out.println("Livros carregados do ficheiro.");
+            Book.resetIdCounter(bookList);
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontrados livros guardados.");
         } catch (IOException | ClassNotFoundException e) {
@@ -44,5 +45,7 @@ public class BookData {
         return bookList;
     }
 
-
+    public List<Book> listBooks() {
+        return load();
+    }
 }

@@ -34,7 +34,7 @@ public class MemberData {
         List<Member> memberList = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             memberList = (List<Member>) in.readObject();
-            System.out.println("Membros carregados do ficheiro");
+
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontrados membros gravados");
         } catch (IOException | ClassNotFoundException e) {

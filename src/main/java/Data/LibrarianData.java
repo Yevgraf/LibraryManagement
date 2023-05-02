@@ -1,6 +1,7 @@
 package Data;
 
 import Model.Librarian;
+import Model.Reservation;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ public class LibrarianData {
         List<Librarian> userList = new ArrayList<>();
         try ( ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             userList = (List<Librarian>) in.readObject();
-            System.out.println("Utilizadores carregados do ficheiro.");
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontrados utilizadores guardados.");
         } catch (IOException | ClassNotFoundException e) {

@@ -43,7 +43,7 @@ public class CreateReservationView {
             return;
         }
 
-        // Start date is set to current date
+
         LocalDate startDate = LocalDate.now();
 
         System.out.print("Data de término da reserva (dd/MM/yyyy): ");

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class AgeRange implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static int counter = 0;
+    private int counter = 0;
     private int id;
     private String description;
 
@@ -13,7 +13,7 @@ public class AgeRange implements Serializable {
         this.description = description;
     }
 
-    public AgeRange(){
+    public AgeRange() {
 
     }
 
@@ -32,6 +32,7 @@ public class AgeRange implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
     @Override
     public String toString() {
         return description;

@@ -11,15 +11,14 @@ import java.time.LocalDate;
  * @author franc
  */
 public class User implements Serializable {
-
-    private static transient int counter = 0;
+    private static final long serialVersionUID = 1L;
+    private int counter = 0;
     private int id;
     private String name;
     private String address;
     private LocalDate birthDate;
     private String phone;
     private String email;
-
 
 
     public User(String name, String address, LocalDate birthDate, String phone, String email) {
@@ -83,7 +82,6 @@ public class User implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
 
     @Override
