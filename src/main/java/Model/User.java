@@ -86,14 +86,14 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("User:\n" +
-                        "\tName: %s\n" +
-                        "\tAddress: %s\n" +
-                        "\tBirth Date: %s\n" +
-                        "\tPhone: %s\n" +
+        return String.format("Utilizador:\n" +
+                        "\tNome: %s\n" +
+                        "\tMorada: %s\n" +
+                        "\tData de nascimento: %s\n" +
+                        "\tTelefone: %s\n" +
                         "\tEmail: %s\n",
-
                 name, address, birthDate, phone, email);
     }
+
 
 }

@@ -67,13 +67,14 @@ public class Author implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("Author:\n" +
+        return String.format("Autor:\n" +
                         "\tID: %d\n" +
-                        "\tName: %s\n" +
-                        "\tAddress: %s\n" +
-                        "\tBirth Date: %s\n",
+                        "\tNome: %s\n" +
+                        "\tMorada: %s\n" +
+                        "\tData de Nascimento: %s\n",
                 id, name, address, birthDate);
     }
+
 
     public static void resetIdCounter(List<Author> authorList) {
         int maxId = authorList.stream().mapToInt(Author::getId).max().orElse(0);

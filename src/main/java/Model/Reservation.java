@@ -63,12 +63,13 @@ public class Reservation implements Serializable {
 
     @Override
     public String toString() {
-        return "Reservation #" + id + ":\n" +
-                "Book: " + book.getTitle() + " by " + book.getAuthor() + "\n" +
-                "Reserved by: " + member.getName() + "\n" +
-                "Reserved on: " + startDate + "\n" +
-                "Ends on: " + endDate + "\n";
+        return "Reserva #" + id + ":\n" +
+                "Livro: " + book.getTitle() + " por " + book.getAuthor() + "\n" +
+                "Reservado por: " + member.getName() + "\n" +
+                "Reservado em: " + startDate + "\n" +
+                "Termina em: " + endDate + "\n";
     }
+
 
     public static void resetIdCounter(List<Reservation> reservationList) {
         int maxId = reservationList.stream().mapToInt(Reservation::getId).max().orElse(0);
