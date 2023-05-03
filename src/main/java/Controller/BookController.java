@@ -53,9 +53,6 @@ public class BookController {
                 .filter(b -> b.getIsbn().equals(isbn))
                 .findFirst()
                 .orElse(null);
-        if (bookByIsbn != null) {
-            throw new IllegalArgumentException("Já existe um livro com esse ISBN.");
-        }
 
         Author author = authorData.findByName(authorName);
         if (author == null) {
