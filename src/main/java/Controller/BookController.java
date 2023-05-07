@@ -37,7 +37,7 @@ public class BookController {
     }
 
     public void createBook(String title, String subtitle, String authorName, int numPages, String categoryName,
-                           LocalDate publicationDate, String ageRangeName, String publisherName, String isbn) {
+                           LocalDate publicationDate, String ageRangeName, String publisherName, String isbn, int quantity) {
         // Validations
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Título do livro inválido.");
@@ -79,7 +79,7 @@ public class BookController {
         }
 
 
-        Book book = new Book(title, subtitle, author, numPages, category, publicationDate, ageRange, publisher, isbn);
+        Book book = new Book(title, subtitle, author, numPages, category, publicationDate, ageRange, publisher, isbn, quantity);
         bookList.add(book);
         bookData.save(bookList);
     }
@@ -94,9 +94,6 @@ public class BookController {
         Optional<Book> bookToRemove = bookList.stream().filter(b -> b.getId() == bookId).findFirst();
         if (bookToRemove.isPresent()) {
             Book book = bookToRemove.get();
-            if (book.isBorrowed()) {
-                return false;
-            }
             bookList.remove(book);
             bookData.save(bookList);
             return true;
@@ -249,7 +246,7 @@ public class BookController {
     public Book isBookBorrowed(int bookId) {
         List<Book> allBooks = bookData.listBooks();
         for (Book book : allBooks) {
-            if (book.getId() == bookId && book.isBorrowed()) {
+            if (book.getId() == bookId ) {
                 return book;
             }
         }

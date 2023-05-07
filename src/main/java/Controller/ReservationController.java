@@ -49,10 +49,6 @@ public class ReservationController {
             return;
         }
 
-        if (book.isBorrowed()) {
-            System.out.println("Erro: Livro já está emprestado e não disponível para reserva");
-            return;
-        }
         if (member.getBorrowedBooks().contains(book)) {
             System.out.println("Erro: Membro já possui uma reserva deste livro");
             return;
@@ -67,7 +63,7 @@ public class ReservationController {
         }
         member.getBorrowedBooks().add(book);
 
-        updateBookStatus(book, true);
+        updateBookStatus(book);
         reservation.setEndDate(endDate);
         reservationData.addReservation(reservation);
         updateMember(member);
@@ -92,16 +88,18 @@ public class ReservationController {
         memberData.save(members);
     }
 
-    private void updateBookStatus(Book book, boolean borrowed) {
+    private void updateBookStatus(Book book) {
         List<Book> books = bookData.load();
         for (Book b : books) {
             if (b.getId() == book.getId()) {
-                b.setBorrowed(borrowed);
+                int currentQuantity = b.getQuantity();
+                b.setQuantity(currentQuantity - 1);
                 break;
             }
         }
         bookData.save(books);
     }
+
 
     public void removeReservationByBookNameOrIsbn(String bookNameOrIsbn) {
         ReservationData reservationData = new ReservationData();
@@ -124,7 +122,7 @@ public class ReservationController {
         if (reservationToRemove != null) {
             reservations.remove(reservationToRemove);
             reservationData.save(reservations);
-            updateBookStatus(reservationToRemove.getBook(), false);
+            updateBookStatus(reservationToRemove.getBook());
             Member member = reservationToRemove.getMember();
             member.getBorrowedBooks().remove(reservationToRemove.getBook());
             updateMember(member);

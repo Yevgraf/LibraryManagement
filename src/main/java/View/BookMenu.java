@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class BookMenu {
-
     private Scanner scanner;
     private BookController bookController;
     private CreateBookView createBookView;
@@ -20,6 +19,7 @@ public class BookMenu {
     private AgeRangeController ageRangeController;
     private CategoryController categoryController;
     private PublisherController publisherController;
+
 
     public BookMenu(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
@@ -49,7 +49,7 @@ public class BookMenu {
             System.out.println("0. Voltar ao menu principal");
             System.out.print("Escolha uma opção: ");
             choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -62,28 +62,16 @@ public class BookMenu {
                     removeBook();
                     break;
                 case 4:
-                    searchBooks();
+                    SearchBooksView searchBooksView = new SearchBooksView(bookController, scanner);
+                    searchBooksView.searchBooks();
                     break;
+
                 case 0:
                     mainMenu.displayMenu();
                     break;
                 default:
                     System.out.println("Opção inválida.");
                     break;
-            }
-        }
-    }
-
-    private void searchBooks() {
-        System.out.print("Digite o ISBN ou nome do livro que deseja procurar: ");
-        String searchTerm = scanner.nextLine();
-        List<Book> bookList = bookController.searchBooks(searchTerm);
-        if (bookList.isEmpty()) {
-            System.out.println("Nenhum livro encontrado.");
-        } else {
-            System.out.println("==== Livros encontrados ====");
-            for (Book book : bookList) {
-                System.out.println(book.toString());
             }
         }
     }
@@ -101,15 +89,21 @@ public class BookMenu {
     }
 
     private void removeBook() {
-        System.out.print("Digite o ISBN ou nome do livro que deseja remover: ");
-        String searchTerm = scanner.nextLine();
-        Book book = bookController.findBookByIdOrName(searchTerm);
-        if (book == null) {
-            System.out.println("Livro não encontrado.");
-        } else {
-            bookController.removeBook(book);
+        System.out.print("Digite o ID do livro que deseja remover: ");
+        int bookId = scanner.nextInt();
+        scanner.nextLine();
+
+        Book borrowedBook = bookController.isBookBorrowed(bookId);
+        if (borrowedBook != null) {
+            System.out.println("Este livro não pode ser removido, pois está atualmente emprestado.");
+        } else if (bookController.removeBook(bookId)) {
             System.out.println("Livro removido com sucesso.");
+        } else {
+            System.out.println("Não foi possível remover o livro.");
         }
     }
+
+
+
 
 }

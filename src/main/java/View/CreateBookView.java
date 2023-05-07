@@ -42,8 +42,9 @@ public class CreateBookView {
         AgeRange ageRange = getAgeRange();
         Publisher publisher = getPublisher();
         String isbn = getIsbn();
+        int quantity = getQuantity();
 
-        bookController.createBook(title, subtitle, author.getName(), numPages, category.getCategoryName(), publicationDate, ageRange.getDescription(), publisher.getName(), isbn);
+        bookController.createBook(title, subtitle, author.getName(), numPages, category.getCategoryName(), publicationDate, ageRange.getDescription(), publisher.getName(), isbn, quantity);
     }
 
     private String getTitle() {
@@ -77,6 +78,11 @@ public class CreateBookView {
         System.out.print("Número de páginas: ");
         return Integer.parseInt(scanner.nextLine());
     }
+    private int getQuantity() {
+        System.out.print("Número de livros: ");
+        return Integer.parseInt(scanner.nextLine());
+    }
+
 
     public Category getCategory() {
         List<Category> categoryList = categoryController.listCategories();
@@ -109,7 +115,7 @@ public class CreateBookView {
         }
         System.out.print("Digite o número da faixa etária desejada: ");
         int selection = scanner.nextInt();
-        scanner.nextLine(); // consume the remaining newline character
+        scanner.nextLine();
         if (selection < 1 || selection > ageRangeList.size()) {
             System.out.println("Seleção inválida!");
             return null;
@@ -126,7 +132,7 @@ public class CreateBookView {
         }
         System.out.print("Digite o número da editora desejada: ");
         int selection = scanner.nextInt();
-        scanner.nextLine(); // consume the remaining newline character
+        scanner.nextLine();
         if (selection < 1 || selection > publisherList.size()) {
             System.out.println("Seleção inválida!");
             return null;
