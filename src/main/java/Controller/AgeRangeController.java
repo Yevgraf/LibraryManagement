@@ -13,13 +13,12 @@ public class AgeRangeController {
     }
 
     public void createAgeRange(String description) {
-        if (description == null || description.trim().isEmpty()) {
+         if (description == null || description.trim().isEmpty()) {
             throw new IllegalArgumentException("A descrição não pode ser vazia.");
         }
         if (description.length() < 3 || description.length() > 50) {
             throw new IllegalArgumentException("A descrição deve ter entre 3 e 50 caracteres.");
         }
-
         List<AgeRange> ageRangeList = listAgeRanges();
         AgeRange ageRange = new AgeRange(description);
         ageRangeList.add(ageRange);
@@ -46,7 +45,7 @@ public class AgeRangeController {
         System.out.println("Lista de faixas etárias:");
         for (int i = 0; i < ageRangeList.size(); i++) {
             AgeRange ageRange = ageRangeList.get(i);
-            System.out.println((i + 1) + ". " + ageRange.getDescription());
+            System.out.println((i+1) + ". " + ageRange.getDescription());
         }
     }
 

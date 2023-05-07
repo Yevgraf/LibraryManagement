@@ -6,6 +6,7 @@ import Data.CategoryData;
 import Model.Category;
 
 public class CategoryController {
+
     private CategoryData categoryData;
 
     public CategoryController(CategoryData categoryData) {

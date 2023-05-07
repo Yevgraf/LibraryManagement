@@ -34,7 +34,7 @@ public class LibrarianData {
 
     public static List<Librarian> load() {
         List<Librarian> userList = new ArrayList<>();
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
+        try ( ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
             userList = (List<Librarian>) in.readObject();
         } catch (FileNotFoundException e) {
             System.out.println("Não foram encontrados utilizadores guardados.");
@@ -44,4 +44,4 @@ public class LibrarianData {
         return userList;
     }
 
-}
+}   
