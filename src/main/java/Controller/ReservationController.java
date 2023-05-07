@@ -1,13 +1,11 @@
 package Controller;
 
 import Data.BookData;
-import Data.CardData;
 import Data.ReservationData;
 import Data.MemberData;
-import Model.Book;
-import Model.Card;
-import Model.Member;
-import Model.Reservation;
+import Model.*;
+
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -61,12 +59,18 @@ public class ReservationController {
             System.out.println("Erro: Data final da reserva não pode ser nula");
             return;
         }
+        //adiciona livros ao arraylist nos membros para verificar quantas reservas tem e qual os livros reservaram
         member.getBorrowedBooks().add(book);
-
-        updateBookStatus(book);
+        //data de final de reserva, currentdate = inicio
         reservation.setEndDate(endDate);
+        //update no estado da reserva
+        updateReservationReserved(reservation);
+        //adicionar reserva ao ficheiro
         reservationData.addReservation(reservation);
+        //update ficheiro membros com o arraylist atualizado
         updateMember(member);
+        //remove 1 livro da quantidade
+        updateBookQuantity(book);
     }
 
     public List<Reservation> getReservationsForMember(Member member) {
@@ -88,11 +92,16 @@ public class ReservationController {
         memberData.save(members);
     }
 
-    private void updateBookStatus(Book book) {
+    //remove 1 na quantidade do livro escolhido, se quantidade atual for igual a 0 print mensagem;
+    private void updateBookQuantity(Book book) {
         List<Book> books = bookData.load();
         for (Book b : books) {
             if (b.getId() == book.getId()) {
                 int currentQuantity = b.getQuantity();
+                if (currentQuantity == 0) {
+                    System.out.println("Erro: Não há mais cópias disponíveis deste livro");
+                    return;
+                }
                 b.setQuantity(currentQuantity - 1);
                 break;
             }
@@ -101,6 +110,39 @@ public class ReservationController {
     }
 
 
+    public void updateReservationReserved(Reservation reservation) {
+        List<Reservation> reservations = reservationData.load();
+        for (Reservation r : reservations) {
+            if (r.getId() == reservation.getId()) {
+                r.setState(State.RESERVED);
+                break;
+            }
+        }
+        reservationData.save(reservations);
+    }
+
+    public void updateReservationDelivered(Reservation reservation) {
+        List<Reservation> reservations = reservationData.load();
+        for (Reservation r : reservations) {
+            if (r.getId() == reservation.getId()) {
+                r.setState(State.DELIVERED);
+                break;
+            }
+        }
+        reservationData.save(reservations);
+    }
+
+
+    public void updateReservationCanceled(Reservation reservation) {
+        List<Reservation> reservations = reservationData.load();
+        for (Reservation r : reservations) {
+            if (r.getId() == reservation.getId()) {
+                r.setState(State.CANCELED);
+                break;
+            }
+        }
+        reservationData.save(reservations);
+    }
     public void removeReservationByBookNameOrIsbn(String bookNameOrIsbn) {
         ReservationData reservationData = new ReservationData();
         BookData bookData = new BookData();
@@ -122,7 +164,7 @@ public class ReservationController {
         if (reservationToRemove != null) {
             reservations.remove(reservationToRemove);
             reservationData.save(reservations);
-            updateBookStatus(reservationToRemove.getBook());
+            updateBookQuantity(reservationToRemove.getBook());
             Member member = reservationToRemove.getMember();
             member.getBorrowedBooks().remove(reservationToRemove.getBook());
             updateMember(member);
