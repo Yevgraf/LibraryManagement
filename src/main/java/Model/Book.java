@@ -26,8 +26,9 @@ public class Book implements Serializable {
     private Publisher publisher;
     private String isbn;
     private boolean borrowed;
+    private int quantity;
 
-    public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn) {
+    public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn, int quantity) {
         this.id = ++counter;
         this.title = title;
         this.subtitle = subtitle;
@@ -39,6 +40,7 @@ public class Book implements Serializable {
         this.publisher = publisher;
         this.isbn = isbn;
         this.borrowed = false;
+        this.quantity = quantity;
     }
 
     public Book() {
@@ -124,6 +126,14 @@ public class Book implements Serializable {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public boolean isBorrowed() {
