@@ -1,7 +1,8 @@
 package Model;
 
 public enum State {
-    RESERVED,
-    CANCELED,
-    DELIVERED
+    RESERVADO,
+    CANCELADA,
+    ENTREGUE,
+    PENDENTE
 }

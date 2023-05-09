@@ -59,18 +59,21 @@ public class ReservationController {
             System.out.println("Erro: Data final da reserva não pode ser nula");
             return;
         }
+
+        reservation.setState(State.PENDENTE);
         //adiciona livros ao arraylist nos membros para verificar quantas reservas tem e qual os livros reservaram
         member.getBorrowedBooks().add(book);
         //data de final de reserva, currentdate = inicio
         reservation.setEndDate(endDate);
-        //update no estado da reserva
-        updateReservationReserved(reservation);
         //adicionar reserva ao ficheiro
         reservationData.addReservation(reservation);
+
+        //update no estado da reserva
+        updateReservationReserved(reservation);
         //update ficheiro membros com o arraylist atualizado
         updateMember(member);
         //remove 1 livro da quantidade
-        updateBookQuantity(book);
+        updateBookQuantityReduce(book);
     }
 
     public List<Reservation> getReservationsForMember(Member member) {
@@ -93,7 +96,7 @@ public class ReservationController {
     }
 
     //remove 1 na quantidade do livro escolhido, se quantidade atual for igual a 0 print mensagem;
-    private void updateBookQuantity(Book book) {
+    private void updateBookQuantityReduce(Book book) {
         List<Book> books = bookData.load();
         for (Book b : books) {
             if (b.getId() == book.getId()) {
@@ -109,23 +112,39 @@ public class ReservationController {
         bookData.save(books);
     }
 
+    private void updateBookQuantityIncrease(Book book) {
+        List<Book> books = bookData.load();
+        for (Book b : books) {
+            if (b.getId() == book.getId()) {
+                int currentQuantity = b.getQuantity();
+                b.setQuantity(currentQuantity + 1);
+                break;
+            }
+        }
+        bookData.save(books);
+    }
 
     public void updateReservationReserved(Reservation reservation) {
         List<Reservation> reservations = reservationData.load();
         for (Reservation r : reservations) {
             if (r.getId() == reservation.getId()) {
-                r.setState(State.RESERVED);
+                r.setState(State.RESERVADO);
                 break;
+            } else if (r.getBook().getId() == reservation.getBook().getId() &&
+                    r.getState() == State.PENDENTE) {
+                r.setState(State.RESERVADO);
             }
         }
         reservationData.save(reservations);
     }
 
+
+
     public void updateReservationDelivered(Reservation reservation) {
         List<Reservation> reservations = reservationData.load();
         for (Reservation r : reservations) {
             if (r.getId() == reservation.getId()) {
-                r.setState(State.DELIVERED);
+                r.setState(State.ENTREGUE);
                 break;
             }
         }
@@ -137,39 +156,42 @@ public class ReservationController {
         List<Reservation> reservations = reservationData.load();
         for (Reservation r : reservations) {
             if (r.getId() == reservation.getId()) {
-                r.setState(State.CANCELED);
+                r.setState(State.CANCELADA);
                 break;
             }
         }
         reservationData.save(reservations);
     }
-    public void removeReservationByBookNameOrIsbn(String bookNameOrIsbn) {
-        ReservationData reservationData = new ReservationData();
-        BookData bookData = new BookData();
-        MemberData memberData = new MemberData();
-        List<Reservation> reservations = reservationData.load();
-        String searchInput = bookNameOrIsbn.trim().toLowerCase();
+    public void deliverReservationByBookNameOrIsbn(String bookNameOrIsbn) {
+        try {
+            List<Reservation> reservations = reservationData.load();
+            String searchInput = bookNameOrIsbn.trim().toLowerCase();
 
-        Reservation reservationToRemove = null;
-        for (Reservation reservation : reservations) {
-            String bookTitle = reservation.getBook().getTitle().trim().toLowerCase();
-            String bookISBN = reservation.getBook().getIsbn().trim().toLowerCase();
-            if (bookTitle.equalsIgnoreCase(searchInput) || bookISBN.equalsIgnoreCase(searchInput)) {
-                reservationToRemove = reservation;
-                System.out.println("Reserva removida: " + reservation.toString());
-                break;
+            Reservation matchingReservation = null;
+            for (Reservation reservation : reservations) {
+                String bookTitle = reservation.getBook().getTitle().trim().toLowerCase();
+                String bookISBN = reservation.getBook().getIsbn().trim().toLowerCase();
+                if (bookTitle.equalsIgnoreCase(searchInput) || bookISBN.equalsIgnoreCase(searchInput)) {
+                    matchingReservation = reservation;
+                    System.out.println("Reserva encontrada: " + reservation.toString());
+                    break;
+                }
             }
-        }
 
-        if (reservationToRemove != null) {
-            reservations.remove(reservationToRemove);
-            reservationData.save(reservations);
-            updateBookQuantity(reservationToRemove.getBook());
-            Member member = reservationToRemove.getMember();
-            member.getBorrowedBooks().remove(reservationToRemove.getBook());
-            updateMember(member);
-        } else {
-            System.out.println("Reserva não encontrada para remoção.");
+            if (matchingReservation != null) {
+                if (matchingReservation.getState() != State.RESERVADO) {
+                    System.out.println("A reserva não pode ser entregue, pois não está no estado 'RESERVADA'");
+                    return;
+                }
+                updateReservationDelivered(matchingReservation);
+                reservationData.save(reservations);
+                updateBookQuantityIncrease(matchingReservation.getBook());
+                System.out.println("Reserva atualizada para 'ENTREGUE': " + matchingReservation.toString());
+            } else {
+                System.out.println("Nenhuma reserva encontrada para o livro com título ou ISBN: " + bookNameOrIsbn);
+            }
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao tentar alterar a reserva para 'ENTREGUE': " + e.getMessage());
         }
     }
 
