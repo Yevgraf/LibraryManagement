@@ -19,6 +19,10 @@ public class RemoveReservationView {
         System.out.print("Nome do Livro ou ISBN do livro: ");
         String searchTerm = scanner.nextLine();
 
-        reservationController.deliverReservationByBookNameOrIsbn(searchTerm);
+        System.out.print("Nome do Membro: ");
+        String memberName = scanner.nextLine();
+
+        reservationController.deliverReservationByBookNameAndUserName(searchTerm, memberName);
     }
+
 }

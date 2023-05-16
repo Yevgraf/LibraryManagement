@@ -6,7 +6,6 @@ import Data.MemberData;
 import Model.*;
 
 
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -61,20 +60,40 @@ public class ReservationController {
         }
 
         reservation.setState(State.PENDENTE);
-        //adiciona livros ao arraylist nos membros para verificar quantas reservas tem e qual os livros reservaram
+        // adiciona livros ao arraylist nos membros para verificar quantas reservas tem e qual os livros reservaram
         member.getBorrowedBooks().add(book);
-        //data de final de reserva, currentdate = inicio
+        // data de final de reserva, currentdate = inicio
         reservation.setEndDate(endDate);
-        //adicionar reserva ao ficheiro
         reservationData.addReservation(reservation);
-
-        //update no estado da reserva
-        updateReservationReserved(reservation);
-        //update ficheiro membros com o arraylist atualizado
-        updateMember(member);
-        //remove 1 livro da quantidade
+        // remove 1 livro da quantidade
         updateBookQuantityReduce(book);
+        // update ficheiro membros com o arraylist atualizado
+        updateMember(member);
+        System.out.println("Reserva adicionada com sucesso!");
+        updateReservationReserved();
     }
+
+    public void updateReservationReserved() {
+        List<Reservation> reservations = reservationData.load();
+        boolean updated = false;
+        for (Reservation r : reservations) {
+            if (r.getState() == State.PENDENTE) {
+                r.setState(State.RESERVADO);
+                updated = true;
+            }
+        }
+        if (updated) {
+            reservationData.save(reservations);
+            System.out.println("Reservas depois do update: " + reservations);
+        } else {
+            System.out.println("Não há reservas pendentes para atualizar.");
+        }
+    }
+
+
+
+
+
 
     public List<Reservation> getReservationsForMember(Member member) {
         return reservationData.getReservationsForMember(member);
@@ -124,32 +143,19 @@ public class ReservationController {
         bookData.save(books);
     }
 
-    public void updateReservationReserved(Reservation reservation) {
+
+    public void updateReservationDelivered(String bookName, String userName) {
         List<Reservation> reservations = reservationData.load();
         for (Reservation r : reservations) {
-            if (r.getId() == reservation.getId()) {
-                r.setState(State.RESERVADO);
-                break;
-            } else if (r.getBook().getId() == reservation.getBook().getId() &&
-                    r.getState() == State.PENDENTE) {
-                r.setState(State.RESERVADO);
-            }
-        }
-        reservationData.save(reservations);
-    }
-
-
-
-    public void updateReservationDelivered(Reservation reservation) {
-        List<Reservation> reservations = reservationData.load();
-        for (Reservation r : reservations) {
-            if (r.getId() == reservation.getId()) {
+            if (r.getBook().getTitle().equalsIgnoreCase(bookName) && r.getMember().getName().equalsIgnoreCase(userName)) {
                 r.setState(State.ENTREGUE);
                 break;
             }
         }
         reservationData.save(reservations);
     }
+
+
 
 
     public void updateReservationCanceled(Reservation reservation) {
@@ -162,37 +168,54 @@ public class ReservationController {
         }
         reservationData.save(reservations);
     }
-    public void deliverReservationByBookNameOrIsbn(String bookNameOrIsbn) {
+
+    public void deliverReservationByBookNameAndUserName(String bookNameOrIsbn, String userName) {
         try {
-            List<Reservation> reservations = reservationData.load();
-            String searchInput = bookNameOrIsbn.trim().toLowerCase();
-
-            Reservation matchingReservation = null;
-            for (Reservation reservation : reservations) {
-                String bookTitle = reservation.getBook().getTitle().trim().toLowerCase();
-                String bookISBN = reservation.getBook().getIsbn().trim().toLowerCase();
-                if (bookTitle.equalsIgnoreCase(searchInput) || bookISBN.equalsIgnoreCase(searchInput)) {
-                    matchingReservation = reservation;
-                    System.out.println("Reserva encontrada: " + reservation.toString());
-                    break;
-                }
-            }
-
+            Reservation matchingReservation = findReservationByBookNameAndUserName(bookNameOrIsbn, userName);
             if (matchingReservation != null) {
                 if (matchingReservation.getState() != State.RESERVADO) {
                     System.out.println("A reserva não pode ser entregue, pois não está no estado 'RESERVADA'");
                     return;
                 }
-                updateReservationDelivered(matchingReservation);
-                reservationData.save(reservations);
+                if (!isBookBorrowedByMember(matchingReservation.getBook(), matchingReservation.getMember())) {
+                    System.out.println("A reserva não pode ser entregue, pois o livro não foi emprestado para o membro que fez a reserva.");
+                    return;
+                }
+                updateReservationDelivered(matchingReservation.getBook().getTitle(),matchingReservation.getMember().getName());
+                reservationData.save(reservationData.load());
                 updateBookQuantityIncrease(matchingReservation.getBook());
                 System.out.println("Reserva atualizada para 'ENTREGUE': " + matchingReservation.toString());
             } else {
-                System.out.println("Nenhuma reserva encontrada para o livro com título ou ISBN: " + bookNameOrIsbn);
+                System.out.println("Nenhuma reserva encontrada para o livro com título ou ISBN: " + bookNameOrIsbn + " e o usuário: " + userName);
             }
         } catch (Exception e) {
             System.out.println("Ocorreu um erro ao tentar alterar a reserva para 'ENTREGUE': " + e.getMessage());
         }
     }
+
+    private Reservation findReservationByBookNameAndUserName(String bookNameOrIsbn, String userName) {
+        List<Reservation> reservations = reservationData.load();
+        String searchInput = bookNameOrIsbn.trim().toLowerCase();
+        for (Reservation reservation : reservations) {
+            String bookTitle = reservation.getBook().getTitle().trim().toLowerCase();
+            String bookISBN = reservation.getBook().getIsbn().trim().toLowerCase();
+            if (bookTitle.equalsIgnoreCase(searchInput) || bookISBN.equalsIgnoreCase(searchInput)) {
+                if (reservation.getMember().getName().equalsIgnoreCase(userName)) {
+                    return reservation;
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean isBookBorrowedByMember(Book book, Member member) {
+        for (Book borrowedBook : member.getBorrowedBooks()) {
+            if (borrowedBook.equals(book)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }
