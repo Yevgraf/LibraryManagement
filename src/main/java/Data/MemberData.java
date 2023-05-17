@@ -3,6 +3,7 @@ package Data;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import Model.Member;
 
@@ -42,4 +43,12 @@ public class MemberData {
         }
         return memberList;
     }
+
+    public Optional<Member> findMemberByName(String memberName) {
+        List<Member> memberList = load();
+        return memberList.stream()
+                .filter(m -> m.getName().equalsIgnoreCase(memberName))
+                .findFirst();
+    }
+
 }

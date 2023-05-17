@@ -25,9 +25,10 @@ public class Book implements Serializable {
     private AgeRange ageRange;
     private Publisher publisher;
     private String isbn;
-    private boolean borrowed;
 
-    public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn) {
+    private int quantity;
+
+    public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn, int quantity) {
         this.id = ++counter;
         this.title = title;
         this.subtitle = subtitle;
@@ -38,7 +39,7 @@ public class Book implements Serializable {
         this.ageRange = ageRange;
         this.publisher = publisher;
         this.isbn = isbn;
-        this.borrowed = false;
+        this.quantity = quantity;
     }
 
     public Book() {
@@ -126,14 +127,13 @@ public class Book implements Serializable {
         this.isbn = isbn;
     }
 
-    public boolean isBorrowed() {
-        return borrowed;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setBorrowed(boolean borrowed) {
-        this.borrowed = borrowed;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
-
 
     @Override
     public String toString() {
@@ -149,7 +149,7 @@ public class Book implements Serializable {
                 .append("Editora: ").append(publisher.getName()).append("\n")
                 .append("Morada: ").append(publisher.getAddress()).append("\n")
                 .append("ISBN: ").append(isbn).append("\n")
-                .append("Emprestado: ").append(borrowed ? "Sim" : "Não").append("\n");
+                .append("Quantidade: ").append(quantity).append("\n");
         return sb.toString();
     }
 
@@ -157,7 +157,6 @@ public class Book implements Serializable {
         int maxId = books.stream().mapToInt(Book::getId).max().orElse(0);
         counter = maxId;
     }
-
 
 
 }

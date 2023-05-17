@@ -12,6 +12,16 @@ public class Reservation implements Serializable {
     private Member member;
     private LocalDate startDate;
     private LocalDate endDate;
+    private State state;
+
+    public Reservation(Book book, Member member, LocalDate startDate, LocalDate endDate, State state) {
+        this.id = counter++;
+        this.book = book;
+        this.member = member;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = state;
+    }
 
     public Reservation(Book book, Member member, LocalDate startDate, LocalDate endDate) {
         this.id = counter++;
@@ -61,15 +71,24 @@ public class Reservation implements Serializable {
         this.id = id;
     }
 
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
     @Override
     public String toString() {
         return "Reserva #" + id + ":\n" +
                 "Livro: " + book.getTitle() + " por " + book.getAuthor() + "\n" +
                 "Reservado por: " + member.getName() + "\n" +
                 "Reservado em: " + startDate + "\n" +
-                "Termina em: " + endDate + "\n";
+                "Termina em: " + endDate + "\n" +
+                "Estado: " + state + "\n";
     }
-
 
     public static void resetIdCounter(List<Reservation> reservationList) {
         int maxId = reservationList.stream().mapToInt(Reservation::getId).max().orElse(0);

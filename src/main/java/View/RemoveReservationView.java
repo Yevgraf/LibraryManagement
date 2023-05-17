@@ -1,7 +1,6 @@
 package View;
 
 import Controller.ReservationController;
-import Model.Reservation;
 
 import java.util.Scanner;
 
@@ -20,6 +19,10 @@ public class RemoveReservationView {
         System.out.print("Nome do Livro ou ISBN do livro: ");
         String searchTerm = scanner.nextLine();
 
-        reservationController.removeReservationByBookNameOrIsbn(searchTerm);
+        System.out.print("Nome do Membro: ");
+        String memberName = scanner.nextLine();
+
+        reservationController.deliverReservationByBookNameAndUserName(searchTerm, memberName);
     }
+
 }

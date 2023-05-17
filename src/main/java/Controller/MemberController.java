@@ -48,6 +48,7 @@ public class MemberController {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 String input = scanner.nextLine().trim();
                 birthDate = LocalDate.parse(input, formatter);
+
             } catch (DateTimeParseException e) {
                 System.out.println("Data de nascimento inválida");
             }

@@ -3,6 +3,7 @@ package Data;
 import Model.Book;
 import Model.Member;
 import Model.Reservation;
+import Model.State;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -35,6 +36,17 @@ public class ReservationData {
             System.err.println("Erro ao carregar reservas do ficheiro: " + e.getMessage());
         }
         return reservations;
+    }
+
+    public List<Reservation> loadReservedReservation() {
+        List<Reservation> reservedReservations = new ArrayList<>();
+        List<Reservation> reservations = load();
+        for (Reservation reservation : reservations) {
+            if (reservation.getState() == State.RESERVADO) {
+                reservedReservations.add(reservation);
+            }
+        }
+        return reservedReservations;
     }
 
     public void addReservation(Reservation reservation) {

@@ -37,7 +37,7 @@ public class BookController {
     }
 
     public void createBook(String title, String subtitle, String authorName, int numPages, String categoryName,
-                           LocalDate publicationDate, String ageRangeName, String publisherName, String isbn) {
+                           LocalDate publicationDate, String ageRangeName, String publisherName, String isbn, int quantity) {
         // Validations
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Título do livro inválido.");
@@ -53,6 +53,9 @@ public class BookController {
                 .filter(b -> b.getIsbn().equals(isbn))
                 .findFirst()
                 .orElse(null);
+        if (bookByIsbn != null) {
+            throw new IllegalArgumentException("Já existe um livro com esse ISBN.");
+        }
 
         Author author = authorData.findByName(authorName);
         if (author == null) {
@@ -76,7 +79,7 @@ public class BookController {
         }
 
 
-        Book book = new Book(title, subtitle, author, numPages, category, publicationDate, ageRange, publisher, isbn);
+        Book book = new Book(title, subtitle, author, numPages, category, publicationDate, ageRange, publisher, isbn, quantity);
         bookList.add(book);
         bookData.save(bookList);
     }
@@ -86,14 +89,11 @@ public class BookController {
         return bookData.load();
     }
 
-    public boolean removeBook(int bookId) {
+    public boolean removeBook(String title) {
         List<Book> bookList = listBooks();
-        Optional<Book> bookToRemove = bookList.stream().filter(b -> b.getId() == bookId).findFirst();
+        Optional<Book> bookToRemove = bookList.stream().filter(b -> b.getTitle().equals(title)).findFirst();
         if (bookToRemove.isPresent()) {
             Book book = bookToRemove.get();
-            if (book.isBorrowed()) {
-                return false;
-            }
             bookList.remove(book);
             bookData.save(bookList);
             return true;
@@ -243,14 +243,7 @@ public class BookController {
         return books;
     }
 
-    public Book isBookBorrowed(int bookId) {
-        List<Book> allBooks = bookData.listBooks();
-        for (Book book : allBooks) {
-            if (book.getId() == bookId && book.isBorrowed()) {
-                return book;
-            }
-        }
-        return null;
-    }
+
+
 
 }
