@@ -38,15 +38,15 @@ public class ReservationData {
         return reservations;
     }
 
-    public List<Reservation> loadPendingReservations() {
-        List<Reservation> pendingReservations = new ArrayList<>();
+    public List<Reservation> loadReservedReservation() {
+        List<Reservation> reservedReservations = new ArrayList<>();
         List<Reservation> reservations = load();
         for (Reservation reservation : reservations) {
-            if (reservation.getState() == State.PENDENTE) {
-                pendingReservations.add(reservation);
+            if (reservation.getState() == State.RESERVADO) {
+                reservedReservations.add(reservation);
             }
         }
-        return pendingReservations;
+        return reservedReservations;
     }
 
     public void addReservation(Reservation reservation) {

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Member extends User implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -47,5 +48,19 @@ public class Member extends User implements Serializable {
     public void setBorrowedBooks(List<Book> borrowedBooks) {
         this.borrowedBooks = borrowedBooks;
     }
+
+    @Override
+    public String toString() {
+        return "Membro:\n" +
+                "  ID: " + id + "\n" +
+                "  Nome: " + getName() + "\n" +
+                "  Email: " + getEmail() + "\n" +
+                "  Livros emprestados: " + borrowedBooks.stream()
+                .map(Book::getTitle)
+                .collect(Collectors.joining(", "));
+    }
+
+
+
 }
 

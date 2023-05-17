@@ -7,7 +7,10 @@ import Model.*;
 
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ReservationController {
 
@@ -34,44 +37,80 @@ public class ReservationController {
     }
 
     public void addReservation(Reservation reservation, LocalDate endDate) {
-        Book book = reservation.getBook();
-        Member member = reservation.getMember();
-        if (book == null) {
+        List<Book> books = bookData.listBooks();
+        List<Member> members = memberData.load();
+
+        if (reservation.getBook() == null) {
             System.out.println("Erro: Livro não pode ser nulo");
             return;
         }
 
-        if (member == null) {
+        if (reservation.getMember() == null) {
             System.out.println("Erro: Membro não pode ser nulo");
             return;
         }
 
-        if (member.getBorrowedBooks().contains(book)) {
+        if (reservation.getMember().getBorrowedBooks().contains(reservation.getBook())) {
             System.out.println("Erro: Membro já possui uma reserva deste livro");
             return;
         }
-        if (member.getBorrowedBooks().size() >= 3) {
-            System.out.println("Erro: Número máximo de livros reservados atingido para este membro");
+
+        if (reservation.getMember().getBorrowedBooks().size() >= 3) {
+            System.out.println("Erro: Número máximo de livros reservados e emprestados atingido para este membro");
             return;
         }
+
+        if (reservationData.loadReservedReservation().stream()
+                .filter(r -> r.getMember().equals(reservation.getMember()))
+                .anyMatch(r -> r.getBook().equals(reservation.getBook()) && (r.getState() == State.RESERVADO || r.getState() == State.PENDENTE))) {
+            System.out.println("Erro: Membro já possui uma reserva ou empréstimo deste livro");
+            return;
+        }
+
         if (endDate == null) {
             System.out.println("Erro: Data final da reserva não pode ser nula");
             return;
         }
 
+        Book book = books.stream()
+                .filter(b -> b.getId() == reservation.getBook().getId())
+                .findFirst()
+                .orElse(null);
+
+        if (book == null) {
+            System.out.println("Erro: Livro não encontrado");
+            return;
+        }
+
+        Member member = members.stream()
+                .filter(m -> m.getId() == reservation.getMember().getId())
+                .findFirst()
+                .orElse(null);
+
+        if (member == null) {
+            System.out.println("Erro: Membro não encontrado");
+            return;
+        }
+
         reservation.setState(State.PENDENTE);
-        // adiciona livros ao arraylist nos membros para verificar quantas reservas tem e qual os livros reservaram
+
         member.getBorrowedBooks().add(book);
-        // data de final de reserva, currentdate = inicio
+        List<Book> booksFromReservation = new ArrayList<>();
+        booksFromReservation.add(book);
+
         reservation.setEndDate(endDate);
         reservationData.addReservation(reservation);
-        // remove 1 livro da quantidade
+
         updateBookQuantityReduce(book);
-        // update ficheiro membros com o arraylist atualizado
-        updateMember(member);
+
+        updateMember(member, booksFromReservation);
+
         System.out.println("Reserva adicionada com sucesso!");
         updateReservationReserved();
     }
+
+
+
 
     public void updateReservationReserved() {
         List<Reservation> reservations = reservationData.load();
@@ -103,18 +142,25 @@ public class ReservationController {
         return reservationData.load();
     }
 
-    private void updateMember(Member member) {
+    private void updateMember(Member member, List<Book> booksFromReservation) {
         List<Member> members = memberData.load();
         for (Member m : members) {
-            if (m.getEmail() == member.getEmail()) {
+            if (m.getEmail().equals(member.getEmail())) {
                 m.setBorrowedBooks(member.getBorrowedBooks());
+                for (Book book : booksFromReservation) {
+                    if (!m.getBorrowedBooks().contains(book)) {
+                        m.getBorrowedBooks().add(book);
+                    }
+                }
                 break;
             }
         }
         memberData.save(members);
     }
 
-    //remove 1 na quantidade do livro escolhido, se quantidade atual for igual a 0 print mensagem;
+
+
+
     private void updateBookQuantityReduce(Book book) {
         List<Book> books = bookData.load();
         for (Book b : books) {
@@ -171,42 +217,49 @@ public class ReservationController {
 
     public void deliverReservationByBookNameAndUserName(String bookNameOrIsbn, String userName) {
         try {
-            Reservation matchingReservation = findReservationByBookNameAndUserName(bookNameOrIsbn, userName);
-            if (matchingReservation != null) {
-                if (matchingReservation.getState() != State.RESERVADO) {
-                    System.out.println("A reserva não pode ser entregue, pois não está no estado 'RESERVADA'");
-                    return;
-                }
-                if (!isBookBorrowedByMember(matchingReservation.getBook(), matchingReservation.getMember())) {
+            List<Reservation> reservations = reservationData.load();
+            Optional<Reservation> matchingReservation = findReservationByBookNameAndUserName(bookNameOrIsbn, userName, reservations);
+            if (matchingReservation.isPresent()) {
+                Reservation reservationToUpdate = matchingReservation.get();
+                if (!isBookBorrowedByMember(reservationToUpdate.getBook(), reservationToUpdate.getMember())) {
                     System.out.println("A reserva não pode ser entregue, pois o livro não foi emprestado para o membro que fez a reserva.");
                     return;
                 }
-                updateReservationDelivered(matchingReservation.getBook().getTitle(),matchingReservation.getMember().getName());
-                reservationData.save(reservationData.load());
-                updateBookQuantityIncrease(matchingReservation.getBook());
-                System.out.println("Reserva atualizada para 'ENTREGUE': " + matchingReservation.toString());
+                reservationToUpdate.setState(State.ENTREGUE);
+                reservationData.save(reservations);
+                updateBookQuantityIncrease(reservationToUpdate.getBook());
+                removeBookFromMember(reservationToUpdate.getMember(), reservationToUpdate.getBook());
+                System.out.println("Reserva atualizada para 'ENTREGUE': " + reservationToUpdate.toString());
             } else {
-                System.out.println("Nenhuma reserva encontrada para o livro com título ou ISBN: " + bookNameOrIsbn + " e o usuário: " + userName);
+                System.out.println("Nenhuma reserva encontrada para o livro com título ou ISBN: " + bookNameOrIsbn + " e o utilizador: " + userName);
             }
         } catch (Exception e) {
             System.out.println("Ocorreu um erro ao tentar alterar a reserva para 'ENTREGUE': " + e.getMessage());
         }
     }
 
-    private Reservation findReservationByBookNameAndUserName(String bookNameOrIsbn, String userName) {
-        List<Reservation> reservations = reservationData.load();
+
+    private Optional<Reservation> findReservationByBookNameAndUserName(String bookNameOrIsbn, String userName, List<Reservation> reservations) {
         String searchInput = bookNameOrIsbn.trim().toLowerCase();
-        for (Reservation reservation : reservations) {
-            String bookTitle = reservation.getBook().getTitle().trim().toLowerCase();
-            String bookISBN = reservation.getBook().getIsbn().trim().toLowerCase();
-            if (bookTitle.equalsIgnoreCase(searchInput) || bookISBN.equalsIgnoreCase(searchInput)) {
-                if (reservation.getMember().getName().equalsIgnoreCase(userName)) {
-                    return reservation;
-                }
-            }
-        }
-        return null;
+        return reservations.stream()
+                .filter(reservation -> reservation.getState() == State.RESERVADO)
+                .filter(reservation -> {
+                    String bookTitle = reservation.getBook().getTitle().trim().toLowerCase();
+                    String bookISBN = reservation.getBook().getIsbn().trim().toLowerCase();
+                    return bookTitle.equalsIgnoreCase(searchInput) || bookISBN.equalsIgnoreCase(searchInput);
+                })
+                .filter(reservation -> reservation.getMember().getName().equalsIgnoreCase(userName))
+                .findFirst();
     }
+
+    private void removeBookFromMember(Member member, Book book) {
+        List<Member> members = memberData.load();
+        members.removeIf(m -> m.getEmail().equals(member.getEmail()));
+        member.getBorrowedBooks().removeIf(b -> b.getTitle().equals(book.getTitle()));
+        members.add(member);
+        memberData.save(members);
+    }
+
 
     private boolean isBookBorrowedByMember(Book book, Member member) {
         for (Book borrowedBook : member.getBorrowedBooks()) {
