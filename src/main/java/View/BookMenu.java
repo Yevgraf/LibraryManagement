@@ -19,6 +19,7 @@ public class BookMenu {
     private AgeRangeController ageRangeController;
     private CategoryController categoryController;
     private PublisherController publisherController;
+    private ReservationController reservationController;
 
 
     public BookMenu(MainMenu mainMenu) {
@@ -30,12 +31,16 @@ public class BookMenu {
         AgeRangeData ageRangeData = new AgeRangeData();
         CategoryData categoryData = new CategoryData();
         PublisherData publisherData = new PublisherData();
+        ReservationData reservationData = new ReservationData();
+        MemberData memberData = new MemberData();
         bookController = new BookController(bookData, authorData, ageRangeData, categoryData, publisherData, scanner);
         authorController = new AuthorController(authorData);
         ageRangeController = new AgeRangeController(ageRangeData);
         categoryController = new CategoryController(categoryData);
         publisherController = new PublisherController(publisherData);
         createBookView = new CreateBookView(bookController, authorController, ageRangeController, categoryController, publisherController, scanner);
+        reservationController = new ReservationController(reservationData, memberData, bookData);
+
     }
 
     public void displayMenu() {
@@ -89,20 +94,17 @@ public class BookMenu {
     }
 
     private void removeBook() {
-        System.out.print("Digite o ID do livro que deseja remover: ");
-        int bookId = scanner.nextInt();
-        scanner.nextLine();
+        System.out.print("Digite o nome do livro que deseja remover: ");
+        String name = scanner.nextLine();
 
-        Book borrowedBook = bookController.isBookBorrowed(bookId);
-        if (borrowedBook != null) {
-            System.out.println("Este livro não pode ser removido, pois está atualmente emprestado.");
-        } else if (bookController.removeBook(bookId)) {
+        if (reservationController.isBookBorrowed(name)) {
+            System.out.println("Este livro não pode ser removido, pois está atualmente emprestado ou reservado.");
+        } else if (bookController.removeBook(name)) {
             System.out.println("Livro removido com sucesso.");
         } else {
             System.out.println("Não foi possível remover o livro.");
         }
     }
-
 
 
 

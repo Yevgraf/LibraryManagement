@@ -252,11 +252,27 @@ public class ReservationController {
         members.stream()
                 .filter(m -> m.getName().equalsIgnoreCase(member.getName()))
                 .findFirst()
-                .ifPresent(m -> m.getBorrowedBooks().removeIf(b -> b.getTitle().equals(book.getTitle())));
+                .ifPresent(m -> {
+                    List<Book> borrowedBooks = m.getBorrowedBooks();
+                    boolean bookRemoved = false;
+                    for (int i = 0; i < borrowedBooks.size(); i++) {
+                        if (borrowedBooks.get(i).getTitle().equals(book.getTitle())) {
+                            borrowedBooks.remove(i);
+                            bookRemoved = true;
+                            break;
+                        }
+                    }
+                    if (bookRemoved) {
+                        m.setBorrowedBooks(borrowedBooks);
+                    }
+                });
         memberData.save(members);
     }
 
-
+    public boolean isBookBorrowed(String title) {
+        return reservationData.load().stream()
+                .anyMatch(r -> r.getBook().getTitle().equalsIgnoreCase(title) && r.getState().equals(State.RESERVADO));
+    }
 
 
 

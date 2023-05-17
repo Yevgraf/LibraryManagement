@@ -89,9 +89,9 @@ public class BookController {
         return bookData.load();
     }
 
-    public boolean removeBook(int bookId) {
+    public boolean removeBook(String title) {
         List<Book> bookList = listBooks();
-        Optional<Book> bookToRemove = bookList.stream().filter(b -> b.getId() == bookId).findFirst();
+        Optional<Book> bookToRemove = bookList.stream().filter(b -> b.getTitle().equals(title)).findFirst();
         if (bookToRemove.isPresent()) {
             Book book = bookToRemove.get();
             bookList.remove(book);
@@ -243,14 +243,7 @@ public class BookController {
         return books;
     }
 
-    public Book isBookBorrowed(int bookId) {
-        List<Book> allBooks = bookData.listBooks();
-        for (Book book : allBooks) {
-            if (book.getId() == bookId ) {
-                return book;
-            }
-        }
-        return null;
-    }
+
+
 
 }
