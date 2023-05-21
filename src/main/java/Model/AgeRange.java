@@ -9,12 +9,16 @@ public class AgeRange implements Serializable {
     private String description;
 
     public AgeRange(String description) {
-        this.id = counter++;
         this.description = description;
     }
 
     public AgeRange() {
 
+    }
+
+    public AgeRange(int id, String description) {
+        this.id = id;
+        this.description = description;
     }
 
     public int getId() {
