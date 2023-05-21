@@ -18,7 +18,7 @@ import View.MainMenu;
 public class Biblioteca {
 
     public static void main(String[] args) {
-        LibrarianData.load();
+
         BookData.load();
         AgeRangeData.load();
         AuthorData.load();
