@@ -16,15 +16,16 @@ public class Member extends User  {
     public Member(String name, String address, LocalDate birthDate, String phone, String email) {
         super(name, address, birthDate, phone, email);
         this.maxBorrowedBooks = 3;
-        this.borrowedBooks = new ArrayList<Book>();
+        this.borrowedBooks = new ArrayList<>();
     }
+
+
     public Member(int id, String name, String address, LocalDate birthDate, String phone, String email, int maxBorrowedBooks) {
         super(name, address, birthDate, phone, email);
         this.id = id;
         this.maxBorrowedBooks = maxBorrowedBooks;
         this.borrowedBooks = new ArrayList<>();
     }
-
 
 
     public int getId() {

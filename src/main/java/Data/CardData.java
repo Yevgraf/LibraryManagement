@@ -5,46 +5,78 @@ import Model.Card;
 import Model.Member;
 
 import java.io.*;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CardData {
 
-    private static final String FILENAME = "Cards.ser";
 
-    public static void save(List<Card> cardList) {
-        try {
-            FileOutputStream fos = null;
-            ObjectOutputStream out = null;
-            File file = new File(FILENAME);
+    public static void save(Card card) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO Card (memberId, cardNumber) VALUES (?, ?)")) {
 
-            if (!file.exists()) {
-                file.createNewFile();
-                System.out.println("Ficheiro de cartões criado.");
+            int memberId = card.getMember().getId();
+
+
+            if (!isMemberExists(connection, memberId)) {
+                System.err.println("Erro ao guardar o cartão: O membro referenciado não existe.");
+                return; // Skip
             }
 
-            fos = new FileOutputStream(file);
-            out = new ObjectOutputStream(fos);
-            out.writeObject(cardList);
-            System.out.println("Cartões guardados no ficheiro.");
-            out.close();
-        } catch (IOException e) {
-            System.err.println("Erro ao guardar cartões no ficheiro: " + e.getMessage());
+            statement.setInt(1, memberId);
+            statement.setString(2, card.getCardNumber());
+            statement.executeUpdate();
+
+            System.out.println("Card criado com sucesso.");
+        } catch (SQLException e) {
+            System.err.println("Erro ao guardar cartão: " + e.getMessage());
         }
     }
 
 
-    public static List<Card> load() {
-        List<Card> cardList = new ArrayList<>();
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
-            cardList = (List<Card>) in.readObject();
-            Card.resetIdCounter(cardList);
-        } catch (FileNotFoundException e) {
-            System.out.println("Não foram encontrados cartões guardados.");
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Erro ao carregar cartões do ficheiro: " + e.getMessage());
+
+    private static boolean isMemberExists(Connection connection, int memberId) throws SQLException {
+        String query = "SELECT COUNT(*) FROM Member WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, memberId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
         }
-        return cardList;
+        return false;
+    }
+
+    public static List<Card> load() {
+        List<Card> cards = new ArrayList<>();
+
+        try (Connection connection = DBconn.getConn();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM Card")) {
+
+            while (resultSet.next()) {
+                int cardId = resultSet.getInt("id");
+                int memberId = resultSet.getInt("memberId");
+                String cardNumber = resultSet.getString("cardNumber");
+
+                // Ir buscar membro associado
+                Member member = MemberData.getById(memberId);
+
+                // Criar  novo objecto cartão
+                Card card = new Card(member, cardNumber);
+                card.setId(cardId);
+
+                // adicionar cartão a lista
+                cards.add(card);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar cartões: " + e.getMessage());
+        }
+
+        return cards;
     }
 
 

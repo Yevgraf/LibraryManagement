@@ -21,7 +21,7 @@ public class MemberData {
             for (User user : userList) {
                 // Check if user, librarian, or member already exists
                 if (isUserExists(connection, user.getEmail()) || isLibrarianExists(connection, user.getEmail()) || isMemberExists(connection, user.getEmail())) {
-                    System.out.println("Utilizador já existe: " + user.getEmail());
+
                     continue; // Skip this user and proceed to the next
                 }
 
@@ -52,6 +52,7 @@ public class MemberData {
             System.err.println("Erro ao guardar utilizadores na base de dados: " + e.getMessage());
         }
     }
+
 
 
 
@@ -131,4 +132,32 @@ public class MemberData {
                 .findFirst();
     }
 
+    public static Member getById(int memberId) {
+        Member member = null;
+
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Member WHERE id = ?")) {
+
+            statement.setInt(1, memberId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    String name = resultSet.getString("name");
+                    String address = resultSet.getString("address");
+                    LocalDate birthDate = resultSet.getDate("birthDate").toLocalDate();
+                    String phone = resultSet.getString("phone");
+                    String email = resultSet.getString("email");
+                    int maxBorrowedBooks = resultSet.getInt("maxBorrowedBooks");
+
+                    member = new Member(name, address, birthDate, phone, email);
+                    member.setId(memberId);
+                    member.setMaxBorrowedBooks(maxBorrowedBooks);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving member by ID: " + e.getMessage());
+        }
+
+        return member;
+    }
 }
