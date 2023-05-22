@@ -11,175 +11,175 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-    public class ReservationData {
+public class ReservationData {
 
-        public void save(Reservation reservation) {
-            try (Connection connection = DBconn.getConn();
-                 PreparedStatement insertStatement = connection.prepareStatement(
-                         "INSERT INTO dbo.Reservation (bookId, memberId, startDate, endDate, state, satisfactionRating, additionalComments) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+    public void save(Reservation reservation) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement insertStatement = connection.prepareStatement(
+                     "INSERT INTO dbo.Reservation (bookId, memberId, startDate, endDate, state, satisfactionRating, additionalComments) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
 
-                insertStatement.setInt(1, reservation.getBook().getId());
-                insertStatement.setInt(2, reservation.getMember().getId());
-                insertStatement.setDate(3, java.sql.Date.valueOf(reservation.getStartDate()));
-                insertStatement.setDate(4, java.sql.Date.valueOf(reservation.getEndDate()));
-                insertStatement.setString(5, reservation.getState().toString());
-                insertStatement.setInt(6, reservation.getSatisfactionRating());
-                insertStatement.setString(7, reservation.getAdditionalComments());
+            insertStatement.setInt(1, reservation.getBook().getId());
+            insertStatement.setInt(2, reservation.getMember().getId());
+            insertStatement.setDate(3, java.sql.Date.valueOf(reservation.getStartDate()));
+            insertStatement.setDate(4, java.sql.Date.valueOf(reservation.getEndDate()));
+            insertStatement.setString(5, reservation.getState().toString());
+            insertStatement.setInt(6, reservation.getSatisfactionRating());
+            insertStatement.setString(7, reservation.getAdditionalComments());
 
-                int affectedRows = insertStatement.executeUpdate();
-                if (affectedRows == 0) {
-                    throw new SQLException("Falha ao salvar a reserva, sem linhas afetadas.");
-                }
-            } catch (SQLException e) {
-                System.err.println("Erro ao salvar a reserva no banco de dados: " + e.getMessage());
+            int affectedRows = insertStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Falha ao salvar a reserva, sem linhas afetadas.");
             }
+        } catch (SQLException e) {
+            System.err.println("Erro ao salvar a reserva no banco de dados: " + e.getMessage());
         }
+    }
 
-        public List<Reservation> load() {
-            List<Reservation> reservations = new ArrayList<>();
-            try (Connection connection = DBconn.getConn();
-                 PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Reservation");
-                 ResultSet resultSet = selectStatement.executeQuery()) {
+    public List<Reservation> load() {
+        List<Reservation> reservations = new ArrayList<>();
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Reservation");
+             ResultSet resultSet = selectStatement.executeQuery()) {
 
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    int bookId = resultSet.getInt("bookId");
-                    int memberId = resultSet.getInt("memberId");
-                    LocalDate startDate = resultSet.getDate("startDate").toLocalDate();
-                    LocalDate endDate = resultSet.getDate("endDate").toLocalDate();
-                    State state = State.valueOf(resultSet.getString("state"));
-                    int satisfactionRating = resultSet.getInt("satisfactionRating");
-                    String additionalComments = resultSet.getString("additionalComments");
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int bookId = resultSet.getInt("bookId");
+                int memberId = resultSet.getInt("memberId");
+                LocalDate startDate = resultSet.getDate("startDate").toLocalDate();
+                LocalDate endDate = resultSet.getDate("endDate").toLocalDate();
+                State state = State.valueOf(resultSet.getString("state"));
+                int satisfactionRating = resultSet.getInt("satisfactionRating");
+                String additionalComments = resultSet.getString("additionalComments");
 
-                    // Load associated book and member objects
+                // Load associated book and member objects
 
-                    Book book = loadBook(bookId);
-                    Member member = loadMemberById(memberId);
+                Book book = loadBook(bookId);
+                Member member = loadMemberById(memberId);
 
-                    Reservation reservation = new Reservation(id, book, member, startDate, endDate, state, satisfactionRating, additionalComments);
-                    reservations.add(reservation);
-                }
-            } catch (SQLException e) {
-                System.err.println("Erro ao carregar reservas do banco de dados: " + e.getMessage());
+                Reservation reservation = new Reservation(id, book, member, startDate, endDate, state, satisfactionRating, additionalComments);
+                reservations.add(reservation);
             }
-            return reservations;
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar reservas do banco de dados: " + e.getMessage());
         }
-        private Book loadBook(int bookId) {
-            Book book = null;
-            try (Connection connection = DBconn.getConn();
-                 PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Book WHERE id = ?")) {
+        return reservations;
+    }
 
-                selectStatement.setInt(1, bookId);
-                ResultSet resultSet = selectStatement.executeQuery();
+    private Book loadBook(int bookId) {
+        Book book = null;
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Book WHERE id = ?")) {
 
-                if (resultSet.next()) {
-                    String title = resultSet.getString("title");
-                    String subtitle = resultSet.getString("subtitle");
-                    int authorId = resultSet.getInt("authorId");
-                    int numPages = resultSet.getInt("numPages");
-                    int categoryId = resultSet.getInt("categoryId");
-                    LocalDate publicationDate = resultSet.getDate("publicationDate").toLocalDate();
-                    int ageRangeId = resultSet.getInt("ageRangeId");
-                    int publisherId = resultSet.getInt("publisherId");
-                    String isbn = resultSet.getString("isbn");
-                    int quantity = resultSet.getInt("quantity");
+            selectStatement.setInt(1, bookId);
+            ResultSet resultSet = selectStatement.executeQuery();
 
-                    // Load the Author, Category, AgeRange, and Publisher objects
-                    Author author = BookData.loadAuthorById(authorId);
-                    Category category = BookData.loadCategoryById(categoryId);
-                    AgeRange ageRange = BookData.loadAgeRangeById(ageRangeId);
-                    Publisher publisher = BookData.loadPublisherById(publisherId);
+            if (resultSet.next()) {
+                String title = resultSet.getString("title");
+                String subtitle = resultSet.getString("subtitle");
+                int authorId = resultSet.getInt("authorId");
+                int numPages = resultSet.getInt("numPages");
+                int categoryId = resultSet.getInt("categoryId");
+                LocalDate publicationDate = resultSet.getDate("publicationDate").toLocalDate();
+                int ageRangeId = resultSet.getInt("ageRangeId");
+                int publisherId = resultSet.getInt("publisherId");
+                String isbn = resultSet.getString("isbn");
+                int quantity = resultSet.getInt("quantity");
 
-                    // Create a Book object
-                    book = new Book(title, subtitle, author, numPages, category, publicationDate, ageRange, publisher, isbn, quantity);
-                    book.setId(bookId);
-                }
-            } catch (SQLException e) {
-                System.err.println("Erro ao carregar livro do banco de dados: " + e.getMessage());
+                // Load the Author, Category, AgeRange, and Publisher objects
+                Author author = BookData.loadAuthorById(authorId);
+                Category category = BookData.loadCategoryById(categoryId);
+                AgeRange ageRange = BookData.loadAgeRangeById(ageRangeId);
+                Publisher publisher = BookData.loadPublisherById(publisherId);
+
+                // Create a Book object
+                book = new Book(title, subtitle, author, numPages, category, publicationDate, ageRange, publisher, isbn, quantity);
+                book.setId(bookId);
             }
-            return book;
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar livro do banco de dados: " + e.getMessage());
         }
+        return book;
+    }
 
-        private Member loadMemberById(int memberId) {
-            Member member = null;
+    private Member loadMemberById(int memberId) {
+        Member member = null;
 
-            try (Connection connection = DBconn.getConn();
-                 PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Member WHERE id = ?")) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Member WHERE id = ?")) {
 
-                statement.setInt(1, memberId);
-                ResultSet resultSet = statement.executeQuery();
+            statement.setInt(1, memberId);
+            ResultSet resultSet = statement.executeQuery();
 
-                if (resultSet.next()) {
-                    int userId = resultSet.getInt("userId");
-                    String name = resultSet.getString("name");
-                    String address = resultSet.getString("address");
-                    LocalDate birthDate = resultSet.getDate("birthDate").toLocalDate();
-                    String phone = resultSet.getString("phone");
-                    String email = resultSet.getString("email");
-                    int maxBorrowedBooks = resultSet.getInt("maxBorrowedBooks");
+            if (resultSet.next()) {
+                int userId = resultSet.getInt("userId");
+                String name = resultSet.getString("name");
+                String address = resultSet.getString("address");
+                LocalDate birthDate = resultSet.getDate("birthDate").toLocalDate();
+                String phone = resultSet.getString("phone");
+                String email = resultSet.getString("email");
+                int maxBorrowedBooks = resultSet.getInt("maxBorrowedBooks");
 
-                    // Assuming there is a LibraryUser class, create an instance of it using the userId
-                    User user = loadLibraryUserById(userId);
+                // Assuming there is a LibraryUser class, create an instance of it using the userId
+                User user = loadLibraryUserById(userId);
 
-                    member = new Member(memberId, user, name, address, birthDate, phone, email, maxBorrowedBooks);
-                }
-
-            } catch (SQLException e) {
-                System.err.println("Erro ao carregar membro por ID: " + e.getMessage());
+                member = new Member(memberId, user, name, address, birthDate, phone, email, maxBorrowedBooks);
             }
 
-            return member;
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar membro por ID: " + e.getMessage());
         }
 
-        private User loadLibraryUserById(int userId) {
-            User libraryUser = null;
+        return member;
+    }
 
-            try (Connection connection = DBconn.getConn();
-                 PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.LibraryUser WHERE id = ?")) {
+    private User loadLibraryUserById(int userId) {
+        User libraryUser = null;
 
-                statement.setInt(1, userId);
-                ResultSet resultSet = statement.executeQuery();
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.LibraryUser WHERE id = ?")) {
 
-                if (resultSet.next()) {
-                    String name = resultSet.getString("name");
-                    String address = resultSet.getString("address");
-                    LocalDate birthDate = resultSet.getDate("birthDate").toLocalDate();
-                    String phone = resultSet.getString("phone");
-                    String email = resultSet.getString("email");
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
 
-                    libraryUser = new User(userId, name, address, birthDate, phone, email);
-                }
+            if (resultSet.next()) {
+                String name = resultSet.getString("name");
+                String address = resultSet.getString("address");
+                LocalDate birthDate = resultSet.getDate("birthDate").toLocalDate();
+                String phone = resultSet.getString("phone");
+                String email = resultSet.getString("email");
 
-            } catch (SQLException e) {
-                System.err.println("Erro ao carregar usuário da biblioteca por ID: " + e.getMessage());
+                libraryUser = new User(userId, name, address, birthDate, phone, email);
             }
 
-            return libraryUser;
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar usuário da biblioteca por ID: " + e.getMessage());
         }
 
-        public void updateState(Reservation reservation, State newState) {
-            try (Connection connection = DBconn.getConn();
-                 PreparedStatement updateStatement = connection.prepareStatement(
-                         "UPDATE dbo.Reservation SET state = ? WHERE id = ?")) {
+        return libraryUser;
+    }
 
-                updateStatement.setString(1, newState.toString());
-                updateStatement.setInt(2, reservation.getId());
+    public void updateState(Reservation reservation, State newState) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement updateStatement = connection.prepareStatement(
+                     "UPDATE dbo.Reservation SET state = ? WHERE id = ?")) {
 
-                int affectedRows = updateStatement.executeUpdate();
-                if (affectedRows == 0) {
-                    throw new SQLException("Falha ao atualizar o estado da reserva, sem linhas afetadas.");
-                }
+            updateStatement.setString(1, newState.toString());
+            updateStatement.setInt(2, reservation.getId());
 
-                reservation.setState(newState); // Update the state of the reservation object
-
-            } catch (SQLException e) {
-                System.err.println("Erro ao atualizar o estado da reserva no banco de dados: " + e.getMessage());
+            int affectedRows = updateStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Falha ao atualizar o estado da reserva, sem linhas afetadas.");
             }
+
+            reservation.setState(newState); // Update the state of the reservation object
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar o estado da reserva no banco de dados: " + e.getMessage());
         }
+    }
 
 
-
-        public List<Reservation> loadReservedReservation() {
+    public List<Reservation> loadReservedReservation() {
         List<Reservation> reservedReservations = new ArrayList<>();
         List<Reservation> reservations = load();
         for (Reservation reservation : reservations) {
@@ -201,5 +201,46 @@ import java.util.List;
         }
         return memberReservations;
     }
+
+    public void updateReservationAdditionalInfo(Reservation reservation, int satisfactionRating, String additionalComments) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Reservation SET satisfactionRating = ?, additionalComments = ? WHERE id = ?")) {
+
+            statement.setInt(1, satisfactionRating);
+            statement.setString(2, additionalComments);
+            statement.setInt(3, reservation.getId());
+
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Failed to update reservation additional information.");
+            }
+
+            // Update the reservation object with the new values
+            reservation.setSatisfactionRating(satisfactionRating);
+            reservation.setAdditionalComments(additionalComments);
+        } catch (SQLException e) {
+            System.err.println("Error updating reservation additional information: " + e.getMessage());
+        }
+    }
+
+    public void updateReservationState(Reservation reservation, State newState) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Reservation SET state = ? WHERE id = ?")) {
+
+            statement.setString(1, newState.toString());
+            statement.setInt(2, reservation.getId());
+
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Failed to update reservation state.");
+            }
+
+            // Update the reservation object with the new state
+            reservation.setState(newState);
+        } catch (SQLException e) {
+            System.err.println("Error updating reservation state: " + e.getMessage());
+        }
+    }
+
 
 }

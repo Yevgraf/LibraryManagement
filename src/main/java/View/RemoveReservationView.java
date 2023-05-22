@@ -14,15 +14,10 @@ public class RemoveReservationView {
         this.scanner = scanner;
     }
 
-    public void removeReservation() {
-        System.out.println("Remover reserva:");
-        System.out.print("Nome do Livro ou ISBN do livro: ");
-        String searchTerm = scanner.nextLine();
-
-        System.out.print("Nome do Membro: ");
-        String memberName = scanner.nextLine();
-
-        reservationController.deliverReservationByBookNameAndUserName(searchTerm, memberName);
+    public void deliverBook() {
+        System.out.println("Entregar livro:");
+        reservationController.deliverReservationByBookNameAndUserName();
     }
+
 
 }

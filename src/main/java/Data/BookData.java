@@ -56,6 +56,34 @@ public class BookData {
             System.err.println("Erro ao guardar livro na base dados: " + e.getMessage());
         }
     }
+    public void updateBookQuantityDecrease(int bookId) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Book SET quantity = quantity - 1 WHERE id = ?")) {
+            statement.setInt(1, bookId);
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Falha ao atualizar a quantidade do livro, nenhum registro afetado.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar a quantidade do livro no banco de dados: " + e.getMessage());
+        }
+    }
+
+    public void updateBookQuantityIncrease(int bookId) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Book SET quantity = quantity + 1 WHERE id = ?")) {
+
+            statement.setInt(1, bookId);
+
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Falha ao atualizar a quantidade do livro.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar a quantidade do livro: " + e.getMessage());
+        }
+    }
+
 
     private void updateBookDetails(Book book) {
         // Implement the code to update the details of an existing book in the database based on its ID

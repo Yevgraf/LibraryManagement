@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import Model.Book;
 import Model.Member;
 import Model.User;
 
@@ -160,4 +161,44 @@ public class MemberData {
 
         return member;
     }
+    public void removeBookFromBorrowedBooks(Member member, Book book) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM dbo.BorrowedBook WHERE memberId = ? AND bookId = ?")) {
+
+            statement.setInt(1, member.getId());
+            statement.setInt(2, book.getId());
+
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Falha ao remover o livro emprestado do membro.");
+            }
+
+            // Update the in-memory borrowed books list of the member
+            member.getBorrowedBooks().remove(book);
+        } catch (SQLException e) {
+            System.err.println("Erro ao remover livro emprestado do membro: " + e.getMessage());
+        }
+    }
+
+
+    public void addBookToBorrowedBooks(Member member, Book book) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO dbo.BorrowedBook (memberId, bookId, borrowedDate) VALUES (?, ?, ?)")) {
+
+            statement.setInt(1, member.getId());
+            statement.setInt(2, book.getId());
+            statement.setDate(3, java.sql.Date.valueOf(LocalDate.now()));
+
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Falha ao adicionar o livro emprestado para o membro.");
+            }
+
+            // Update the in-memory borrowed books list of the member
+            member.getBorrowedBooks().add(book);
+        } catch (SQLException e) {
+            System.err.println("Erro ao adicionar livro emprestado para o membro: " + e.getMessage());
+        }
+    }
+
 }
