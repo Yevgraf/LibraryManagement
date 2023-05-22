@@ -11,17 +11,14 @@ import java.util.List;
 /**
  * @author franc
  */
-public class Author implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private static int counter = 0;
+public class Author {
+
     private int id;
     private String name;
     private String address;
     private LocalDate birthDate;
 
     public Author(String name, String address, LocalDate birthDate) {
-
-        this.id = counter++;
         this.name = name;
         this.address = address;
         this.birthDate = birthDate;
@@ -73,11 +70,5 @@ public class Author implements Serializable {
                         "\tMorada: %s\n" +
                         "\tData de Nascimento: %s\n",
                 id, name, address, birthDate);
-    }
-
-
-    public static void resetIdCounter(List<Author> authorList) {
-        int maxId = authorList.stream().mapToInt(Author::getId).max().orElse(0);
-        counter = maxId;
     }
 }
