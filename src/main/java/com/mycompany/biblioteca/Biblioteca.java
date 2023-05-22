@@ -19,15 +19,6 @@ public class Biblioteca {
 
     public static void main(String[] args) {
 
-        BookData.load();
-        AgeRangeData.load();
-        AuthorData.load();
-        CardData.load();
-        CategoryData.load();
-        MemberData.load();
-        PublisherData.load();
-        ReservationData.load();
-
         LibrarianData librarianData = new LibrarianData();
         LibrarianController librarianController = new LibrarianController(librarianData);
         LoginView loginView = new LoginView(librarianController);
