@@ -99,6 +99,7 @@ public class MemberData {
         return false;
     }
 
+
     public static List<Member> load() {
         List<Member> memberList = new ArrayList<>();
 
@@ -116,6 +117,20 @@ public class MemberData {
                 int maxBorrowedBooks = resultSet.getInt("maxBorrowedBooks");
 
                 Member member = new Member(id, name, address, birthDate, phone, email, maxBorrowedBooks);
+
+                // Load borrowed books for the member
+                PreparedStatement borrowedBooksStatement = connection.prepareStatement("SELECT b.id, b.title FROM BorrowedBook bb INNER JOIN Book b ON bb.bookId = b.id WHERE bb.memberId = ?");
+                borrowedBooksStatement.setInt(1, id);
+                ResultSet borrowedBooksResultSet = borrowedBooksStatement.executeQuery();
+
+                while (borrowedBooksResultSet.next()) {
+                    int bookId = borrowedBooksResultSet.getInt("id");
+                    String bookTitle = borrowedBooksResultSet.getString("title");
+
+                    Book book = new Book(bookId, bookTitle);
+                    member.addBorrowedBook(book);
+                }
+
                 memberList.add(member);
             }
         } catch (SQLException e) {
@@ -173,23 +188,34 @@ public class MemberData {
                 throw new SQLException("Falha ao remover o livro emprestado do membro.");
             }
 
-            // Update the in-memory borrowed books list of the member
+
             member.getBorrowedBooks().remove(book);
         } catch (SQLException e) {
             System.err.println("Erro ao remover livro emprestado do membro: " + e.getMessage());
         }
     }
 
-
     public void addBookToBorrowedBooks(Member member, Book book) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("INSERT INTO dbo.BorrowedBook (memberId, bookId, borrowedDate) VALUES (?, ?, ?)")) {
+             PreparedStatement selectStatement = connection.prepareStatement(
+                     "SELECT COUNT(*) FROM dbo.BorrowedBook WHERE memberId = ?");
+             PreparedStatement insertStatement = connection.prepareStatement(
+                     "INSERT INTO dbo.BorrowedBook (memberId, bookId, borrowedDate) VALUES (?, ?, ?)")) {
 
-            statement.setInt(1, member.getId());
-            statement.setInt(2, book.getId());
-            statement.setDate(3, java.sql.Date.valueOf(LocalDate.now()));
 
-            int affectedRows = statement.executeUpdate();
+            int memberId = member.getId();
+            int maxBorrowedBooks = 3;
+            int currentBorrowedBooks = getNumberOfBorrowedBooks(memberId);
+
+            if (currentBorrowedBooks >= maxBorrowedBooks) {
+                throw new SQLException("O membro já possui " + currentBorrowedBooks + " livros emprestados. Não é permitido ter mais de " + maxBorrowedBooks + " livros emprestados.");
+            }
+
+            insertStatement.setInt(1, memberId);
+            insertStatement.setInt(2, book.getId());
+            insertStatement.setDate(3, java.sql.Date.valueOf(LocalDate.now()));
+
+            int affectedRows = insertStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Falha ao adicionar o livro emprestado para o membro.");
             }
@@ -200,5 +226,23 @@ public class MemberData {
             System.err.println("Erro ao adicionar livro emprestado para o membro: " + e.getMessage());
         }
     }
+
+    private int getNumberOfBorrowedBooks(int memberId) throws SQLException {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT COUNT(*) FROM dbo.BorrowedBook WHERE memberId = ?")) {
+
+            statement.setInt(1, memberId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1);
+                }
+            }
+        }
+
+        throw new SQLException("Falha ao obter o número de livros emprestados para o membro.");
+    }
+
 
 }

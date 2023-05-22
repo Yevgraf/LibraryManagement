@@ -18,8 +18,17 @@ public class ReservationData {
              PreparedStatement insertStatement = connection.prepareStatement(
                      "INSERT INTO dbo.Reservation (bookId, memberId, startDate, endDate, state, satisfactionRating, additionalComments) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
 
+            // Validate the number of reservations in state 'RESERVADO' for the member
+            int memberId = reservation.getMember().getId();
+            int maxReservations = 3; // Maximum number of reservations allowed
+            int currentReservations = getNumberOfReservations(memberId, State.RESERVADO);
+
+            if (currentReservations >= maxReservations) {
+                throw new SQLException("O membro já possui " + currentReservations + " reservas em estado 'RESERVADO'. Não é permitido ter mais de " + maxReservations + " reservas em andamento.");
+            }
+
             insertStatement.setInt(1, reservation.getBook().getId());
-            insertStatement.setInt(2, reservation.getMember().getId());
+            insertStatement.setInt(2, memberId);
             insertStatement.setDate(3, java.sql.Date.valueOf(reservation.getStartDate()));
             insertStatement.setDate(4, java.sql.Date.valueOf(reservation.getEndDate()));
             insertStatement.setString(5, reservation.getState().toString());
@@ -31,9 +40,30 @@ public class ReservationData {
                 throw new SQLException("Falha ao salvar a reserva, sem linhas afetadas.");
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao salvar a reserva no banco de dados: " + e.getMessage());
+            // If the validation fails, do not proceed with saving the reservation
+            return;
         }
     }
+
+
+    private int getNumberOfReservations(int memberId, State state) throws SQLException {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT COUNT(*) FROM dbo.Reservation WHERE memberId = ? AND state = ?")) {
+
+            statement.setInt(1, memberId);
+            statement.setString(2, state.toString());
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1);
+                }
+            }
+        }
+
+        throw new SQLException("Falha ao obter o número de reservas para o membro.");
+    }
+
 
     public List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();

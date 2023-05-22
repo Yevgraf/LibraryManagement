@@ -95,7 +95,9 @@ public class Member extends User  {
                 .collect(Collectors.joining(", "));
     }
 
-
+    public void addBorrowedBook(Book book) {
+        borrowedBooks.add(book);
+    }
 
 }
 

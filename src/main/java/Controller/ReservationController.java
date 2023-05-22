@@ -92,7 +92,6 @@ public class ReservationController {
     }
 
 
-
     private Member selectMember(List<Member> members) {
         System.out.println("Selecione o membro:");
         for (int i = 0; i < members.size(); i++) {
@@ -152,9 +151,6 @@ public class ReservationController {
         memberData.save(members);
     }
 
-
-
-
     public void deliverReservationByBookNameAndUserName() {
         try {
             List<Reservation> reservations = reservationData.load();
@@ -163,9 +159,8 @@ public class ReservationController {
                     .filter(reservation -> reservation.getState() == State.RESERVADO)
                     .collect(Collectors.toList());
 
-
             if (matchingReservations.isEmpty()) {
-                System.out.println("Nenhuma reserva encontrada para o livro com título ou ISBN: " );
+                System.out.println("Nenhuma reserva encontrada para o livro com título ou ISBN.");
                 return;
             }
 
@@ -173,7 +168,13 @@ public class ReservationController {
             System.out.println("Livros encontrados:");
             for (int i = 0; i < matchingReservations.size(); i++) {
                 Reservation reservation = matchingReservations.get(i);
-                System.out.println((i + 1) + ". " + reservation.getBook().getTitle());
+                Book book = reservation.getBook();
+                Member member = reservation.getMember();
+
+                String bookInfo = String.format("%d. %s - %s", (i + 1), book.getTitle(), member.getName());
+                System.out.println(bookInfo);
+                System.out.println("   - Email: " + member.getEmail());
+                System.out.println("   - Data de devolução: " + reservation.getEndDate());
             }
 
             // Prompt for book selection
@@ -189,39 +190,8 @@ public class ReservationController {
             Reservation selectedReservation = matchingReservations.get(bookSelection - 1);
             Book selectedBook = selectedReservation.getBook();
 
-            // Filter members by the selected book
-            List<Member> membersWithReservedBook = reservations.stream()
-                    .filter(reservation -> reservation.getBook() == selectedBook && reservation.getState() == State.RESERVADO)
-                    .map(Reservation::getMember)
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            if (membersWithReservedBook.isEmpty()) {
-                System.out.println("Nenhum membro encontrado com reserva para o livro selecionado.");
-                return;
-            }
-
-            // Display a list of members with reserved book
-            System.out.println("Membros com reserva para o livro '" + selectedBook.getTitle() + "':");
-            for (int i = 0; i < membersWithReservedBook.size(); i++) {
-                Member member = membersWithReservedBook.get(i);
-                System.out.println((i + 1) + ". " + member.getName());
-            }
-
-            // Prompt for member selection
-            System.out.print("Selecione o membro (digite o número correspondente): ");
-            int memberSelection = scanner.nextInt();
-
-            if (memberSelection < 1 || memberSelection > membersWithReservedBook.size()) {
-                System.out.println("Seleção inválida.");
-                return;
-            }
-
-            Member selectedMember = membersWithReservedBook.get(memberSelection - 1);
-
             // Update the reservation state to 'ENTREGUE'
             reservationData.updateReservationState(selectedReservation, State.ENTREGUE);
-
 
             // Prompt for additional information (satisfaction rating and additional comments)
             int satisfactionRating = getSatisfactionRatingInput();
@@ -234,16 +204,13 @@ public class ReservationController {
             updateBookQuantityIncrease(selectedBook);
 
             // Remove the book from the member's borrowed books
-            memberData.removeBookFromBorrowedBooks(selectedMember, selectedBook);
-
+            memberData.removeBookFromBorrowedBooks(selectedReservation.getMember(), selectedBook);
 
             System.out.println("Reserva atualizada para 'ENTREGUE': " + selectedReservation.toString());
         } catch (Exception e) {
             System.out.println("Ocorreu um erro ao tentar alterar a reserva para 'ENTREGUE': " + e.getMessage());
         }
     }
-
-
 
 
     private int getSatisfactionRatingInput() {
@@ -275,7 +242,6 @@ public class ReservationController {
     }
 
 
-
     private boolean isBookBorrowedByMember(Book book, Member member) {
         List<Member> members = memberData.load();
         Optional<Member> matchingMember = members.stream()
@@ -290,8 +256,6 @@ public class ReservationController {
     }
 
 
-
-
     private Optional<Reservation> findReservationByBookNameAndUserName(String bookNameOrIsbn, String userName, List<Reservation> reservations) {
         String searchInput = bookNameOrIsbn.trim().toLowerCase();
         return reservations.stream()
@@ -303,7 +267,6 @@ public class ReservationController {
                 .filter(reservation -> reservation.getMember().getName().equalsIgnoreCase(userName))
                 .findFirst();
     }
-
 
 
 }
