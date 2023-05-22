@@ -7,9 +7,11 @@ import Model.*;
 
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class ReservationController {
@@ -36,107 +38,83 @@ public class ReservationController {
         this.bookData = bookData;
     }
 
-    public void addReservation(Reservation reservation, LocalDate endDate) {
-        List<Book> books = bookData.listBooks();
+    public void addReservation() {
         List<Member> members = memberData.load();
-        boolean success = true;
+        List<Book> books = bookData.listBooks();
 
-
-        if (reservation.getBook() == null) {
-            System.out.println("Erro: Livro não pode ser nulo");
-            success = false;
+        Member selectedMember = selectMember(members);
+        if (selectedMember == null) {
+            System.out.println("Erro: Membro não selecionado.");
+            return;
         }
 
-        if (reservation.getMember() == null) {
-            System.out.println("Erro: Membro não pode ser nulo");
-            success = false;
+        Book selectedBook = selectBook(books);
+        if (selectedBook == null) {
+            System.out.println("Erro: Livro não selecionado.");
+            return;
         }
 
-        if (reservation.getMember().getBorrowedBooks().contains(reservation.getBook())) {
-            System.out.println("Erro: Membro já possui uma reserva deste livro");
-            success = false;
-        }
-
-        if (reservation.getMember().getBorrowedBooks().size() + reservation.getMember().getBorrowedBooks().size() >= reservation.getMember().getMaxBorrowedBooks() + reservation.getMember().getMaxBorrowedBooks()) {
-            System.out.println("Erro: Número máximo de livros reservados e emprestados atingido para este membro");
-            success = false;
-        }
-
-        if (reservationData.loadReservedReservation().stream()
-                .filter(r -> r.getMember().equals(reservation.getMember()))
-                .anyMatch(r -> r.getBook().equals(reservation.getBook()) && (r.getState() == State.RESERVADO || r.getState() == State.PENDENTE))) {
-            System.out.println("Erro: Membro já possui uma reserva ou empréstimo deste livro");
-            success = false;
-        }
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = getEndDateInput(); // Prompt the librarian to enter the end date
 
         if (endDate == null) {
-            System.out.println("Erro: Data final da reserva não pode ser nula");
-            success = false;
+            System.out.println("Erro: Data final da reserva não fornecida.");
+            return;
         }
 
-        Book book = books.stream()
-                .filter(b -> b.getId() == reservation.getBook().getId())
-                .findFirst()
-                .orElse(null);
+        Reservation reservation = new Reservation(selectedMember, selectedBook, startDate, endDate);
+        reservation.setState(State.RESERVADO); // Set the state to "RESERVADO"
+        reservationData.save(reservation); // Save the reservation
 
-        if (book == null) {
-            System.out.println("Erro: Livro não encontrado");
-            success = false;
+        System.out.println("Reserva adicionada com sucesso.");
+    }
+
+    private LocalDate getEndDateInput() {
+        System.out.print("Digite a data final da reserva (yyyy-mm-dd): ");
+        Scanner scanner = new Scanner(System.in);
+        String endDateStr = scanner.nextLine();
+
+        try {
+            return LocalDate.parse(endDateStr);
+        } catch (DateTimeParseException e) {
+            System.out.println("Erro: Formato de data inválido. Use o formato yyyy-mm-dd.");
+            return null;
         }
-
-        Member member = members.stream()
-                .filter(m -> m.getName().equals(reservation.getMember().getName()))
-                .findFirst()
-                .orElse(null);
-
-        if (member == null) {
-            System.out.println("Erro: Membro não encontrado");
-            success = false;
-        }
-
-        if (success) {
-            reservation.setState(State.PENDENTE);
-
-            member.getBorrowedBooks().add(book);
-            List<Book> booksFromReservation = new ArrayList<>();
-            booksFromReservation.add(book);
-
-            reservation.setEndDate(endDate);
-            reservationData.addReservation(reservation);
-
-           // updateBookQuantityReduce(book);
-
-            updateMember(member, booksFromReservation);
-
-            updateReservationReserved();
-
-            // verifica se a reserva foi adiciona com sucesso
-            List<Reservation> reservations = reservationData.loadReservedReservation();
-            if (reservations.contains(reservation)) {
-                System.out.println("Reserva adicionada com sucesso!");
-            } else {
-                System.out.println("Erro ao adicionar reserva");
-            }
-        }
-
     }
 
 
-    public void updateReservationReserved() {
-        List<Reservation> reservations = reservationData.load();
-        boolean updated = false;
-        for (Reservation r : reservations) {
-            if (r.getState() == State.PENDENTE) {
-                r.setState(State.RESERVADO);
-                updated = true;
-            }
+    private Member selectMember(List<Member> members) {
+        System.out.println("Selecione o membro:");
+        for (int i = 0; i < members.size(); i++) {
+            System.out.println((i + 1) + ". " + members.get(i).getName());
         }
-        if (updated) {
-            reservationData.save(reservations);
-            System.out.println("Reservas depois do update: " + reservations);
+
+        int selection = getUserInput("Opção: ");
+        if (selection >= 1 && selection <= members.size()) {
+            return members.get(selection - 1);
         } else {
-            System.out.println("Não há reservas pendentes para atualizar.");
+            return null;
         }
+    }
+
+    private Book selectBook(List<Book> books) {
+        System.out.println("Selecione o livro:");
+        for (int i = 0; i < books.size(); i++) {
+            System.out.println((i + 1) + ". " + books.get(i).getTitle());
+        }
+
+        int selection = getUserInput("Opção: ");
+        if (selection >= 1 && selection <= books.size()) {
+            return books.get(selection - 1);
+        } else {
+            return null;
+        }
+    }
+
+    private int getUserInput(String prompt) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print(prompt);
+        return scanner.nextInt();
     }
 
 

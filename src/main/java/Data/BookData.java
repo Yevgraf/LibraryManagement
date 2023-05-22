@@ -102,7 +102,7 @@ public class BookData {
     }
 
     // Helper methods to load associated objects (Author, Category, AgeRange, Publisher) by ID
-    private Author loadAuthorById(int authorId) {
+    static Author loadAuthorById(int authorId) {
         Author author = null;
 
         try (Connection connection = DBconn.getConn();
@@ -126,7 +126,7 @@ public class BookData {
         return author;
     }
 
-    private Category loadCategoryById(int categoryId) {
+    static Category loadCategoryById(int categoryId) {
         Category category = null;
 
         try (Connection connection = DBconn.getConn();
@@ -149,7 +149,7 @@ public class BookData {
     }
 
 
-    private AgeRange loadAgeRangeById(int ageRangeId) {
+    static AgeRange loadAgeRangeById(int ageRangeId) {
         AgeRange ageRange = null;
 
         try (Connection connection = DBconn.getConn();
@@ -172,7 +172,7 @@ public class BookData {
     }
 
 
-    private Publisher loadPublisherById(int publisherId) {
+    static Publisher loadPublisherById(int publisherId) {
         Publisher publisher = null;
 
         try (Connection connection = DBconn.getConn();

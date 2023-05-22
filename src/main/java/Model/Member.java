@@ -27,6 +27,34 @@ public class Member extends User  {
         this.borrowedBooks = new ArrayList<>();
     }
 
+    public Member(String name, String address, LocalDate birthDate, String phone, String email, int id, int maxBorrowedBooks, Card card, List<Book> borrowedBooks) {
+        super(name, address, birthDate, phone, email);
+        this.id = id;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = borrowedBooks;
+    }
+    public Member(int id, User user, String name, String address, LocalDate birthDate, String phone, String email, int maxBorrowedBooks) {
+        super(user.getId(), name, address, birthDate, phone, email);
+        this.id = id;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.borrowedBooks = new ArrayList<>();
+    }
+
+    public Member(int id, String name, String address, LocalDate birthDate, String phone, String email, int id1, int maxBorrowedBooks, Card card, List<Book> borrowedBooks) {
+        super(id, name, address, birthDate, phone, email);
+        this.id = id1;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = borrowedBooks;
+    }
+
+    public Member(int id, int maxBorrowedBooks, Card card, List<Book> borrowedBooks) {
+        this.id = id;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = borrowedBooks;
+    }
 
     public int getId() {
         return id;
