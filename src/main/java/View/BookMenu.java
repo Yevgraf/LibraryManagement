@@ -134,8 +134,22 @@ public class BookMenu {
     public int getSelectedBookIndex() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Insira o índice do livro a ser excluído: ");
-        return scanner.nextInt();
+
+        int selectedIndex = -1;
+        while (selectedIndex < 1) {
+            if (scanner.hasNextInt()) {
+                selectedIndex = scanner.nextInt();
+                if (selectedIndex < 1) {
+                    System.out.println("Índice inválido. Insira um valor maior que zero.");
+                }
+            } else {
+                System.out.println("Entrada inválida. Insira um número inteiro correspondente ao índice do livro.");
+                scanner.next();
+            }
+        }
+        return selectedIndex;
     }
+
 
     public void showSuccessMessage(String bookTitle) {
         System.out.println("O livro \"" + bookTitle + "\" foi removido com sucesso.");
