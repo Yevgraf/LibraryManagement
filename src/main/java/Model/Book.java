@@ -12,9 +12,8 @@ import java.util.List;
  * @author franc
  */
 
-public class Book implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private static int counter = 0;
+public class Book {
+
     private int id;
     private String title;
     private String subtitle;
@@ -29,7 +28,6 @@ public class Book implements Serializable {
     private int quantity;
 
     public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn, int quantity) {
-        this.id = ++counter;
         this.title = title;
         this.subtitle = subtitle;
         this.author = author;
@@ -41,6 +39,19 @@ public class Book implements Serializable {
         this.isbn = isbn;
         this.quantity = quantity;
     }
+    public Book(String title, String subtitle, int numPages, LocalDate publicationDate, String isbn, int quantity, Author author, Category category, AgeRange ageRange, Publisher publisher) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.numPages = numPages;
+        this.publicationDate = publicationDate;
+        this.isbn = isbn;
+        this.quantity = quantity;
+        this.author = author;
+        this.category = category;
+        this.ageRange = ageRange;
+        this.publisher = publisher;
+    }
+
 
     public Book() {
 
@@ -151,11 +162,6 @@ public class Book implements Serializable {
                 .append("ISBN: ").append(isbn).append("\n")
                 .append("Quantidade: ").append(quantity).append("\n");
         return sb.toString();
-    }
-
-    public static void resetIdCounter(List<Book> books) {
-        int maxId = books.stream().mapToInt(Book::getId).max().orElse(0);
-        counter = maxId;
     }
 
 
