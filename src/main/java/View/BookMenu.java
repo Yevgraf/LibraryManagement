@@ -93,17 +93,56 @@ public class BookMenu {
         }
     }
 
-    private void removeBook() {
-        System.out.print("Digite o nome do livro que deseja remover: ");
-        String name = scanner.nextLine();
 
-        if (reservationController.isBookBorrowed(name)) {
-            System.out.println("Este livro não pode ser removido, pois está atualmente emprestado ou reservado.");
-        } else if (bookController.removeBook(name)) {
-            System.out.println("Livro removido com sucesso.");
-        } else {
-            System.out.println("Não foi possível remover o livro.");
+    public void removeBook() {
+        List<Book> bookList = bookController.listBooks();
+
+        if (bookList.isEmpty()) {
+            System.out.println("Nenhum livro encontrado na base de dados.");
+            return;
         }
+
+        displayBookList(bookList);
+
+        int selectedIndex = getSelectedBookIndex();
+        if (selectedIndex >= 1 && selectedIndex <= bookList.size()) {
+            Book selectedBook = bookList.get(selectedIndex - 1);
+            boolean removed = bookController.removeBook(selectedBook);
+            if (removed) {
+                showSuccessMessage(selectedBook.getTitle());
+            } else {
+                showFailureMessage(selectedBook.getTitle());
+            }
+        } else {
+            System.out.println("Índice inválido. Operação cancelada.");
+        }
+    }
+
+    public void displayBookList(List<Book> bookList) {
+        if (bookList.isEmpty()) {
+            System.out.println("Nenhum livro encontrado na base de dados.");
+            return;
+        }
+
+        System.out.println("Lista de Livros:");
+        for (int i = 0; i < bookList.size(); i++) {
+            Book book = bookList.get(i);
+            System.out.println((i + 1) + ". " + book.getTitle());
+        }
+    }
+
+    public int getSelectedBookIndex() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Insira o índice do livro a ser excluído: ");
+        return scanner.nextInt();
+    }
+
+    public void showSuccessMessage(String bookTitle) {
+        System.out.println("O livro \"" + bookTitle + "\" foi removido com sucesso.");
+    }
+
+    public void showFailureMessage(String bookTitle) {
+        System.out.println("Falha ao remover o livro \"" + bookTitle + "\".");
     }
 
 

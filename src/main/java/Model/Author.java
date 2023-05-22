@@ -24,6 +24,13 @@ public class Author {
         this.birthDate = birthDate;
     }
 
+    public Author(int id, String name, String address, LocalDate birthDate) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.birthDate = birthDate;
+    }
+
     public Author() {
 
     }

@@ -52,6 +52,19 @@ public class Book {
         this.publisher = publisher;
     }
 
+    public Book(int id, String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn, int quantity) {
+        this.id = id;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.author = author;
+        this.numPages = numPages;
+        this.category = category;
+        this.publicationDate = publicationDate;
+        this.ageRange = ageRange;
+        this.publisher = publisher;
+        this.isbn = isbn;
+        this.quantity = quantity;
+    }
 
     public Book() {
 
@@ -114,21 +127,6 @@ public class Book {
         this.publicationDate = publicationDate;
     }
 
-    public AgeRange getAgeRange() {
-        return ageRange;
-    }
-
-    public void setAgeRange(AgeRange ageRange) {
-        this.ageRange = ageRange;
-    }
-
-    public Publisher getPublisher() {
-        return publisher;
-    }
-
-    public void setPublisher(Publisher publisher) {
-        this.publisher = publisher;
-    }
 
     public String getIsbn() {
         return isbn;
@@ -144,6 +142,23 @@ public class Book {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+
+    public AgeRange getAgeRange() {
+        return ageRange;
+    }
+
+    public void setAgeRange(AgeRange ageRange) {
+        this.ageRange = ageRange;
+    }
+
+    public Publisher getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(Publisher publisher) {
+        this.publisher = publisher;
     }
 
     @Override
@@ -163,6 +178,7 @@ public class Book {
                 .append("Quantidade: ").append(quantity).append("\n");
         return sb.toString();
     }
+
 
 
 }

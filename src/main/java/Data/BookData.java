@@ -10,271 +10,204 @@ import java.util.Collection;
 import java.util.List;
 
 public class BookData {
-    private static final String BOOK_TABLE = "Book";
-    private static final String AUTHOR_TABLE = "Author";
-    private static final String CATEGORY_TABLE = "Category";
-    private static final String AGERANGE_TABLE = "AgeRange";
-    private static final String PUBLISHER_TABLE = "Publisher";
 
 
-    public static void save(List<Book> bookList) {
+    public void save(Book book) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement bookStatement = connection.prepareStatement("INSERT INTO Book (title, subtitle, numPages, publicationDate, isbn, quantity, authorId, categoryId, ageRangeId, publisherId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement checkStatement = connection.prepareStatement("SELECT id FROM dbo.Book WHERE isbn = ?");
+             PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO dbo.Book (title, subtitle, authorId, numPages, categoryId, publicationDate, ageRangeId, publisherId, isbn, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
 
-            for (Book book : bookList) {
-                // Check if the author exists in the database, if not, save the author first
-                Author author = book.getAuthor();
-                int authorId = getAuthorIdByName(connection, author.getName());
-                if (authorId == -1) {
-                    authorId = saveAuthor(connection, author);
-                    author.setId(authorId);
-                } else {
-                    author.setId(authorId);
-                }
-
-                // Check if the category exists in the database, if not, save the category first
-                Category category = book.getCategory();
-                int categoryId = getCategoryIdByName(connection, category.getCategoryName());
-                if (categoryId == -1) {
-                    categoryId = saveCategory(connection, category);
-                    category.setCategoryId(categoryId);
-                } else {
-                    category.setCategoryId(categoryId);
-                }
-
-                // Check if the age range exists in the database, if not, save the age range first
-                AgeRange ageRange = book.getAgeRange();
-                int ageRangeId = getAgeRangeIdByName(connection, ageRange.getDescription());
-                if (ageRangeId == -1) {
-                    ageRangeId = saveAgeRange(connection, ageRange);
-                    ageRange.setId(ageRangeId);
-                } else {
-                    ageRange.setId(ageRangeId);
-                }
-
-                // Check if the publisher exists in the database, if not, save the publisher first
-                Publisher publisher = book.getPublisher();
-                int publisherId = getPublisherIdByName(connection, publisher.getName());
-                if (publisherId == -1) {
-                    publisherId = savePublisher(connection, publisher);
-                    publisher.setId(publisherId);
-                } else {
-                    publisher.setId(publisherId);
-                }
-
-                bookStatement.setString(1, book.getTitle());
-                bookStatement.setString(2, book.getSubtitle());
-                bookStatement.setInt(3, book.getNumPages());
-                bookStatement.setDate(4, Date.valueOf(book.getPublicationDate()));
-                bookStatement.setString(5, book.getIsbn());
-                bookStatement.setInt(6, book.getQuantity());
-                bookStatement.setInt(7, author.getId());
-                bookStatement.setInt(8, category.getCategoryId());
-                bookStatement.setInt(9, ageRange.getId());
-                bookStatement.setInt(10, publisher.getId());
-                bookStatement.executeUpdate();
-
-                ResultSet generatedKeys = bookStatement.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int bookId = generatedKeys.getInt(1);
-                    book.setId(bookId);
-                }
+            // Check if the book already exists
+            checkStatement.setString(1, book.getIsbn());
+            ResultSet resultSet = checkStatement.executeQuery();
+            if (resultSet.next()) {
+                // Book already exists, update its details instead of inserting a new record
+                int existingBookId = resultSet.getInt("id");
+                book.setId(existingBookId);
+                updateBookDetails(book);
+                return;
             }
+
+            // Book does not exist, insert a new record
+            insertStatement.setString(1, book.getTitle());
+            insertStatement.setString(2, book.getSubtitle());
+            insertStatement.setInt(3, book.getAuthor().getId());
+            insertStatement.setInt(4, book.getNumPages());
+            insertStatement.setInt(5, book.getCategory().getCategoryId());
+            insertStatement.setDate(6, java.sql.Date.valueOf(book.getPublicationDate()));
+            insertStatement.setInt(7, book.getAgeRange().getId());
+            insertStatement.setInt(8, book.getPublisher().getId());
+            insertStatement.setString(9, book.getIsbn());
+            insertStatement.setInt(10, book.getQuantity());
+
+            int affectedRows = insertStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Criação de lviro falhou, sem linhas afetadas.");
+            }
+
+            ResultSet generatedKeys = insertStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                book.setId(generatedKeys.getInt(1));
+            } else {
+                throw new SQLException("Falha ao obter o ID gerado do livro.");
+            }
+
         } catch (SQLException e) {
-            System.err.println("Error saving books to the database: " + e.getMessage());
+            System.err.println("Erro ao guardar livro na base dados: " + e.getMessage());
         }
     }
 
+    private void updateBookDetails(Book book) {
+        // Implement the code to update the details of an existing book in the database based on its ID
+        // You can use a PreparedStatement with an UPDATE statement to perform the update operation
+        // Make sure to handle any SQLExceptions appropriately
+    }
 
-
-
-    public static List<Book> load() {
-        List<Book> bookList = new ArrayList<>();
+    public List<Book> load() {
+        List<Book> books = new ArrayList<>();
 
         try (Connection connection = DBconn.getConn();
-             Statement statement = connection.createStatement()) {
-            String query = "SELECT b.id AS bookId, b.title, b.subtitle, b.numPages, b.publicationDate, b.isbn, b.quantity, " +
-                    "a.id AS authorId, a.name AS authorName, a.address AS authorAddress, a.birthDate AS authorBirthDate, " +
-                    "c.id AS categoryId, c.categoryName, " +
-                    "ar.id AS ageRangeId, ar.ageRangeName, " +
-                    "p.id AS publisherId, p.name AS publisherName, p.address AS publisherAddress " +
-                    "FROM Book b " +
-                    "JOIN Author a ON b.authorId = a.id " +
-                    "JOIN Category c ON b.categoryId = c.id " +
-                    "JOIN AgeRange ar ON b.ageRangeId = ar.id " +
-                    "JOIN Publisher p ON b.publisherId = p.id";
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Book");
+             ResultSet resultSet = statement.executeQuery()) {
 
-            ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
-                int id = resultSet.getInt("bookId");  // Corrected column name
+                int bookId = resultSet.getInt("id");
                 String title = resultSet.getString("title");
                 String subtitle = resultSet.getString("subtitle");
+                int authorId = resultSet.getInt("authorId");
                 int numPages = resultSet.getInt("numPages");
+                int categoryId = resultSet.getInt("categoryId");
                 LocalDate publicationDate = resultSet.getDate("publicationDate").toLocalDate();
+                int ageRangeId = resultSet.getInt("ageRangeId");
+                int publisherId = resultSet.getInt("publisherId");
                 String isbn = resultSet.getString("isbn");
                 int quantity = resultSet.getInt("quantity");
 
-                int authorId = resultSet.getInt("authorId");
-                String authorName = resultSet.getString("authorName");
-                String authorAddress = resultSet.getString("authorAddress");
-                LocalDate authorBirthDate = resultSet.getDate("authorBirthDate").toLocalDate();
-                Author author = new Author(authorName, authorAddress, authorBirthDate);
-                author.setId(authorId);
+                // Retrieve the associated Author, Category, AgeRange, and Publisher objects
+                Author author = loadAuthorById(authorId);
+                Category category = loadCategoryById(categoryId);
+                AgeRange ageRange = loadAgeRangeById(ageRangeId);
+                Publisher publisher = loadPublisherById(publisherId);
 
-                int categoryId = resultSet.getInt("categoryId");
-                String categoryName = resultSet.getString("categoryName");
-                Category category = new Category(categoryName);
-                category.setCategoryId(categoryId);
-
-                int ageRangeId = resultSet.getInt("ageRangeId");
-                String ageRangeName = resultSet.getString("ageRangeName");
-                AgeRange ageRange = new AgeRange(ageRangeName);
-                ageRange.setId(ageRangeId);
-
-                int publisherId = resultSet.getInt("publisherId");
-                String publisherName = resultSet.getString("publisherName");
-                String publisherAddress = resultSet.getString("publisherAddress");
-                Publisher publisher = new Publisher(publisherName, publisherAddress);
-                publisher.setId(publisherId);
-
-                Book book = new Book(title, subtitle, numPages, publicationDate, isbn, quantity, author, category, ageRange, publisher);
-                book.setId(id);
-                bookList.add(book);
+                // Create a new Book object and add it to the list
+                Book book = new Book(bookId, title, subtitle, author, numPages, category, publicationDate, ageRange, publisher, isbn, quantity);
+                books.add(book);
             }
+
         } catch (SQLException e) {
-            System.err.println("Error loading books from the database: " + e.getMessage());
+            System.err.println("Erro ao carregar livros do banco de dados: " + e.getMessage());
         }
 
-        return bookList;
+        return books;
     }
 
+    // Helper methods to load associated objects (Author, Category, AgeRange, Publisher) by ID
+    private Author loadAuthorById(int authorId) {
+        Author author = null;
 
-    // Get author ID by name
-    private static int getAuthorIdByName(Connection connection, String authorName) throws SQLException {
-        int authorId = -1;
-        String query = "SELECT id FROM Author WHERE name = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, authorName);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    authorId = resultSet.getInt("id");
-                }
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Author WHERE id = ?")) {
+
+            statement.setInt(1, authorId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String name = resultSet.getString("name");
+                String address = resultSet.getString("address");
+                LocalDate birthDate = resultSet.getDate("birthDate").toLocalDate();
+
+                author = new Author(authorId, name, address, birthDate);
             }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar autor por ID: " + e.getMessage());
         }
-        return authorId;
+
+        return author;
     }
 
-    // Save author and return the generated ID
-    private static int saveAuthor(Connection connection, Author author) throws SQLException {
-        int authorId = -1;
-        String query = "INSERT INTO Author (name, address, birthDate) VALUES (?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, author.getName());
-            statement.setString(2, author.getAddress());
-            statement.setDate(3, Date.valueOf(author.getBirthDate()));
-            statement.executeUpdate();
+    private Category loadCategoryById(int categoryId) {
+        Category category = null;
 
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                authorId = generatedKeys.getInt(1);
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Category WHERE categoryId = ?")) {
+
+            statement.setInt(1, categoryId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String categoryName = resultSet.getString("categoryName");
+
+                category = new Category(categoryId, categoryName);
             }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar categoria por ID: " + e.getMessage());
         }
-        return authorId;
+
+        return category;
     }
 
-    // Get category ID by name
-    private static int getCategoryIdByName(Connection connection, String categoryName) throws SQLException {
-        int categoryId = -1;
-        String query = "SELECT categoryId FROM Category WHERE categoryName = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, categoryName);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    categoryId = resultSet.getInt("categoryId");
-                }
+
+    private AgeRange loadAgeRangeById(int ageRangeId) {
+        AgeRange ageRange = null;
+
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.AgeRange WHERE id = ?")) {
+
+            statement.setInt(1, ageRangeId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String description = resultSet.getString("description");
+
+                ageRange = new AgeRange(ageRangeId, description);
             }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar faixa etária por ID: " + e.getMessage());
         }
-        return categoryId;
+
+        return ageRange;
     }
 
-    // Save category and return the generated ID
-    private static int saveCategory(Connection connection, Category category) throws SQLException {
-        int categoryId = -1;
-        String query = "INSERT INTO Category (categoryName) VALUES (?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, category.getCategoryName());
-            statement.executeUpdate();
 
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                categoryId = generatedKeys.getInt(1);
+    private Publisher loadPublisherById(int publisherId) {
+        Publisher publisher = null;
+
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Publisher WHERE id = ?")) {
+
+            statement.setInt(1, publisherId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String name = resultSet.getString("name");
+                String address = resultSet.getString("address");
+
+                publisher = new Publisher(publisherId, name, address);
             }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar editora por ID: " + e.getMessage());
         }
-        return categoryId;
+
+        return publisher;
+    }
+    public boolean deleteBook(int bookId) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM dbo.Book WHERE id = ?")) {
+
+            statement.setInt(1, bookId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao remover livro da base de dados: " + e.getMessage());
+            return false;
+        }
     }
 
-    // Get age range ID by name
-    private static int getAgeRangeIdByName(Connection connection, String ageRangeName) throws SQLException {
-        int ageRangeId = -1;
-        String query = "SELECT ageRangeId FROM AgeRange WHERE ageRangeName = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, ageRangeName);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    ageRangeId = resultSet.getInt("ageRangeId");
-                }
-            }
-        }
-        return ageRangeId;
-    }
-
-    // Save age range and return the generated ID
-    private static int saveAgeRange(Connection connection, AgeRange ageRange) throws SQLException {
-        int ageRangeId = -1;
-        String query = "INSERT INTO AgeRange (ageRangeName) VALUES (?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, ageRange.getDescription());
-            statement.executeUpdate();
-
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                ageRangeId = generatedKeys.getInt(1);
-            }
-        }
-        return ageRangeId;
-    }
-
-    // Get publisher ID by name
-    private static int getPublisherIdByName(Connection connection, String publisherName) throws SQLException {
-        int publisherId = -1;
-        String query = "SELECT id FROM Publisher WHERE name = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, publisherName);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    publisherId = resultSet.getInt("id");
-                }
-            }
-        }
-        return publisherId;
-    }
-
-    // Save publisher and return the generated ID
-    private static int savePublisher(Connection connection, Publisher publisher) throws SQLException {
-        int publisherId = -1;
-        String query = "INSERT INTO Publisher (name, address) VALUES (?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, publisher.getName());
-            statement.setString(2, publisher.getAddress());
-            statement.executeUpdate();
-
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                publisherId = generatedKeys.getInt(1);
-            }
-        }
-        return publisherId;
-    }
 
     public List<Book> listBooks() {
         return load();

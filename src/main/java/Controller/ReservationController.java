@@ -104,7 +104,7 @@ public class ReservationController {
             reservation.setEndDate(endDate);
             reservationData.addReservation(reservation);
 
-            updateBookQuantityReduce(book);
+           // updateBookQuantityReduce(book);
 
             updateMember(member, booksFromReservation);
 
@@ -165,33 +165,33 @@ public class ReservationController {
     }
 
 
-    private void updateBookQuantityReduce(Book book) {
-        List<Book> books = bookData.load();
-        for (Book b : books) {
-            if (b.getId() == book.getId()) {
-                int currentQuantity = b.getQuantity();
-                if (currentQuantity == 0) {
-                    System.out.println("Erro: Não há mais cópias disponíveis deste livro");
-                    return;
-                }
-                b.setQuantity(currentQuantity - 1);
-                break;
-            }
-        }
-        bookData.save(books);
-    }
+//    private void updateBookQuantityReduce(Book book) {
+//        List<Book> books = bookData.load();
+//        for (Book b : books) {
+//            if (b.getId() == book.getId()) {
+//                int currentQuantity = b.getQuantity();
+//                if (currentQuantity == 0) {
+//                    System.out.println("Erro: Não há mais cópias disponíveis deste livro");
+//                    return;
+//                }
+//                b.setQuantity(currentQuantity - 1);
+//                break;
+//            }
+//        }
+//        bookData.save(books);
+//    }
 
-    private void updateBookQuantityIncrease(Book book) {
-        List<Book> books = bookData.load();
-        for (Book b : books) {
-            if (b.getId() == book.getId()) {
-                int currentQuantity = b.getQuantity();
-                b.setQuantity(currentQuantity + 1);
-                break;
-            }
-        }
-        bookData.save(books);
-    }
+//    private void updateBookQuantityIncrease(Book book) {
+//        List<Book> books = bookData.load();
+//        for (Book b : books) {
+//            if (b.getId() == book.getId()) {
+//                int currentQuantity = b.getQuantity();
+//                b.setQuantity(currentQuantity + 1);
+//                break;
+//            }
+//        }
+//        bookData.save(books);
+//    }
 
 
 
@@ -207,7 +207,7 @@ public class ReservationController {
                 }
                 reservationToUpdate.setState(State.ENTREGUE);
                 reservationData.save(reservations);
-                updateBookQuantityIncrease(reservationToUpdate.getBook());
+              //  updateBookQuantityIncrease(reservationToUpdate.getBook());
                 removeBookFromMember(reservationToUpdate.getMember(), reservationToUpdate.getBook());
                 System.out.println("Reserva atualizada para 'ENTREGUE': " + reservationToUpdate.toString());
             } else {
