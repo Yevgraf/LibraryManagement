@@ -19,9 +19,15 @@ public class CreateAgeRangeView {
         System.out.print("Descrição: ");
         String description = scanner.nextLine();
 
-        ageRangeController.createAgeRange(description);
-        System.out.println("Faixa etária criada e guardada com sucesso.");
+        try {
+            ageRangeController.createAgeRange(description);
+            System.out.println("Faixa etária criada e guardada com sucesso.");
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao criar a faixa etária: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
 
     public void listAgeRanges() {
         List<AgeRange> ageRanges = ageRangeController.listAgeRanges();

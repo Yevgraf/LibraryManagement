@@ -133,7 +133,7 @@ public class BookMenu {
 
     public int getSelectedBookIndex() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Insira o índice do livro a ser excluído: ");
+        System.out.print("Insira o índice do livro: ");
 
         int selectedIndex = -1;
         while (selectedIndex < 1) {

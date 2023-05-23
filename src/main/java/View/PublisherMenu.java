@@ -39,7 +39,7 @@ public class PublisherMenu {
                     listPublishers();
                     break;
                 case 3:
-                    System.out.println("Voltando...");
+                    System.out.println("Voltar...");
                     mainMenu.displayMenu();
                     return;
                 default:
