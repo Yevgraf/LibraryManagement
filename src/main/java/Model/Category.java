@@ -3,21 +3,23 @@ package Model;
 import java.io.Serializable;
 import java.util.List;
 
-public class Category implements Serializable {
+public class Category {
 
-    private static final long serialVersionUID = 1L;
-    private static int counter = 0;
     private int categoryId;
     private String categoryName;
 
 
     public Category(String categoryName) {
-        this.categoryId = counter++;
         this.categoryName = categoryName;
     }
 
     public Category() {
 
+    }
+
+    public Category(int categoryId, String categoryName) {
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
     }
 
     public int getCategoryId() {
@@ -41,9 +43,5 @@ public class Category implements Serializable {
         return categoryName;
     }
 
-    public static void resetIdCounter(List<Category> categoryList) {
-        int maxId = categoryList.stream().mapToInt(Category::getCategoryId).max().orElse(0);
-        counter = maxId;
-    }
 
 }

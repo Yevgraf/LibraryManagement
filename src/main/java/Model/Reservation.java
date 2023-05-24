@@ -4,22 +4,50 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
-public class Reservation implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private static int counter = 0;
+public class Reservation {
+
     private int id;
     private Book book;
     private Member member;
     private LocalDate startDate;
     private LocalDate endDate;
+    private State state;
+    private int satisfactionRating;
+    private String additionalComments;
+
+    public Reservation(Member member, Book book, LocalDate startDate, LocalDate endDate) {
+        this.member = member;
+        this.book = book;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = State.PENDENTE;
+        this.satisfactionRating = 0;
+        this.additionalComments = "";
+    }
 
     public Reservation(Book book, Member member, LocalDate startDate, LocalDate endDate) {
-        this.id = counter++;
         this.book = book;
         this.member = member;
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
+    public Reservation(int id, Book book, Member member, LocalDate startDate, LocalDate endDate, State state, int satisfactionRating, String additionalComments) {
+        this.id = id;
+        this.book = book;
+        this.member = member;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = state;
+        this.satisfactionRating = satisfactionRating;
+        this.additionalComments = additionalComments;
+    }
+    public Reservation(Member member, Book book, LocalDate endDate) {
+        this.member = member;
+        this.book = book;
+        this.endDate = endDate;
+    }
+
 
     public Book getBook() {
         return book;
@@ -61,19 +89,39 @@ public class Reservation implements Serializable {
         this.id = id;
     }
 
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public int getSatisfactionRating() {
+        return satisfactionRating;
+    }
+
+    public void setSatisfactionRating(int satisfactionRating) {
+        this.satisfactionRating = satisfactionRating;
+    }
+
+    public String getAdditionalComments() {
+        return additionalComments;
+    }
+
+    public void setAdditionalComments(String additionalComments) {
+        this.additionalComments = additionalComments;
+    }
+
     @Override
     public String toString() {
         return "Reserva #" + id + ":\n" +
                 "Livro: " + book.getTitle() + " por " + book.getAuthor() + "\n" +
                 "Reservado por: " + member.getName() + "\n" +
                 "Reservado em: " + startDate + "\n" +
-                "Termina em: " + endDate + "\n";
-    }
-
-
-    public static void resetIdCounter(List<Reservation> reservationList) {
-        int maxId = reservationList.stream().mapToInt(Reservation::getId).max().orElse(0);
-        counter = maxId;
+                "Termina em: " + endDate + "\n" +
+                "Estado: " + state + "\n";
     }
 
 

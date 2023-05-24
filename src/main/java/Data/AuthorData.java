@@ -5,46 +5,64 @@ import Model.Book;
 import Model.Category;
 
 import java.io.*;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AuthorData {
 
-    private static final String FILENAME = "Author.ser";
-
     public static void save(List<Author> authorList) {
-        try {
-            FileOutputStream fos = null;
-            ObjectOutputStream out = null;
-            File file = new File(FILENAME);
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO " + "Author" + " (name, address, birthDate) VALUES (?, ?, ?)")) {
 
-            if (!file.exists()) {
-                file.createNewFile();
-                System.out.println("Ficheiro de autores criado.");
+            for (Author author : authorList) {
+                if (!isAuthorExists(connection, author)) {
+                    statement.setString(1, author.getName());
+                    statement.setString(2, author.getAddress());
+                    statement.setDate(3, Date.valueOf(author.getBirthDate()));
+                    statement.executeUpdate();
+                }
             }
 
-            fos = new FileOutputStream(file);
-            out = new ObjectOutputStream(fos);
-            out.writeObject(authorList);
-            System.out.println("Autores guardados no ficheiro.");
-            out.close();
-        } catch (IOException e) {
-            System.err.println("Erro ao guardar autores no ficheiro: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Erro ao guardar autores na base de dados: " + e.getMessage());
         }
     }
 
-
     public static List<Author> load() {
         List<Author> authorList = new ArrayList<>();
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
-            authorList = (List<Author>) in.readObject();
-            Author.resetIdCounter(authorList);
-        } catch (FileNotFoundException e) {
-            System.out.println("Não foram encontrados autores guardados.");
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Erro ao carregar autores do ficheiro: " + e.getMessage());
+        try (Connection connection = DBconn.getConn();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + "Author")) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String address = resultSet.getString("address");
+                LocalDate birthDate = resultSet.getDate("birthDate").toLocalDate();
+                Author author = new Author(name, address, birthDate);
+                author.setId(id);
+                authorList.add(author);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar autores da base de dados: " + e.getMessage());
         }
         return authorList;
+    }
+
+    private static boolean isAuthorExists(Connection connection, Author author) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM " + "Author" + " WHERE name = ? AND address = ? AND birthDate = ?");
+        statement.setString(1, author.getName());
+        statement.setString(2, author.getAddress());
+        statement.setDate(3, Date.valueOf(author.getBirthDate()));
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            int count = resultSet.getInt(1);
+            return count > 0;
+        }
+        return false;
     }
     public Author findByName(String name) {
         List<Author> authorList = load();

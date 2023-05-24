@@ -2,19 +2,22 @@ package Model;
 
 import java.io.Serializable;
 
-public class AgeRange implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private int counter = 0;
+public class AgeRange {
+
     private int id;
     private String description;
 
     public AgeRange(String description) {
-        this.id = counter++;
         this.description = description;
     }
 
     public AgeRange() {
 
+    }
+
+    public AgeRange(int id, String description) {
+        this.id = id;
+        this.description = description;
     }
 
     public int getId() {
@@ -37,4 +40,6 @@ public class AgeRange implements Serializable {
     public String toString() {
         return description;
     }
+
+
 }

@@ -104,16 +104,16 @@ public class LibrarianController {
     public void deleteLibrarian() {
         List<Librarian> librarianList = librarianData.load();
 
-        System.out.print("Digite o nome do bibliotecário: ");
+        System.out.print("Digite o email do bibliotecário: ");
         Scanner scanner = new Scanner(System.in);
-        String name = scanner.nextLine().trim();
+        String email = scanner.nextLine().trim();
 
         List<Librarian> matchingLibrarians = librarianList.stream()
-                .filter(librarian -> librarian.getName().equalsIgnoreCase(name))
+                .filter(librarian -> librarian.getEmail().equalsIgnoreCase(email))
                 .collect(Collectors.toList());
 
         if (matchingLibrarians.isEmpty()) {
-            System.out.println("Não foi encontrado nenhum bibliotecário com esse nome.");
+            System.out.println("Não foi encontrado nenhum bibliotecário com esse email.");
             return;
         }
 
@@ -131,11 +131,8 @@ public class LibrarianController {
         }
 
         Librarian librarianToRemove = matchingLibrarians.get(selection - 1);
-        librarianList.remove(librarianToRemove);
+        librarianData.deleteLibrarian(librarianToRemove.getEmail());
 
-        librarianData.save(librarianList);
-
-        System.out.println("Bibliotecário removido com sucesso.");
     }
 
     public List<Librarian> listLibrarians() {

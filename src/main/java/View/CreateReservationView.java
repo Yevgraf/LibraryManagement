@@ -8,6 +8,7 @@ import Model.Member;
 import Model.Reservation;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.time.LocalDate;
 import java.util.Scanner;
@@ -26,35 +27,24 @@ public class CreateReservationView {
         this.scanner = scanner;
     }
 
+
     public void createReservation() {
-        System.out.println("Adicionar reserva:");
-        System.out.print("Nome do membro: ");
-        String memberName = scanner.nextLine();
-        Member member = memberController.getMemberByName(memberName);
-        if (member == null) {
-            System.out.println("Membro não encontrado.");
-            return;
-        }
-        System.out.print("Nome do livro ou ISBN: ");
-        String searchTerm = scanner.nextLine();
-        Book book = bookController.findBookByIdOrName(searchTerm);
-        if (book == null) {
-            System.out.println("Livro não encontrado.");
-            return;
-        }
+        reservationController.addReservation();
+    }
 
 
-        LocalDate startDate = LocalDate.now();
-
+    private LocalDate getEndDateInput() {
         System.out.print("Data de término da reserva (dd/MM/yyyy): ");
         String endDateString = scanner.nextLine();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate endDate = LocalDate.parse(endDateString, formatter);
-
-        Reservation reservation = new Reservation(book, member, startDate, endDate);
-        reservationController.addReservation(reservation, endDate);
-        System.out.println("Reserva adicionada com sucesso!");
+        try {
+            return LocalDate.parse(endDateString, formatter);
+        } catch (DateTimeParseException e) {
+            System.out.println("Erro: Formato de data inválido. Use o formato dd/MM/yyyy.");
+            return null;
+        }
     }
+
 
 
 
@@ -70,4 +60,6 @@ public class CreateReservationView {
             }
         }
     }
+
+
 }

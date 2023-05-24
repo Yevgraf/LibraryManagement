@@ -7,7 +7,6 @@ import Model.*;
 import java.util.Scanner;
 
 public class MainMenu {
-
     private Scanner scanner;
     private AuthorMenu authorMenu;
     private LibrarianMenu librarianMenu;
@@ -18,8 +17,6 @@ public class MainMenu {
     private AgeRangeMenu ageRangeMenu;
     private BookMenu bookMenu;
     private ReservationMenu reservationMenu;
-    private Authentication authentication;
-    private boolean authenticated; 
 
     public MainMenu() {
         scanner = new Scanner(System.in);
@@ -44,20 +41,12 @@ public class MainMenu {
         ageRangeMenu = new AgeRangeMenu(this);
         bookMenu = new BookMenu(this);
         reservationMenu = new ReservationMenu(this, memberController, bookController, reservationController);
-        authentication = new Authentication();
-        authenticated = false; 
     }
 
-    public void displayMenu() {
-        if (!authenticated) { 
-            System.out.println("===================================");
-            System.out.println("| Bem-vindo à biblioteca!        |");
-            System.out.println("| Faça login para acessar o menu |");
-            System.out.println("===================================");
-            authenticated = authentication.login(); 
-        }
 
+    public void displayMenu() {
         System.out.println("===================================");
+        System.out.println("| Bem-vindo à biblioteca!        |");
         System.out.println("| Selecione uma opção:           |");
         System.out.println("===================================");
         System.out.println("| 1 - Gestão de reservas         |");

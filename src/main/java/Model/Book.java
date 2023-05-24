@@ -12,9 +12,8 @@ import java.util.List;
  * @author franc
  */
 
-public class Book implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private static int counter = 0;
+public class Book {
+
     private int id;
     private String title;
     private String subtitle;
@@ -25,10 +24,10 @@ public class Book implements Serializable {
     private AgeRange ageRange;
     private Publisher publisher;
     private String isbn;
-    private boolean borrowed;
 
-    public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn) {
-        this.id = ++counter;
+    private int quantity;
+
+    public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn, int quantity) {
         this.title = title;
         this.subtitle = subtitle;
         this.author = author;
@@ -38,13 +37,43 @@ public class Book implements Serializable {
         this.ageRange = ageRange;
         this.publisher = publisher;
         this.isbn = isbn;
-        this.borrowed = false;
+        this.quantity = quantity;
+    }
+    public Book(String title, String subtitle, int numPages, LocalDate publicationDate, String isbn, int quantity, Author author, Category category, AgeRange ageRange, Publisher publisher) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.numPages = numPages;
+        this.publicationDate = publicationDate;
+        this.isbn = isbn;
+        this.quantity = quantity;
+        this.author = author;
+        this.category = category;
+        this.ageRange = ageRange;
+        this.publisher = publisher;
+    }
+
+    public Book(int id, String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn, int quantity) {
+        this.id = id;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.author = author;
+        this.numPages = numPages;
+        this.category = category;
+        this.publicationDate = publicationDate;
+        this.ageRange = ageRange;
+        this.publisher = publisher;
+        this.isbn = isbn;
+        this.quantity = quantity;
     }
 
     public Book() {
 
     }
 
+    public Book(int id, String title) {
+        this.id = id;
+        this.title = title;
+    }
 
     public int getId() {
         return id;
@@ -102,6 +131,24 @@ public class Book implements Serializable {
         this.publicationDate = publicationDate;
     }
 
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+
     public AgeRange getAgeRange() {
         return ageRange;
     }
@@ -118,23 +165,6 @@ public class Book implements Serializable {
         this.publisher = publisher;
     }
 
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
-
-    public boolean isBorrowed() {
-        return borrowed;
-    }
-
-    public void setBorrowed(boolean borrowed) {
-        this.borrowed = borrowed;
-    }
-
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -149,13 +179,8 @@ public class Book implements Serializable {
                 .append("Editora: ").append(publisher.getName()).append("\n")
                 .append("Morada: ").append(publisher.getAddress()).append("\n")
                 .append("ISBN: ").append(isbn).append("\n")
-                .append("Emprestado: ").append(borrowed ? "Sim" : "Não").append("\n");
+                .append("Quantidade: ").append(quantity).append("\n");
         return sb.toString();
-    }
-
-    public static void resetIdCounter(List<Book> books) {
-        int maxId = books.stream().mapToInt(Book::getId).max().orElse(0);
-        counter = maxId;
     }
 
 

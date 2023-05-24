@@ -38,7 +38,7 @@ public class AuthorMenu {
                     createAuthorView.listAuthors();
                     break;
                 case 3:
-                    System.out.println("Voltando...");
+                    System.out.println("Voltar...");
                     return;
                 default:
                     System.out.println("Opção inválida.");

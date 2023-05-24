@@ -23,71 +23,60 @@ public class MemberController {
         this.scanner = scanner;
     }
 
+
+
     public void createMember(String name, String address, LocalDate birthDate, String phone, String email) {
-        Scanner scanner = new Scanner(System.in);
-
-        while (name == null || name.isEmpty()) {
-            System.out.print("Digite o nome do membro: ");
-            name = scanner.nextLine().trim();
-            if (name.isEmpty()) {
-                System.out.println("Nome não pode ser vazio");
-            }
+        if (isInvalidInput(name, address, birthDate, phone, email)) {
+            System.out.println("Os dados de membro são inválidos. Não foi possível criar o membro.");
+            return;
         }
 
-        while (address == null || address.isEmpty()) {
-            System.out.print("Digite o endereço do membro: ");
-            address = scanner.nextLine().trim();
-            if (address.isEmpty()) {
-                System.out.println("Endereço não pode ser vazio");
-            }
-        }
-
-        while (birthDate == null || birthDate.isAfter(LocalDate.now())) {
-            System.out.print("Digite a data de nascimento do membro (no formato DD/MM/AAAA): ");
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                String input = scanner.nextLine().trim();
-                birthDate = LocalDate.parse(input, formatter);
-            } catch (DateTimeParseException e) {
-                System.out.println("Data de nascimento inválida");
-            }
-        }
-
-        while (phone == null || !Pattern.matches("^(9[1236]\\d{7})$", phone)) {
-            System.out.print("Digite o telefone do membro (no formato 9XXXXXXXX): ");
-            phone = scanner.nextLine().trim();
-            if (!Pattern.matches("^(9[1236]\\d{7})$", phone)) {
-                System.out.println("Número de telefone inválido");
-            }
-        }
-
-        while (email == null || !isValidEmail(email)) {
-            System.out.print("Digite o email do membro: ");
-            email = scanner.nextLine().trim();
-            if (!isValidEmail(email)) {
-                System.out.println("Endereço de email inválido");
-            }
-        }
-
-        List<Member> memberList = listMembers();
         Member member = new Member(name, address, birthDate, phone, email);
-        CardController cardController = new CardController(new CardData());
-        String cardNumber = cardController.generateCardNumber(member.getId());
-        Card card = cardController.createCard(member, cardNumber);
-        member.setCard(card);
+        boolean success = saveMember(member);
+
+        if (success) {
+            // Retrieve the saved member to ensure it has an ID
+            Member savedMember = getMemberByEmail(member.getEmail());
+
+            CardController cardController = new CardController(new CardData());
+            String cardNumber = cardController.generateCardNumber(savedMember.getId());
+            Card card = cardController.createCard(savedMember, cardNumber);
+            savedMember.setCard(card);
+
+            System.out.println("Membro criado e guardado com sucesso.");
+        } else {
+            System.out.println("Ocorreu um erro ao salvar o membro. Não foi possível criar o cartão.");
+        }
+    }
+
+    public Member getMemberByEmail(String email) {
+        List<Member> members = listMembers();
+        for (Member member : members) {
+            if (member.getEmail().equalsIgnoreCase(email)) {
+                return member;
+            }
+        }
+        return null;
+    }
+
+
+    private boolean isInvalidInput(String name, String address, LocalDate birthDate, String phone, String email) {
+        return name.isEmpty() || address.isEmpty() || birthDate == null || phone.isEmpty() || email.isEmpty();
+    }
+
+    private boolean saveMember(Member member) {
+        List<Member> memberList = listMembers();
+        if (memberList.contains(member)) {
+            System.out.println("Utilizador já existe: " + member.getEmail());
+            return false;
+        }
+
         memberList.add(member);
         memberData.save(memberList);
-
-        System.out.println("Membro registrado com sucesso!");
+        return true;
     }
 
 
-    // Validation methods
-    private boolean isValidEmail(String email) {
-        Pattern pattern = Pattern.compile("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
-    }
 
     public Member getMemberByName(String name) {
         List<Member> members = listMembers();

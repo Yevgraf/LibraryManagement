@@ -14,14 +14,27 @@ public class CreatePublisherView {
     }
 
     public void createPublisher() {
-        System.out.print("Nome: ");
-        String name = scanner.nextLine();
+        String name = getNameInput();
+        String address = getAddressInput();
 
-        System.out.print("Morada: ");
-        String address = scanner.nextLine();
-
-        publisherController.createPublisher(name, address);
-
-        System.out.println("Editora criada com sucesso.");
+        if (name != null && address != null) {
+            publisherController.createPublisher(name, address);
+            System.out.println("Editora criada com sucesso.");
+        } else {
+            System.out.println("Entrada inválida. Certifique-se de preencher todos os campos corretamente.");
+        }
     }
+
+    private String getNameInput() {
+        System.out.print("Nome: ");
+        String name = scanner.nextLine().trim();
+        return !name.isEmpty() ? name : null;
+    }
+
+    private String getAddressInput() {
+        System.out.print("Morada: ");
+        String address = scanner.nextLine().trim();
+        return !address.isEmpty() ? address : null;
+    }
+
 }

@@ -37,7 +37,7 @@ public class BookController {
     }
 
     public void createBook(String title, String subtitle, String authorName, int numPages, String categoryName,
-                           LocalDate publicationDate, String ageRangeName, String publisherName, String isbn) {
+                           LocalDate publicationDate, String ageRangeName, String publisherName, String isbn, int quantity) {
         // Validations
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Título do livro inválido.");
@@ -48,7 +48,7 @@ public class BookController {
         if (publicationDate == null || publicationDate.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Data de publicação do livro inválida.");
         }
-        List<Book> bookList = listBooks();
+        List<Book> bookList = bookData.listBooks();
         Book bookByIsbn = bookList.stream()
                 .filter(b -> b.getIsbn().equals(isbn))
                 .findFirst()
@@ -78,10 +78,21 @@ public class BookController {
             return;
         }
 
+        Book book = new Book();
+        book.setTitle(title);
+        book.setSubtitle(subtitle);
+        book.setAuthor(author);
+        book.setNumPages(numPages);
+        book.setCategory(category);
+        book.setPublicationDate(publicationDate);
+        book.setAgeRange(ageRange);
+        book.setPublisher(publisher);
+        book.setIsbn(isbn);
+        book.setQuantity(quantity);
 
-        Book book = new Book(title, subtitle, author, numPages, category, publicationDate, ageRange, publisher, isbn);
-        bookList.add(book);
-        bookData.save(bookList);
+        bookData.save(book);
+
+        System.out.println("Livro criado com sucesso.");
     }
 
 
@@ -89,22 +100,10 @@ public class BookController {
         return bookData.load();
     }
 
-    public boolean removeBook(int bookId) {
-        List<Book> bookList = listBooks();
-        Optional<Book> bookToRemove = bookList.stream().filter(b -> b.getId() == bookId).findFirst();
-        if (bookToRemove.isPresent()) {
-            Book book = bookToRemove.get();
-            if (book.isBorrowed()) {
-                return false;
-            }
-            bookList.remove(book);
-            bookData.save(bookList);
-            return true;
-        } else {
-            System.out.println("Livro não encontrado.");
-            return false;
-        }
+    public boolean removeBook(Book book) {
+        return bookData.deleteBook(book.getId());
     }
+
 
 
 
@@ -246,14 +245,7 @@ public class BookController {
         return books;
     }
 
-    public Book isBookBorrowed(int bookId) {
-        List<Book> allBooks = bookData.listBooks();
-        for (Book book : allBooks) {
-            if (book.getId() == bookId && book.isBorrowed()) {
-                return book;
-            }
-        }
-        return null;
-    }
+
+
 
 }

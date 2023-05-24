@@ -44,7 +44,7 @@ public class LibrarianMenu {
                     librarianController.deleteLibrarian();
                     break;
                 case 4:
-                    System.out.println("Voltando...");
+                    System.out.println("Voltar...");
                     mainMenu.displayMenu();
                     return;
                 default:
