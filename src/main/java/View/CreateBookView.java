@@ -61,7 +61,7 @@ public class CreateBookView {
         List<Author> authorList = authorController.listAuthors();
         System.out.println("Lista de autores:");
         for (int i = 0; i < authorList.size(); i++) {
-            System.out.println((i+1) + ". " + authorList.get(i).getName());
+            System.out.println((i + 1) + ". " + authorList.get(i).getName());
         }
         System.out.print("Digite o número do autor desejado: ");
         int selection = scanner.nextInt();
@@ -78,6 +78,7 @@ public class CreateBookView {
         System.out.print("Número de páginas: ");
         return Integer.parseInt(scanner.nextLine());
     }
+
     private int getQuantity() {
         System.out.print("Número de livros: ");
         return Integer.parseInt(scanner.nextLine());
@@ -88,7 +89,7 @@ public class CreateBookView {
         List<Category> categoryList = categoryController.listCategories();
         System.out.println("Lista de categorias:");
         for (int i = 0; i < categoryList.size(); i++) {
-            System.out.println((i+1) + ". " + categoryList.get(i).getCategoryName());
+            System.out.println((i + 1) + ". " + categoryList.get(i).getCategoryName());
         }
         System.out.print("Digite o número da categoria desejada: ");
         int selection = scanner.nextInt();
@@ -111,7 +112,7 @@ public class CreateBookView {
         List<AgeRange> ageRangeList = ageRangeController.listAgeRanges();
         System.out.println("Lista de faixas etárias:");
         for (int i = 0; i < ageRangeList.size(); i++) {
-            System.out.println((i+1) + ". " + ageRangeList.get(i).getDescription());
+            System.out.println((i + 1) + ". " + ageRangeList.get(i).getDescription());
         }
         System.out.print("Digite o número da faixa etária desejada: ");
         int selection = scanner.nextInt();
@@ -128,7 +129,7 @@ public class CreateBookView {
         List<Publisher> publisherList = publisherController.listPublishers();
         System.out.println("Lista de editoras:");
         for (int i = 0; i < publisherList.size(); i++) {
-            System.out.println((i+1) + ". " + publisherList.get(i).getName());
+            System.out.println((i + 1) + ". " + publisherList.get(i).getName());
         }
         System.out.print("Digite o número da editora desejada: ");
         int selection = scanner.nextInt();
@@ -141,10 +142,29 @@ public class CreateBookView {
     }
 
 
-
     private String getIsbn() {
         System.out.print("ISBN: ");
-        return scanner.nextLine();
+        String isbn = scanner.nextLine();
+
+        try {
+            validateIsbn(isbn);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Entrada inválida: " + e.getMessage());
+            return getIsbn(); // Prompt again if validation fails
+        }
+
+        return isbn;
     }
 
+    private void validateIsbn(String isbn) {
+        if (isbn.length() != 13) {
+            throw new IllegalArgumentException("O ISBN deve ter 13 dígitos.");
+        }
+
+        try {
+            Long.parseLong(isbn);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("O ISBN deve ser um número válido.");
+        }
+    }
 }

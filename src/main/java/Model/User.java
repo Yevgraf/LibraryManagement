@@ -10,9 +10,8 @@ import java.time.LocalDate;
 /**
  * @author franc
  */
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private int counter = 0;
+public class User {
+
     private int id;
     private String name;
     private String address;
@@ -22,13 +21,21 @@ public class User implements Serializable {
 
 
     public User(String name, String address, LocalDate birthDate, String phone, String email) {
-        this.id = counter++;
         this.name = name;
         this.address = address;
         this.birthDate = birthDate;
         this.phone = phone;
         this.email = email;
 
+    }
+
+    public User(int id, String name, String address, LocalDate birthDate, String phone, String email) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.birthDate = birthDate;
+        this.phone = phone;
+        this.email = email;
     }
 
     public User() {

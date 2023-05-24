@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
-public class Librarian extends User implements Serializable {
+public class Librarian extends User {
 
     private String password;
 
@@ -63,6 +63,18 @@ public class Librarian extends User implements Serializable {
     }
 
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Bibliotecário:\n");
+        sb.append("\tNome: ").append(getName()).append("\n");
+        sb.append("\tMorada: ").append(getAddress()).append("\n");
+        sb.append("\tData de Nascimento: ").append(getBirthDate()).append("\n");
+        sb.append("\tTelefone: ").append(getPhone()).append("\n");
+        sb.append("\tEmail: ").append(getEmail()).append("\n");
+        sb.append("\tPalavra-passe: ").append(getPassword()).append("\n");
+        return sb.toString();
+    }
 
 
 }

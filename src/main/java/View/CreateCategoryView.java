@@ -17,7 +17,20 @@ public class CreateCategoryView {
         System.out.print("Nome da categoria: ");
         String categoryName = scanner.nextLine();
 
-        categoryController.createCategory(categoryName);
-        System.out.println("Categoria criada e guardada com sucesso.");
+        try {
+            validateCategoryName(categoryName);
+
+            categoryController.createCategory(categoryName);
+            System.out.println("Categoria criada e guardada com sucesso.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Entrada inválida: " + e.getMessage());
+        }
     }
+
+    private void validateCategoryName(String categoryName) {
+        if (categoryName.isEmpty()) {
+            throw new IllegalArgumentException("O nome da categoria não pode estar vazio.");
+        }
+    }
+
 }

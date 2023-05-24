@@ -12,9 +12,8 @@ import java.util.List;
  * @author franc
  */
 
-public class Book implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private static int counter = 0;
+public class Book {
+
     private int id;
     private String title;
     private String subtitle;
@@ -29,7 +28,32 @@ public class Book implements Serializable {
     private int quantity;
 
     public Book(String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn, int quantity) {
-        this.id = ++counter;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.author = author;
+        this.numPages = numPages;
+        this.category = category;
+        this.publicationDate = publicationDate;
+        this.ageRange = ageRange;
+        this.publisher = publisher;
+        this.isbn = isbn;
+        this.quantity = quantity;
+    }
+    public Book(String title, String subtitle, int numPages, LocalDate publicationDate, String isbn, int quantity, Author author, Category category, AgeRange ageRange, Publisher publisher) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.numPages = numPages;
+        this.publicationDate = publicationDate;
+        this.isbn = isbn;
+        this.quantity = quantity;
+        this.author = author;
+        this.category = category;
+        this.ageRange = ageRange;
+        this.publisher = publisher;
+    }
+
+    public Book(int id, String title, String subtitle, Author author, int numPages, Category category, LocalDate publicationDate, AgeRange ageRange, Publisher publisher, String isbn, int quantity) {
+        this.id = id;
         this.title = title;
         this.subtitle = subtitle;
         this.author = author;
@@ -46,6 +70,10 @@ public class Book implements Serializable {
 
     }
 
+    public Book(int id, String title) {
+        this.id = id;
+        this.title = title;
+    }
 
     public int getId() {
         return id;
@@ -103,21 +131,6 @@ public class Book implements Serializable {
         this.publicationDate = publicationDate;
     }
 
-    public AgeRange getAgeRange() {
-        return ageRange;
-    }
-
-    public void setAgeRange(AgeRange ageRange) {
-        this.ageRange = ageRange;
-    }
-
-    public Publisher getPublisher() {
-        return publisher;
-    }
-
-    public void setPublisher(Publisher publisher) {
-        this.publisher = publisher;
-    }
 
     public String getIsbn() {
         return isbn;
@@ -133,6 +146,23 @@ public class Book implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+
+    public AgeRange getAgeRange() {
+        return ageRange;
+    }
+
+    public void setAgeRange(AgeRange ageRange) {
+        this.ageRange = ageRange;
+    }
+
+    public Publisher getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(Publisher publisher) {
+        this.publisher = publisher;
     }
 
     @Override
@@ -153,10 +183,6 @@ public class Book implements Serializable {
         return sb.toString();
     }
 
-    public static void resetIdCounter(List<Book> books) {
-        int maxId = books.stream().mapToInt(Book::getId).max().orElse(0);
-        counter = maxId;
-    }
 
 
 }

@@ -12,27 +12,22 @@ import java.util.Random;
 /**
  * @author franc
  */
-public class Card implements Serializable {
+public class Card  {
 
-    private static int counter = 0;
+
     private int id;
     private Member member;
     private String cardNumber;
-    private int borrowedBooks;
-    private static final long serialVersionUID = 1L;
+
+
 
 
     public Card(Member member, String cardNumber) {
-        this.id = counter++;
         this.member = member;
         this.cardNumber = cardNumber;
-        this.borrowedBooks = 0;
+
     }
 
-    public static void resetIdCounter(List<Card> cardList) {
-        int maxId = cardList.stream().mapToInt(Card::getId).max().orElse(0);
-        counter = maxId;
-    }
 
 
     public int getId() {
@@ -47,18 +42,17 @@ public class Card implements Serializable {
         return cardNumber;
     }
 
-    public int getBorrowedBooks() {
-        return borrowedBooks;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setBorrowedBooks(int borrowedBooks) {
-        this.borrowedBooks = borrowedBooks;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
-    public boolean canBorrow() {
-        return borrowedBooks < member.getMaxBorrowedBooks();
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
-
 
     @Override
     public String toString() {
@@ -66,11 +60,9 @@ public class Card implements Serializable {
                 "Cartão{%n" +
                         "    membro=%s%n" +
                         "    número do cartão='%s'%n" +
-                        "    livros emprestados=%s%n" +
                         "}",
                 member,
-                cardNumber,
-                borrowedBooks
+                cardNumber
         );
     }
 

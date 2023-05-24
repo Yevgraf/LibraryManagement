@@ -1,6 +1,7 @@
 package Data;
 
 import java.io.*;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,40 +9,55 @@ import Model.AgeRange;
 import Model.Publisher;
 
 public class PublisherData {
-    private static final String FILENAME = "Publisher.ser";
 
     public static void save(List<Publisher> publisherList) {
-        try {
-            FileOutputStream fos = null;
-            ObjectOutputStream out = null;
-            File file = new File(FILENAME);
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO " + "Publisher" + " (name, address) VALUES (?, ?)")) {
 
-            if (!file.exists()) {
-                file.createNewFile();
-                System.out.println("Ficheiro da Editoras criados");
+            for (Publisher publisher : publisherList) {
+                if (!isPublisherExists(connection, publisher)) {
+                    statement.setString(1, publisher.getName());
+                    statement.setString(2, publisher.getAddress());
+                    statement.executeUpdate();
+                }
             }
 
-            fos = new FileOutputStream(file);
-            out = new ObjectOutputStream(fos);
-            out.writeObject(publisherList);
-            System.out.println("Editoras gravados no ficheiros.");
-            out.close();
-        } catch (IOException e) {
-            System.err.println("Erro ao gravar ficheiro de editores: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Erro ao guardar editores na base de dados: " + e.getMessage());
         }
     }
 
     public static List<Publisher> load() {
         List<Publisher> publisherList = new ArrayList<>();
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILENAME))) {
-            publisherList = (List<Publisher>) in.readObject();
-            Publisher.resetIdCounter(publisherList);
-        } catch (FileNotFoundException e) {
-            System.out.println("Não foram encontrados edititoras gravados no ficheiro");
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Erro ao carregar editoras do ficheiro: " + e.getMessage());
+        try (Connection connection = DBconn.getConn();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + "Publisher")) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String address = resultSet.getString("address");
+                Publisher publisher = new Publisher(name, address);
+                publisher.setId(id);
+                publisherList.add(publisher);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar editores da base de dados: " + e.getMessage());
         }
         return publisherList;
+    }
+
+    private static boolean isPublisherExists(Connection connection, Publisher publisher) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM " + "Publisher" + " WHERE name = ? AND address = ?");
+        statement.setString(1, publisher.getName());
+        statement.setString(2, publisher.getAddress());
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            int count = resultSet.getInt(1);
+            return count > 0;
+        }
+        return false;
     }
 
     public static Publisher findByName(String name) {

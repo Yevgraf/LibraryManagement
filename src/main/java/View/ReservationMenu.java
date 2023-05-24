@@ -3,8 +3,6 @@ package View;
 import Controller.BookController;
 import Controller.MemberController;
 import Controller.ReservationController;
-import Model.Book;
-import Model.Member;
 
 import java.util.Scanner;
 
@@ -40,13 +38,13 @@ public class ReservationMenu {
                         createReservationView.createReservation();
                         break;
                     case 2:
-                        removeReservationView.removeReservation();
+                        removeReservationView.deliverBook();
                         break;
                     case 3:
                         createReservationView.listAllReservations();
                         break;
                     case 4:
-                        System.out.println("Voltando...");
+                        System.out.println("Voltar...");
                         mainMenu.displayMenu();
                         return;
                     default:
