@@ -166,7 +166,7 @@ public class MemberData {
                     int maxBorrowedBooks = resultSet.getInt("maxBorrowedBooks");
 
                     member = new Member(name, address, birthDate, phone, email);
-                    member.setId(memberId);
+                    member.setMemberId(memberId);
                     member.setMaxBorrowedBooks(maxBorrowedBooks);
                 }
             }

@@ -60,6 +60,10 @@ public class Member extends User  {
         return id;
     }
 
+    public void setMemberId(int id){
+        this.id = id;
+    }
+
     public int getMaxBorrowedBooks() {
         return maxBorrowedBooks;
     }

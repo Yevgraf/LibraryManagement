@@ -59,10 +59,12 @@ public class Card  {
         return String.format(
                 "Cartão{%n" +
                         "    membro=%s%n" +
-                        "    número do cartão='%s'%n" +
+                        "    número do cartão: %s%n" +
+                        " ID Cartão: %s%n" +
                         "}",
                 member,
-                cardNumber
+                cardNumber,
+                id
         );
     }
 
