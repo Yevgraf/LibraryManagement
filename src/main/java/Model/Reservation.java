@@ -14,6 +14,7 @@ public class Reservation {
     private State state;
     private int satisfactionRating;
     private String additionalComments;
+    private CD cd;
 
     public Reservation(Member member, Book book, LocalDate startDate, LocalDate endDate) {
         this.member = member;
@@ -46,6 +47,30 @@ public class Reservation {
         this.member = member;
         this.book = book;
         this.endDate = endDate;
+    }
+
+
+    public Reservation(Member member, Book book, CD cd, LocalDate startDate, LocalDate endDate) {
+        this.member = member;
+        this.book = book;
+        this.cd = cd;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = State.RESERVADO;
+        this.satisfactionRating = 0;
+        this.additionalComments = "";
+    }
+
+    public Reservation(int id, Book book, CD cd, Member member, LocalDate startDate, LocalDate endDate, State state, int satisfactionRating, String additionalComments) {
+        this.id = id;
+        this.book = book;
+        this.cd = cd;
+        this.member = member;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = state;
+        this.satisfactionRating = satisfactionRating;
+        this.additionalComments = additionalComments;
     }
 
 
@@ -114,14 +139,31 @@ public class Reservation {
         this.additionalComments = additionalComments;
     }
 
+    public CD getCd() {
+        return cd;
+    }
+
+    public void setCd(CD cd) {
+        this.cd = cd;
+    }
+
+
     @Override
     public String toString() {
-        return "Reserva #" + id + ":\n" +
-                "Livro: " + book.getTitle() + " por " + book.getAuthor() + "\n" +
+        String reservationInfo = "Reserva #" + id + ":\n" +
+                "Livro: " + book.getTitle() + " por " + book.getAuthor() + "\n";
+
+        if (cd != null) {
+            reservationInfo += "CD: " + cd.getTitle() + " artista: " + cd.getArtist() + "\n";
+        }
+
+        reservationInfo +=
                 "Reservado por: " + member.getName() + "\n" +
-                "Reservado em: " + startDate + "\n" +
-                "Termina em: " + endDate + "\n" +
-                "Estado: " + state + "\n";
+                        "Reservado em: " + startDate + "\n" +
+                        "Termina em: " + endDate + "\n" +
+                        "Estado: " + state + "\n";
+
+        return reservationInfo;
     }
 
 

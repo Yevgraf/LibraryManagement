@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import Model.Book;
+import Model.CD;
 import Model.Member;
 import Model.User;
 
@@ -53,8 +54,6 @@ public class MemberData {
             System.err.println("Erro ao guardar utilizadores na base de dados: " + e.getMessage());
         }
     }
-
-
 
 
     private static boolean isMemberExists(Connection connection, String email) throws SQLException {
@@ -131,6 +130,18 @@ public class MemberData {
                     member.addBorrowedBook(book);
                 }
 
+                PreparedStatement borrowedCDsStatement = connection.prepareStatement("SELECT c.id, c.title FROM BorrowedCD bc INNER JOIN CD c ON bc.cdId = c.id WHERE bc.memberId = ?");
+                borrowedCDsStatement.setInt(1, id);
+                ResultSet borrowedCDsResultSet = borrowedCDsStatement.executeQuery();
+
+                while (borrowedCDsResultSet.next()) {
+                    int cdId = borrowedCDsResultSet.getInt("id");
+                    String cdTitle = borrowedCDsResultSet.getString("title");
+
+                    CD cd = new CD(cdId, cdTitle);
+                    member.addBorrowedCD(cd);
+                }
+
                 memberList.add(member);
             }
         } catch (SQLException e) {
@@ -176,6 +187,7 @@ public class MemberData {
 
         return member;
     }
+
     public void removeBookFromBorrowedBooks(Member member, Book book) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("DELETE FROM dbo.BorrowedBook WHERE memberId = ? AND bookId = ?")) {
@@ -244,5 +256,30 @@ public class MemberData {
         throw new SQLException("Falha ao obter o número de livros emprestados para o membro.");
     }
 
+
+    public void addCDToBorrowedCDs(Member member, CD cd) {
+        LocalDate borrowedDate = LocalDate.now();
+
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO BorrowedCD (memberId, cdId, borrowedDate) VALUES (?, ?, ?)")) {
+            statement.setInt(1, member.getId());
+            statement.setInt(2, cd.getId());
+            statement.setDate(3, java.sql.Date.valueOf(borrowedDate));
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao adicionar CD à lista de CDs emprestados do membro: " + e.getMessage());
+        }
+    }
+
+    public void removeCDFromBorrowedCDs(Member member, CD cd) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM BorrowedCD WHERE memberId = ? AND cdId = ?")) {
+            statement.setInt(1, member.getId());
+            statement.setInt(2, cd.getId());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao remover CD da lista de CDs emprestados do membro: " + e.getMessage());
+        }
+    }
 
 }

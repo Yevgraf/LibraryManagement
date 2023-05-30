@@ -13,18 +13,20 @@ import java.util.List;
 
 public class ReservationData {
 
+
     public void save(Reservation reservation) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement insertStatement = connection.prepareStatement(
-                     "INSERT INTO dbo.Reservation (bookId, memberId, startDate, endDate, state, satisfactionRating, additionalComments) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                     "INSERT INTO dbo.Reservation (bookId, memberId, startDate, endDate, state, satisfactionRating, additionalComments, cdId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
 
-            // Validate the number of reservations in state 'RESERVADO' for the member
+            // Validate the number of reservations and borrowed items for the member
             int memberId = reservation.getMember().getId();
             int maxReservations = 3; // Maximum number of reservations allowed
             int currentReservations = getNumberOfReservations(memberId, State.RESERVADO);
+            int currentBorrowedItems = getNumberOfBorrowedItems(memberId);
 
-            if (currentReservations >= maxReservations) {
-                throw new SQLException("O membro já possui " + currentReservations + " reservas em estado 'RESERVADO'. Não é permitido ter mais de " + maxReservations + " reservas em andamento.");
+            if (currentReservations + currentBorrowedItems >= maxReservations) {
+                throw new SQLException("O membro já possui " + (currentReservations + currentBorrowedItems) + " reservas e itens emprestados. Não é permitido ter mais de " + maxReservations + " reservas e itens emprestados no total.");
             }
 
             insertStatement.setInt(1, reservation.getBook().getId());
@@ -34,6 +36,7 @@ public class ReservationData {
             insertStatement.setString(5, reservation.getState().toString());
             insertStatement.setInt(6, reservation.getSatisfactionRating());
             insertStatement.setString(7, reservation.getAdditionalComments());
+            insertStatement.setInt(8, reservation.getCd().getId()); // Update the statement to include CD ID
 
             int affectedRows = insertStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -44,7 +47,6 @@ public class ReservationData {
             return;
         }
     }
-
 
     private int getNumberOfReservations(int memberId, State state) throws SQLException {
         try (Connection connection = DBconn.getConn();
@@ -64,6 +66,24 @@ public class ReservationData {
         throw new SQLException("Falha ao obter o número de reservas para o membro.");
     }
 
+    private int getNumberOfBorrowedItems(int memberId) throws SQLException {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT COUNT(*) FROM (SELECT bookId FROM dbo.BorrowedBook WHERE memberId = ? UNION ALL SELECT cdId FROM dbo.BorrowedCD WHERE memberId = ?) AS borrowedItems")) {
+
+            statement.setInt(1, memberId);
+            statement.setInt(2, memberId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1);
+                }
+            }
+        }
+
+        throw new SQLException("Falha ao obter o número de itens emprestados para o membro.");
+    }
+
 
     public List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();
@@ -74,6 +94,7 @@ public class ReservationData {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 int bookId = resultSet.getInt("bookId");
+                int cdId = resultSet.getInt("cdId");
                 int memberId = resultSet.getInt("memberId");
                 LocalDate startDate = resultSet.getDate("startDate").toLocalDate();
                 LocalDate endDate = resultSet.getDate("endDate").toLocalDate();
@@ -81,12 +102,12 @@ public class ReservationData {
                 int satisfactionRating = resultSet.getInt("satisfactionRating");
                 String additionalComments = resultSet.getString("additionalComments");
 
-                // Load associated book and member objects
-
+                // Load associated book, CD, and member objects
                 Book book = loadBook(bookId);
+                CD cd = loadCD(cdId);
                 Member member = loadMemberById(memberId);
 
-                Reservation reservation = new Reservation(id, book, member, startDate, endDate, state, satisfactionRating, additionalComments);
+                Reservation reservation = new Reservation(id, book, cd, member, startDate, endDate, state, satisfactionRating, additionalComments);
                 reservations.add(reservation);
             }
         } catch (SQLException e) {
@@ -94,6 +115,7 @@ public class ReservationData {
         }
         return reservations;
     }
+
 
     private Book loadBook(int bookId) {
         Book book = null;
@@ -186,6 +208,34 @@ public class ReservationData {
         }
 
         return libraryUser;
+    }
+    private CD loadCD(int cdId) {
+        CD cd = null;
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.CD WHERE id = ?")) {
+
+            selectStatement.setInt(1, cdId);
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String title = resultSet.getString("title");
+                String artist = resultSet.getString("artist");
+                int releaseYear = resultSet.getInt("releaseYear");
+                int numTracks = resultSet.getInt("numTracks");
+                int categoryId = resultSet.getInt("categoryId");
+                int quantity = resultSet.getInt("quantity");
+
+                // Load the Category object
+                Category category = BookData.loadCategoryById(categoryId);
+
+                // Create a CD object
+                cd = new CD(title, artist, releaseYear, numTracks, category, quantity);
+                cd.setId(cdId);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar CD do banco de dados: " + e.getMessage());
+        }
+        return cd;
     }
 
     public void updateState(Reservation reservation, State newState) {

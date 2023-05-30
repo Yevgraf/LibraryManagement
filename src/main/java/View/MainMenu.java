@@ -17,6 +17,7 @@ public class MainMenu {
     private AgeRangeMenu ageRangeMenu;
     private BookMenu bookMenu;
     private ReservationMenu reservationMenu;
+    private CDMenu cdMenu; // Add CDMenu reference
 
     public MainMenu() {
         scanner = new Scanner(System.in);
@@ -27,9 +28,10 @@ public class MainMenu {
         AgeRangeData ageRangeData = new AgeRangeData();
         CategoryData categoryData = new CategoryData();
         PublisherData publisherData = new PublisherData();
+        CDData cdData = new CDData();
         CardController cardController = new CardController(cardData);
         ReservationData reservationData = new ReservationData();
-        ReservationController reservationController = new ReservationController(reservationData, memberData, bookData);
+        ReservationController reservationController = new ReservationController(reservationData, memberData, bookData, cdData); // Pass CDData instance
         MemberController memberController = new MemberController(memberData, scanner);
         BookController bookController = new BookController(bookData, authorData, ageRangeData, categoryData, publisherData, scanner);
 
@@ -41,6 +43,7 @@ public class MainMenu {
         ageRangeMenu = new AgeRangeMenu(this);
         bookMenu = new BookMenu(this);
         reservationMenu = new ReservationMenu(this, memberController, bookController, reservationController);
+        cdMenu = new CDMenu(this, new CDController(cdData, categoryData), scanner); // Initialize CDMenu with CDController and scanner
     }
 
 
@@ -57,6 +60,7 @@ public class MainMenu {
         System.out.println("| 6 - Gestão de categorias       |");
         System.out.println("| 7 - Gestão de faixa etária     |");
         System.out.println("| 8 - Gestão de livros           |");
+        System.out.println("| 9 - Gestão de CDs              |"); // Add CD menu option
         System.out.println("| 0 - Sair                       |");
         System.out.println("===================================");
 
@@ -87,6 +91,9 @@ public class MainMenu {
                 break;
             case 8:
                 bookMenu.displayMenu();
+                break;
+            case 9:
+                cdMenu.displayMenu(); // Call displayMenu() from CDMenu
                 break;
             case 0:
                 System.out.println("Até logo!");
