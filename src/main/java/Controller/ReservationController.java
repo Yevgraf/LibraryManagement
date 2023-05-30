@@ -40,6 +40,8 @@ public class ReservationController {
     public void setBookData(BookData bookData) {
         this.bookData = bookData;
     }
+
+
     public void addReservation() {
         List<Member> members = memberData.load();
         List<Book> books = bookData.listBooks();
@@ -67,7 +69,20 @@ public class ReservationController {
             return;
         }
 
-        Reservation reservation = new Reservation(selectedMember, selectedBook, selectedCD, startDate, endDate);
+        Reservation reservation;
+
+        if (selectedBook != null && selectedCD != null) {
+            reservation = new Reservation(selectedMember, selectedBook, selectedCD, startDate, endDate);
+        } else if (selectedBook != null) {
+            reservation = new Reservation(selectedMember, selectedBook, startDate, endDate);
+        } else if (selectedCD != null) {
+            reservation = new Reservation(selectedMember, selectedCD, startDate, endDate);
+        } else {
+            System.out.println("Erro: Nenhum item selecionado.");
+            return;
+        }
+
+
         reservation.setState(State.RESERVADO); // estado alterado para 'RESERVADO' em memória
         reservationData.save(reservation); // cria a reserva na base de dados
 
@@ -81,10 +96,7 @@ public class ReservationController {
             cdData.updateCDQuantityDecrease(selectedCD.getId());
             memberData.addCDToBorrowedCDs(selectedMember, selectedCD);
         }
-
-        System.out.println("Reserva adicionada com sucesso.");
     }
-
 
 
     private CD selectCD(List<CD> cds) {
@@ -115,8 +127,6 @@ public class ReservationController {
 
         return null;
     }
-
-
 
 
     private LocalDate getEndDateInput() {
@@ -151,29 +161,23 @@ public class ReservationController {
     private Book selectBook(List<Book> books) {
         System.out.println("Selecione o livro:");
 
-        // Add the "nenhum" option
-        System.out.println("0. Nenhum");
-
         for (int i = 0; i < books.size(); i++) {
             System.out.println((i + 1) + ". " + books.get(i).getTitle());
         }
 
-        Book selectedBook = null;
-        boolean validSelection = false;
-        while (!validSelection) {
-            int selection = getUserInput("Opção: ");
-            if (selection == 0) {
-                validSelection = true;
-            } else if (selection >= 1 && selection <= books.size()) {
-                selectedBook = books.get(selection - 1);
-                validSelection = true;
-            } else {
-                System.out.println("Opção inválida. Por favor, selecione uma opção válida.");
-            }
-        }
+        System.out.println("0. Nenhum");
 
-        return selectedBook;
+        int selection = getUserInput("Opção: ");
+        if (selection == 0) {
+            return null;
+        } else if (selection >= 1 && selection <= books.size()) {
+            return books.get(selection - 1); // Return the selected book
+        } else {
+            System.out.println("Opção inválida. Por favor, selecione uma opção válida.");
+            return selectBook(books);
+        }
     }
+
 
 
     private int getUserInput(String prompt) {

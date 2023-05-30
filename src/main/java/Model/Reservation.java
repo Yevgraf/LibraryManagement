@@ -26,39 +26,36 @@ public class Reservation {
         this.additionalComments = "";
     }
 
-    public Reservation(Book book, Member member, LocalDate startDate, LocalDate endDate) {
-        this.book = book;
+    public Reservation(Member member, CD cd, LocalDate startDate, LocalDate endDate) {
         this.member = member;
+        this.cd = cd;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.state = State.PENDENTE;
+        this.satisfactionRating = 0;
+        this.additionalComments = "";
     }
 
-    public Reservation(int id, Book book, Member member, LocalDate startDate, LocalDate endDate, State state, int satisfactionRating, String additionalComments) {
+    public Reservation(int id, Member member, Book book, LocalDate startDate, LocalDate endDate, State state, int satisfactionRating, String additionalComments) {
         this.id = id;
-        this.book = book;
         this.member = member;
+        this.book = book;
         this.startDate = startDate;
         this.endDate = endDate;
         this.state = state;
         this.satisfactionRating = satisfactionRating;
         this.additionalComments = additionalComments;
     }
-    public Reservation(Member member, Book book, LocalDate endDate) {
-        this.member = member;
-        this.book = book;
-        this.endDate = endDate;
-    }
 
-
-    public Reservation(Member member, Book book, CD cd, LocalDate startDate, LocalDate endDate) {
+    public Reservation(int id, Member member, CD cd, LocalDate startDate, LocalDate endDate, State state, int satisfactionRating, String additionalComments) {
+        this.id = id;
         this.member = member;
-        this.book = book;
         this.cd = cd;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.state = State.RESERVADO;
-        this.satisfactionRating = 0;
-        this.additionalComments = "";
+        this.state = state;
+        this.satisfactionRating = satisfactionRating;
+        this.additionalComments = additionalComments;
     }
 
     public Reservation(int id, Book book, CD cd, Member member, LocalDate startDate, LocalDate endDate, State state, int satisfactionRating, String additionalComments) {
@@ -73,6 +70,16 @@ public class Reservation {
         this.additionalComments = additionalComments;
     }
 
+    public Reservation(Member member, Book book, CD cd, LocalDate startDate, LocalDate endDate) {
+        this.member = member;
+        this.book = book;
+        this.cd = cd;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = State.RESERVADO;
+        this.satisfactionRating = 0;
+        this.additionalComments = "";
+    }
 
     public Book getBook() {
         return book;
@@ -114,7 +121,6 @@ public class Reservation {
         this.id = id;
     }
 
-
     public State getState() {
         return state;
     }
@@ -147,14 +153,56 @@ public class Reservation {
         this.cd = cd;
     }
 
+    public int getItemsCount() {
+        int itemCount = 0;
+
+        if (book != null) {
+            itemCount++;
+        }
+
+        if (cd != null) {
+            itemCount++;
+        }
+
+        return itemCount;
+    }
+
+
+    public Reservation(int id, Book book, Member member, LocalDate startDate, LocalDate endDate, State state, int satisfactionRating, String additionalComments) {
+        this.id = id;
+        this.book = book;
+        this.member = member;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = state;
+        this.satisfactionRating = satisfactionRating;
+        this.additionalComments = additionalComments;
+    }
+    public Reservation(int id, CD cd, Member member, LocalDate startDate, LocalDate endDate, State state, int satisfactionRating, String additionalComments) {
+        this.id = id;
+        this.cd = cd;
+        this.member = member;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = state;
+        this.satisfactionRating = satisfactionRating;
+        this.additionalComments = additionalComments;
+    }
 
     @Override
     public String toString() {
-        String reservationInfo = "Reserva #" + id + ":\n" +
-                "Livro: " + book.getTitle() + " por " + book.getAuthor() + "\n";
+        String reservationInfo = "Reserva #" + id + ":\n";
+
+        if (book != null) {
+            reservationInfo += "Livro: " + book.getTitle() + " por " + book.getAuthor() + "\n";
+        } else {
+            reservationInfo += "Livro: Nenhum livro associado\n";
+        }
 
         if (cd != null) {
             reservationInfo += "CD: " + cd.getTitle() + " artista: " + cd.getArtist() + "\n";
+        } else {
+            reservationInfo += "CD: Nenhum CD associado\n";
         }
 
         reservationInfo +=
@@ -165,6 +213,5 @@ public class Reservation {
 
         return reservationInfo;
     }
-
 
 }

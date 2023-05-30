@@ -75,9 +75,6 @@ public class Book {
         this.title = title;
     }
 
-    public int getId() {
-        return id;
-    }
 
     public void setId(int id) {
         this.id = id;
@@ -165,6 +162,12 @@ public class Book {
         this.publisher = publisher;
     }
 
+    public int getId() {
+        if (this == null) {
+            return -1; // Return a default value when the book is null
+        }
+        return this.id;
+    }
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
