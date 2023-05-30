@@ -10,9 +10,7 @@ import Model.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -92,7 +90,7 @@ public class ReservationController {
     private CD selectCD(List<CD> cds) {
         Scanner scanner = new Scanner(System.in);
 
-        // Display list of CDs to choose from
+
         System.out.println("CDs disponíveis:");
         for (CD cd : cds) {
             System.out.println(cd.getId() + ". Título: " + cd.getTitle());
@@ -109,7 +107,6 @@ public class ReservationController {
             return null;
         }
 
-        // Find the selected CD by ID
         for (CD cd : cds) {
             if (cd.getId() == cdId) {
                 return cd;
@@ -195,21 +192,22 @@ public class ReservationController {
     }
 
 
-    public void deliverReservationByBookNameAndUserName() {
+    public void deliverReservation() {
         try {
             List<Reservation> reservations = reservationData.load();
 
             List<Reservation> matchingReservations = reservations.stream()
-                    .filter(reservation -> reservation.getState() == State.RESERVADO)
+                    .filter(reservation -> reservation.getState() == State.RESERVADO && (reservation.getBook() != null || reservation.getCd() != null))
                     .collect(Collectors.toList());
+
 
             if (matchingReservations.isEmpty()) {
                 System.out.println("Nenhuma reserva encontrada para o livro ou CD.");
                 return;
             }
 
-            // Display a list of books and CDs matching the criteria
-            System.out.println("Itens encontrados:");
+            // Display a list of reservations
+            System.out.println("Reservas encontradas:");
             for (int i = 0; i < matchingReservations.size(); i++) {
                 Reservation reservation = matchingReservations.get(i);
                 Book book = reservation.getBook();
@@ -217,10 +215,14 @@ public class ReservationController {
                 Member member = reservation.getMember();
 
                 String itemInfo;
-                if (book != null) {
+                if (book != null && cd != null) {
+                    itemInfo = String.format("%d. Livro: %s - %s\n   CD: %s - %s", (i + 1), book.getTitle(), member.getName(), cd.getTitle(), member.getName());
+                } else if (book != null) {
                     itemInfo = String.format("%d. Livro: %s - %s", (i + 1), book.getTitle(), member.getName());
-                } else {
+                } else if (cd != null) {
                     itemInfo = String.format("%d. CD: %s - %s", (i + 1), cd.getTitle(), member.getName());
+                } else {
+                    itemInfo = String.format("%d. Reserva inválida", (i + 1));
                 }
 
                 System.out.println(itemInfo);
