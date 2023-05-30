@@ -99,6 +99,14 @@ public class Member extends User  {
         this.borrowedBooks = borrowedBooks;
     }
 
+    public List<CD> getBorrowedCDs() {
+        return borrowedCDs;
+    }
+
+    public void setBorrowedCDs(List<CD> borrowedCDs) {
+        this.borrowedCDs = borrowedCDs;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

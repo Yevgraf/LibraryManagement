@@ -13,22 +13,22 @@ import java.util.List;
 
 public class ReservationData {
 
-
     public void save(Reservation reservation) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement insertStatement = connection.prepareStatement(
                      "INSERT INTO dbo.Reservation (bookId, memberId, startDate, endDate, state, satisfactionRating, additionalComments, cdId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
 
-            // Validate the number of reservations and borrowed items for the member
             int memberId = reservation.getMember().getId();
-            int maxReservations = 3; // Maximum number of reservations allowed
-            int currentReservations = getNumberOfReservations(memberId, State.RESERVADO);
-            int currentBorrowedItems = getNumberOfBorrowedItems(memberId);
+            int maxReservationsAndBorrowedItems = 3;
+            int totalReservationsAndBorrowedItems = getNumberOfReservationsAndBorrowedItems(memberId);
 
-            if (currentReservations + currentBorrowedItems >= maxReservations) {
-                throw new SQLException("O membro já possui " + (currentReservations + currentBorrowedItems) + " reservas e itens emprestados. Não é permitido ter mais de " + maxReservations + " reservas e itens emprestados no total.");
+            if (totalReservationsAndBorrowedItems + 1 > maxReservationsAndBorrowedItems) {
+                System.out.println("O membro já possui " + totalReservationsAndBorrowedItems + " reservas e itens emprestados. Não é permitido ter mais de " + maxReservationsAndBorrowedItems + " reservas e itens emprestados no total.");
+                System.out.println("A reserva não foi adicionada.");
+                return;
             }
 
+            // Save the reservation
             insertStatement.setInt(1, reservation.getBook().getId());
             insertStatement.setInt(2, memberId);
             insertStatement.setDate(3, java.sql.Date.valueOf(reservation.getStartDate()));
@@ -36,54 +36,86 @@ public class ReservationData {
             insertStatement.setString(5, reservation.getState().toString());
             insertStatement.setInt(6, reservation.getSatisfactionRating());
             insertStatement.setString(7, reservation.getAdditionalComments());
-            insertStatement.setInt(8, reservation.getCd().getId()); // Update the statement to include CD ID
+            insertStatement.setInt(8, reservation.getCd().getId());
 
             int affectedRows = insertStatement.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Falha ao salvar a reserva, sem linhas afetadas.");
+                System.out.println("Falha ao salvar a reserva, sem linhas afetadas.");
+                System.out.println("A reserva não foi adicionada.");
+            } else {
+                System.out.println("Reserva adicionada com sucesso.");
             }
         } catch (SQLException e) {
-            // If the validation fails, do not proceed with saving the reservation
-            return;
+            System.out.println("Erro ao salvar a reserva: " + e.getMessage());
+            System.out.println("A reserva não foi adicionada.");
         }
     }
 
-    private int getNumberOfReservations(int memberId, State state) throws SQLException {
+    private int getNumberOfReservationsAndBorrowedItems(int memberId) {
+        int numberOfReservations = getNumberOfReservations(memberId, State.RESERVADO);
+        int numberOfBorrowedBooks = getNumberOfBorrowedBooks(memberId);
+        int numberOfBorrowedCDs = getNumberOfBorrowedCDs(memberId);
+
+        return numberOfReservations + numberOfBorrowedBooks + numberOfBorrowedCDs;
+    }
+
+    private int getNumberOfBorrowedBooks(int memberId) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement(
-                     "SELECT COUNT(*) FROM dbo.Reservation WHERE memberId = ? AND state = ?")) {
+             PreparedStatement countStatement = connection.prepareStatement(
+                     "SELECT COUNT(*) FROM BorrowedBook WHERE memberId = ?")) {
 
-            statement.setInt(1, memberId);
-            statement.setString(2, state.toString());
+            countStatement.setInt(1, memberId);
 
-            try (ResultSet resultSet = statement.executeQuery()) {
+            try (ResultSet resultSet = countStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt(1);
                 }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        throw new SQLException("Falha ao obter o número de reservas para o membro.");
+        return 0;
     }
 
-    private int getNumberOfBorrowedItems(int memberId) throws SQLException {
+    private int getNumberOfBorrowedCDs(int memberId) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement(
-                     "SELECT COUNT(*) FROM (SELECT bookId FROM dbo.BorrowedBook WHERE memberId = ? UNION ALL SELECT cdId FROM dbo.BorrowedCD WHERE memberId = ?) AS borrowedItems")) {
+             PreparedStatement countStatement = connection.prepareStatement(
+                     "SELECT COUNT(*) FROM BorrowedCD WHERE memberId = ?")) {
 
-            statement.setInt(1, memberId);
-            statement.setInt(2, memberId);
+            countStatement.setInt(1, memberId);
 
-            try (ResultSet resultSet = statement.executeQuery()) {
+            try (ResultSet resultSet = countStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt(1);
                 }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        throw new SQLException("Falha ao obter o número de itens emprestados para o membro.");
+        return 0;
     }
 
+    private int getNumberOfReservations(int memberId, State state) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement countStatement = connection.prepareStatement(
+                     "SELECT COUNT(*) FROM Reservation WHERE memberId = ? AND state = ?")) {
+
+            countStatement.setInt(1, memberId);
+            countStatement.setString(2, state.toString());
+
+            try (ResultSet resultSet = countStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
 
     public List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();
