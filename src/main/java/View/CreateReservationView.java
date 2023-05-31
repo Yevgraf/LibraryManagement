@@ -52,9 +52,9 @@ public class CreateReservationView {
         List<Reservation> reservations = reservationController.getAllReservations();
 
         if (reservations.isEmpty()) {
-            System.out.println("No reservations found.");
+            System.out.println("Reservas não encotradas.");
         } else {
-            System.out.println("All reservations:");
+            System.out.println("Todas as reservas:");
             for (Reservation reservation : reservations) {
                 System.out.println(reservation.toString());
             }

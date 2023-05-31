@@ -33,15 +33,17 @@ public class BookMenu {
         PublisherData publisherData = new PublisherData();
         ReservationData reservationData = new ReservationData();
         MemberData memberData = new MemberData();
+        CDData cdData = new CDData();  // Instantiate CDData
         bookController = new BookController(bookData, authorData, ageRangeData, categoryData, publisherData, scanner);
         authorController = new AuthorController(authorData);
         ageRangeController = new AgeRangeController(ageRangeData);
         categoryController = new CategoryController(categoryData);
         publisherController = new PublisherController(publisherData);
+        CDController cdController = new CDController(cdData, categoryData);  // Instantiate CDController
         createBookView = new CreateBookView(bookController, authorController, ageRangeController, categoryController, publisherController, scanner);
-        reservationController = new ReservationController(reservationData, memberData, bookData);
-
+        reservationController = new ReservationController(reservationData, memberData, bookData, cdData);  // Pass cdData to ReservationController
     }
+
 
     public void displayMenu() {
         int choice = -1;

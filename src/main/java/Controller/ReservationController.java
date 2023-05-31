@@ -1,6 +1,7 @@
 package Controller;
 
 import Data.BookData;
+import Data.CDData;
 import Data.ReservationData;
 import Data.MemberData;
 import Model.*;
@@ -9,9 +10,7 @@ import Model.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -20,12 +19,15 @@ public class ReservationController {
     private ReservationData reservationData;
     private MemberData memberData;
     private BookData bookData;
+    private CDData cdData;
 
-    public ReservationController(ReservationData reservationData, MemberData memberData, BookData bookData) {
+    public ReservationController(ReservationData reservationData, MemberData memberData, BookData bookData, CDData cdData) {
         this.reservationData = reservationData;
         this.memberData = memberData;
         this.bookData = bookData;
+        this.cdData = cdData;
     }
+
 
     public void setReservationData(ReservationData reservationData) {
         this.reservationData = reservationData;
@@ -39,9 +41,11 @@ public class ReservationController {
         this.bookData = bookData;
     }
 
+
     public void addReservation() {
         List<Member> members = memberData.load();
         List<Book> books = bookData.listBooks();
+        List<CD> cds = cdData.load();
 
         Member selectedMember = selectMember(members);
         if (selectedMember == null) {
@@ -50,8 +54,10 @@ public class ReservationController {
         }
 
         Book selectedBook = selectBook(books);
-        if (selectedBook == null) {
-            System.out.println("Erro: Livro não selecionado.");
+        CD selectedCD = selectCD(cds);
+
+        if (selectedBook == null && selectedCD == null) {
+            System.out.println("Erro: Nenhum item selecionado.");
             return;
         }
 
@@ -63,17 +69,63 @@ public class ReservationController {
             return;
         }
 
-        Reservation reservation = new Reservation(selectedMember, selectedBook, startDate, endDate);
-        reservation.setState(State.RESERVADO); // estado alterado para 'RESERVADO' em memoria
-        reservationData.save(reservation); // cria a reserva na base dados
+        Reservation reservation;
 
-        // Update qauntidade livro - 1
-        bookData.updateBookQuantityDecrease(selectedBook.getId());
+        if (selectedBook != null && selectedCD != null) {
+            reservation = new Reservation(selectedMember, selectedBook, selectedCD, startDate, endDate);
+        } else if (selectedBook != null) {
+            reservation = new Reservation(selectedMember, selectedBook, startDate, endDate);
+        } else if (selectedCD != null) {
+            reservation = new Reservation(selectedMember, selectedCD, startDate, endDate);
+        } else {
+            System.out.println("Erro: Nenhum item selecionado.");
+            return;
+        }
 
-        //adiciona livro a lista de livros emprestados do membro - tabela BorrowedBook
-        memberData.addBookToBorrowedBooks(selectedMember, selectedBook);
 
-        System.out.println("Reserva adicionada com sucesso.");
+        reservation.setState(State.RESERVADO); // estado alterado para 'RESERVADO' em memória
+        reservationData.save(reservation); // cria a reserva na base de dados
+
+        // Update quantidade do livro ou CD - 1
+        if (selectedBook != null) {
+            bookData.updateBookQuantityDecrease(selectedBook.getId());
+            memberData.addBookToBorrowedBooks(selectedMember, selectedBook);
+        }
+
+        if (selectedCD != null) {
+            cdData.updateCDQuantityDecrease(selectedCD.getId());
+            memberData.addCDToBorrowedCDs(selectedMember, selectedCD);
+        }
+    }
+
+
+    private CD selectCD(List<CD> cds) {
+        Scanner scanner = new Scanner(System.in);
+
+
+        System.out.println("CDs disponíveis:");
+        for (CD cd : cds) {
+            System.out.println(cd.getId() + ". Título: " + cd.getTitle());
+        }
+
+        // Add the "none" option
+        System.out.println("0. Nenhum");
+
+        // Prompt user to select a CD by ID
+        System.out.print("Selecione o ID do CD: ");
+        int cdId = scanner.nextInt();
+
+        if (cdId == 0) {
+            return null;
+        }
+
+        for (CD cd : cds) {
+            if (cd.getId() == cdId) {
+                return cd;
+            }
+        }
+
+        return null;
     }
 
 
@@ -108,24 +160,24 @@ public class ReservationController {
 
     private Book selectBook(List<Book> books) {
         System.out.println("Selecione o livro:");
+
         for (int i = 0; i < books.size(); i++) {
             System.out.println((i + 1) + ". " + books.get(i).getTitle());
         }
 
-        Book selectedBook = null;
-        boolean validSelection = false;
-        while (!validSelection) {
-            int selection = getUserInput("Opção: ");
-            if (selection >= 1 && selection <= books.size()) {
-                selectedBook = books.get(selection - 1);
-                validSelection = true;
-            } else {
-                System.out.println("Opção inválida. Por favor, selecione uma opção válida.");
-            }
-        }
+        System.out.println("0. Nenhum");
 
-        return selectedBook;
+        int selection = getUserInput("Opção: ");
+        if (selection == 0) {
+            return null;
+        } else if (selection >= 1 && selection <= books.size()) {
+            return books.get(selection - 1); // Return the selected book
+        } else {
+            System.out.println("Opção inválida. Por favor, selecione uma opção válida.");
+            return selectBook(books);
+        }
     }
+
 
 
     private int getUserInput(String prompt) {
@@ -143,60 +195,80 @@ public class ReservationController {
         return reservationData.load();
     }
 
-    public void deliverReservationByBookNameAndUserName() {
+
+    public void deliverReservation() {
         try {
             List<Reservation> reservations = reservationData.load();
 
             List<Reservation> matchingReservations = reservations.stream()
-                    .filter(reservation -> reservation.getState() == State.RESERVADO)
+                    .filter(reservation -> reservation.getState() == State.RESERVADO && (reservation.getBook() != null || reservation.getCd() != null))
                     .collect(Collectors.toList());
 
+
             if (matchingReservations.isEmpty()) {
-                System.out.println("Nenhuma reserva encontrada para o livro com título ou ISBN.");
+                System.out.println("Nenhuma reserva encontrada para o livro ou CD.");
                 return;
             }
 
-            // Display a list of books matching the criteria
-            System.out.println("Livros encontrados:");
+            // Display a list of reservations
+            System.out.println("Reservas encontradas:");
             for (int i = 0; i < matchingReservations.size(); i++) {
                 Reservation reservation = matchingReservations.get(i);
                 Book book = reservation.getBook();
+                CD cd = reservation.getCd();
                 Member member = reservation.getMember();
 
-                String bookInfo = String.format("%d. %s - %s", (i + 1), book.getTitle(), member.getName());
-                System.out.println(bookInfo);
+                String itemInfo;
+                if (book != null && cd != null) {
+                    itemInfo = String.format("%d. Livro: %s - %s\n   CD: %s - %s", (i + 1), book.getTitle(), member.getName(), cd.getTitle(), member.getName());
+                } else if (book != null) {
+                    itemInfo = String.format("%d. Livro: %s - %s", (i + 1), book.getTitle(), member.getName());
+                } else if (cd != null) {
+                    itemInfo = String.format("%d. CD: %s - %s", (i + 1), cd.getTitle(), member.getName());
+                } else {
+                    itemInfo = String.format("%d. Reserva inválida", (i + 1));
+                }
+
+                System.out.println(itemInfo);
                 System.out.println("   - Email: " + member.getEmail());
                 System.out.println("   - Data de devolução: " + reservation.getEndDate());
             }
 
-            // Prompt seleção de livro
-            System.out.print("Selecione o livro (digite o número correspondente): ");
+            // Prompt for item selection
+            System.out.print("Selecione o item (digite o número correspondente): ");
             Scanner scanner = new Scanner(System.in);
-            int bookSelection = scanner.nextInt();
+            int itemSelection = scanner.nextInt();
 
-            if (bookSelection < 1 || bookSelection > matchingReservations.size()) {
+            if (itemSelection < 1 || itemSelection > matchingReservations.size()) {
                 System.out.println("Seleção inválida.");
                 return;
             }
 
-            Reservation selectedReservation = matchingReservations.get(bookSelection - 1);
-            Book selectedBook = selectedReservation.getBook();
+            Reservation selectedReservation = matchingReservations.get(itemSelection - 1);
 
-            // Update estado reserva para 'ENTREGUE'
+            // Update reservation state to 'ENTREGUE'
             reservationData.updateReservationState(selectedReservation, State.ENTREGUE);
 
-            // Prompt para formulário statisfação
+            // Prompt for satisfaction rating
             int satisfactionRating = getSatisfactionRatingInput();
             String additionalComments = getAdditionalCommentsInput();
 
-            //update reserva com a informação adicional
+            // Update reservation with additional information
             reservationData.updateReservationAdditionalInfo(selectedReservation, satisfactionRating, additionalComments);
 
-            // Update quantidade de livro +1
-            updateBookQuantityIncrease(selectedBook);
+            // Update quantity of book or CD + 1
+            Book selectedBook = selectedReservation.getBook();
+            CD selectedCD = selectedReservation.getCd();
 
-            //remove livro da lista de livros emprestados do membro - remove da tabela BorrowedBook
-            memberData.removeBookFromBorrowedBooks(selectedReservation.getMember(), selectedBook);
+            if (selectedBook != null) {
+                updateBookQuantityIncrease(selectedBook);
+                memberData.removeBookFromBorrowedBooks(selectedReservation.getMember(), selectedBook);
+            }
+
+            if (selectedCD != null) {
+                cdData.updateCDQuantityIncrease(selectedCD);
+                memberData.removeCDFromBorrowedCDs(selectedReservation.getMember(), selectedCD);
+            }
 
             System.out.println("Reserva atualizada para 'ENTREGUE': " + selectedReservation.toString());
         } catch (Exception e) {
@@ -220,7 +292,6 @@ public class ReservationController {
         String comments = scanner.nextLine();
         return comments;
     }
-
 
 
     private void updateBookQuantityIncrease(Book book) {
