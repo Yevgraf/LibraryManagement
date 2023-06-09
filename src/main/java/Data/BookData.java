@@ -11,27 +11,26 @@ import java.util.List;
 
 public class BookData {
 
-
     public void save(Book book) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement checkStatement = connection.prepareStatement("SELECT id FROM dbo.Book WHERE isbn = ?");
-             PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO dbo.Book (title, subtitle, authorId, numPages, categoryId, publicationDate, ageRangeId, publisherId, isbn, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement checkStatement = connection.prepareStatement("SELECT id FROM dbo.Product WHERE isbn = ? AND type = 'book'");
+             PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO dbo.Product (title, type, authorId, subtitle, numPages, categoryId, publicationDate, ageRangeId, publisherId, isbn, quantity) VALUES (?, 'book', ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
 
             // Check if the book already exists
             checkStatement.setString(1, book.getIsbn());
             ResultSet resultSet = checkStatement.executeQuery();
             if (resultSet.next()) {
                 // Book already exists, update its details instead of inserting a new record
-                int existingBookId = resultSet.getInt("id");
-                book.setId(existingBookId);
+                int existingProductId = resultSet.getInt("id");
+                book.setId(existingProductId);
                 updateBookDetails(book);
                 return;
             }
 
             // Book does not exist, insert a new record
             insertStatement.setString(1, book.getTitle());
-            insertStatement.setString(2, book.getSubtitle());
-            insertStatement.setInt(3, book.getAuthor().getId());
+            insertStatement.setInt(2, book.getAuthor().getId());
+            insertStatement.setString(3, book.getSubtitle());
             insertStatement.setInt(4, book.getNumPages());
             insertStatement.setInt(5, book.getCategory().getCategoryId());
             insertStatement.setDate(6, java.sql.Date.valueOf(book.getPublicationDate()));
@@ -42,7 +41,7 @@ public class BookData {
 
             int affectedRows = insertStatement.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Criação de lviro falhou, sem linhas afetadas.");
+                throw new SQLException("Criação de livro falhou, sem linhas afetadas.");
             }
 
             ResultSet generatedKeys = insertStatement.getGeneratedKeys();
@@ -53,9 +52,10 @@ public class BookData {
             }
 
         } catch (SQLException e) {
-            System.err.println("Erro ao guardar livro na base dados: " + e.getMessage());
+            System.out.println("Erro ao guardar livro na base de dados: " + e.getMessage());
         }
     }
+
     public void updateBookQuantityDecrease(int bookId) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Book SET quantity = quantity - 1 WHERE id = ?")) {
@@ -65,37 +65,62 @@ public class BookData {
                 throw new SQLException("Falha ao atualizar a quantidade do livro, nenhum registro afetado.");
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao atualizar a quantidade do livro no banco de dados: " + e.getMessage());
+            System.out.println("Erro ao atualizar a quantidade do livro no banco de dados: " + e.getMessage());
         }
     }
 
-    public void updateBookQuantityIncrease(int bookId) {
+    public void updateBookQuantityIncrease(int productId) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Book SET quantity = quantity + 1 WHERE id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Product SET quantity = quantity + 1 WHERE id = ?")) {
 
-            statement.setInt(1, bookId);
+            statement.setInt(1, productId);
 
             int affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Falha ao atualizar a quantidade do livro.");
+                throw new SQLException("Falha ao atualizar a quantidade do produto.");
+            } else {
+                System.out.println("Quantidade do produto atualizada com sucesso.");
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao atualizar a quantidade do livro: " + e.getMessage());
+            System.err.println("Erro ao atualizar a quantidade do produto: " + e.getMessage());
+        }
+    }
+
+    private void updateBookDetails(Book book) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("UPDATE Product SET title = ?, subtitle = ?, authorId = ?, numPages = ?, categoryId = ?, publicationDate = ?, ageRangeId = ?, publisherId = ?, isbn = ?, quantity = ? WHERE id = ?")) {
+
+            statement.setString(1, book.getTitle());
+            statement.setString(2, book.getSubtitle());
+            statement.setInt(3, book.getAuthor().getId());
+            statement.setInt(4, book.getNumPages());
+            statement.setInt(5, book.getCategory().getCategoryId());
+            statement.setDate(6, java.sql.Date.valueOf(book.getPublicationDate()));
+            statement.setInt(7, book.getAgeRange().getId());
+            statement.setInt(8, book.getPublisher().getId());
+            statement.setString(9, book.getIsbn());
+            statement.setInt(10, book.getQuantity());
+            statement.setInt(11, book.getId());
+
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("Detalhes do livro atualizados com sucesso.");
+            } else {
+                System.out.println("Falha ao atualizar os detalhes do livro.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar os detalhes do livro no banco de dados: " + e.getMessage());
         }
     }
 
 
-    private void updateBookDetails(Book book) {
-        // Implement the code to update the details of an existing book in the database based on its ID
-        // You can use a PreparedStatement with an UPDATE statement to perform the update operation
-        // Make sure to handle any SQLExceptions appropriately
-    }
 
     public List<Book> load() {
         List<Book> books = new ArrayList<>();
 
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Book");
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Product WHERE type = 'book'");
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -224,7 +249,7 @@ public class BookData {
     }
     public boolean deleteBook(int bookId) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("DELETE FROM dbo.Book WHERE id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM Product WHERE id = ?")) {
 
             statement.setInt(1, bookId);
             int affectedRows = statement.executeUpdate();
@@ -235,6 +260,7 @@ public class BookData {
             return false;
         }
     }
+
 
 
     public List<Book> listBooks() {

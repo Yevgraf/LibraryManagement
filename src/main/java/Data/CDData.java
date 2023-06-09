@@ -14,7 +14,7 @@ public class CDData {
 
     public void save(CD cd) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO dbo.CD (title, artist, releaseYear, numTracks, categoryId, quantity) VALUES (?, ?, ?, ?, ?, ?)")) {
+             PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO dbo.Product (title, type, artistId, releaseYear, numTracks, categoryId, quantity) VALUES (?, 'cd', ?, ?, ?, ?, ?)")) {
 
             insertStatement.setString(1, cd.getTitle());
             insertStatement.setString(2, cd.getArtist());
@@ -33,11 +33,12 @@ public class CDData {
         }
     }
 
+
     public List<CD> load() {
         List<CD> cds = new ArrayList<>();
 
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.CD");
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE type = 'cd'");
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -49,9 +50,7 @@ public class CDData {
                 int categoryId = resultSet.getInt("categoryId");
                 int quantity = resultSet.getInt("quantity");
 
-
                 Category category = loadCategoryById(categoryId);
-
 
                 CD cd = new CD(cdId, title, artist, releaseYear, numTracks, category, quantity);
                 cds.add(cd);
@@ -63,6 +62,7 @@ public class CDData {
 
         return cds;
     }
+
 
     private Category loadCategoryById(int categoryId) {
         Category category = null;
@@ -88,19 +88,26 @@ public class CDData {
 
     public void updateCDQuantityDecrease(int cdId) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("UPDATE CD SET quantity = quantity - 1 WHERE id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Product SET quantity = quantity - 1 WHERE id = ?")) {
             statement.setInt(1, cdId);
-            statement.executeUpdate();
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Falha ao atualizar a quantidade do CD.");
+            }
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar a quantidade do CD: " + e.getMessage());
         }
     }
 
+
     public void updateCDQuantityIncrease(CD selectedCD) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("UPDATE CD SET quantity = quantity + 1 WHERE id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Product SET quantity = quantity + 1 WHERE id = ?")) {
             statement.setInt(1, selectedCD.getId());
-            statement.executeUpdate();
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Falha ao atualizar a quantidade do CD.");
+            }
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar a quantidade do CD: " + e.getMessage());
         }

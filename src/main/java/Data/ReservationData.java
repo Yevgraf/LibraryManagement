@@ -3,23 +3,22 @@ package Data;
 import Model.*;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReservationData {
 
-
     public void save(Reservation reservation) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement selectStatement = connection.prepareStatement(
-                     "SELECT COUNT(*) FROM dbo.Reservation WHERE memberId = ?");
-             PreparedStatement insertStatement = connection.prepareStatement(
-                     "INSERT INTO dbo.Reservation (bookId, memberId, startDate, endDate, state, satisfactionRating, additionalComments, cdId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)\n")) {
+                     "SELECT COUNT(*) FROM Reservation WHERE memberId = ?");
+             PreparedStatement insertReservationStatement = connection.prepareStatement(
+                     "INSERT INTO Reservation (memberId, startDate, endDate, state, satisfactionRating, additionalComments) " +
+                             "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement insertReservationProductStatement = connection.prepareStatement(
+                     "INSERT INTO ReservationProduct (reservationId, productId) VALUES (?, ?)")) {
 
             int maxReservations = 3;
             int memberId = reservation.getMember().getId();
@@ -42,7 +41,6 @@ public class ReservationData {
                 return;
             }
 
-
             if (reservationExists(reservation)) {
                 System.out.println("A reserva já existe para o membro.");
                 System.out.println("A reserva não foi adicionada.");
@@ -51,32 +49,46 @@ public class ReservationData {
 
             try {
                 // Save the reservation
-                if (reservation.getBook() != null) {
-                    insertStatement.setInt(1, reservation.getBook().getId());
-                } else {
-                    insertStatement.setNull(1, java.sql.Types.INTEGER);
-                }
+                insertReservationStatement.setInt(1, memberId);
+                insertReservationStatement.setDate(2, java.sql.Date.valueOf(reservation.getStartDate()));
+                insertReservationStatement.setDate(3, java.sql.Date.valueOf(reservation.getEndDate()));
+                insertReservationStatement.setString(4, reservation.getState().toString());
+                insertReservationStatement.setInt(5, reservation.getSatisfactionRating());
+                insertReservationStatement.setString(6, reservation.getAdditionalComments());
 
-
-                insertStatement.setInt(2, memberId);
-                insertStatement.setDate(3, java.sql.Date.valueOf(reservation.getStartDate()));
-                insertStatement.setDate(4, java.sql.Date.valueOf(reservation.getEndDate()));
-                insertStatement.setString(5, reservation.getState().toString());
-                insertStatement.setInt(6, reservation.getSatisfactionRating());
-                insertStatement.setString(7, reservation.getAdditionalComments());
-
-                if (reservation.getCd() != null) {
-                    insertStatement.setInt(8, reservation.getCd().getId());
-                } else {
-                    insertStatement.setNull(8, java.sql.Types.INTEGER);
-                }
-
-                int affectedRows = insertStatement.executeUpdate();
+                int affectedRows = insertReservationStatement.executeUpdate();
                 if (affectedRows == 0) {
                     System.out.println("Falha ao salvar a reserva, sem linhas afetadas.");
                     System.out.println("A reserva não foi adicionada.");
                     return;
                 }
+
+                // Get the generated reservation ID
+                ResultSet generatedKeys = insertReservationStatement.getGeneratedKeys();
+                int reservationId;
+                if (generatedKeys.next()) {
+                    reservationId = generatedKeys.getInt(1);
+                } else {
+                    System.out.println("Falha ao obter o ID da reserva gerado.");
+                    System.out.println("A reserva não foi adicionada.");
+                    return;
+                }
+
+                // Save the associated products
+                for (Book book : reservation.getBooks()) {
+                    insertReservationProductStatement.setInt(1, reservationId);
+                    insertReservationProductStatement.setInt(2, book.getId());
+                    insertReservationProductStatement.addBatch();
+                }
+
+                for (CD cd : reservation.getCds()) {
+                    insertReservationProductStatement.setInt(1, reservationId);
+                    insertReservationProductStatement.setInt(2, cd.getId());
+                    insertReservationProductStatement.addBatch();
+                }
+
+                // Execute the batch insert for reservation products
+                insertReservationProductStatement.executeBatch();
 
                 System.out.println("Reserva adicionada com sucesso.");
             } catch (SQLException e) {
@@ -91,19 +103,41 @@ public class ReservationData {
 
 
     private boolean reservationExists(Reservation reservation) {
-        try (Connection connection = DBconn.getConn(); PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM Reservation WHERE bookId = ? AND memberId = ?")) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM ReservationProduct WHERE productId = ? AND memberId = ?")) {
+
             int memberId = reservation.getMember().getId();
-            int bookId = reservation.getBook() != null ? reservation.getBook().getId() : 0; //set bookId para 0 caso a reserva que esteja a ser feita não tenha livro (null)
 
-            countStatement.setInt(1, bookId);
-            countStatement.setInt(2, memberId);
+            for (Book book : reservation.getBooks()) {
+                int bookId = book.getId();
+                countStatement.setInt(1, bookId);
+                countStatement.setInt(2, memberId);
 
-            try (ResultSet resultSet = countStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    int count = resultSet.getInt(1);
-                    return count > 0;
+                try (ResultSet resultSet = countStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        int count = resultSet.getInt(1);
+                        if (count > 0) {
+                            return true; // Reservation already exists for this book and member
+                        }
+                    }
                 }
             }
+
+            for (CD cd : reservation.getCds()) {
+                int cdId = cd.getId();
+                countStatement.setInt(1, cdId);
+                countStatement.setInt(2, memberId);
+
+                try (ResultSet resultSet = countStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        int count = resultSet.getInt(1);
+                        if (count > 0) {
+                            return true; // Reservation already exists for this CD and member
+                        }
+                    }
+                }
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -115,7 +149,8 @@ public class ReservationData {
 
 
     private int getNumberOfReservations(int memberId, State state) {
-        try (Connection connection = DBconn.getConn(); PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM Reservation WHERE memberId = ? AND state = ?")) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM Reservation JOIN ReservationProduct ON Reservation.id = ReservationProduct.reservationId WHERE Reservation.memberId = ? AND Reservation.state = ?")) {
 
             countStatement.setInt(1, memberId);
             countStatement.setString(2, state.toString());
@@ -132,39 +167,12 @@ public class ReservationData {
         return 0;
     }
 
-//    public List<Reservation> load() {
-//        List<Reservation> reservations = new ArrayList<>();
-//        try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Reservation"); ResultSet resultSet = selectStatement.executeQuery()) {
-//
-//            while (resultSet.next()) {
-//                int id = resultSet.getInt("id");
-//                int bookId = resultSet.getInt("bookId");
-//                int cdId = resultSet.getInt("cdId");
-//                int memberId = resultSet.getInt("memberId");
-//                LocalDate startDate = resultSet.getDate("startDate").toLocalDate();
-//                LocalDate endDate = resultSet.getDate("endDate").toLocalDate();
-//                State state = State.valueOf(resultSet.getString("state"));
-//                int satisfactionRating = resultSet.getInt("satisfactionRating");
-//                String additionalComments = resultSet.getString("additionalComments");
-//
-//                // Load associated book, CD, and member objects
-//                Book book = loadBook(bookId);
-//                CD cd = loadCD(cdId);
-//                Member member = loadMemberById(memberId);
-//
-//                Reservation reservation = new Reservation(id, book, cd, member, startDate, endDate, state, satisfactionRating, additionalComments);
-//                reservations.add(reservation);
-//            }
-//        } catch (SQLException e) {
-//            System.err.println("Erro ao carregar reservas do banco de dados: " + e.getMessage());
-//        }
-//        return reservations;
-//    }
+
 
 
     private Book loadBook(int bookId) {
         Book book = null;
-        try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Book WHERE id = ?")) {
+        try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE id = ?")) {
 
             selectStatement.setInt(1, bookId);
             ResultSet resultSet = selectStatement.executeQuery();
@@ -254,7 +262,7 @@ public class ReservationData {
 
     private CD loadCD(int cdId) {
         CD cd = null;
-        try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.CD WHERE id = ?")) {
+        try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE id = ?")) {
 
             selectStatement.setInt(1, cdId);
             ResultSet resultSet = selectStatement.executeQuery();
@@ -352,12 +360,12 @@ public class ReservationData {
 
     public List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();
-        try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Reservation"); ResultSet resultSet = selectStatement.executeQuery()) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Reservation");
+             ResultSet resultSet = selectStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
-                int bookId = resultSet.getInt("bookId");
-                int cdId = resultSet.getInt("cdId");
                 int memberId = resultSet.getInt("memberId");
                 LocalDate startDate = resultSet.getDate("startDate").toLocalDate();
                 LocalDate endDate = resultSet.getDate("endDate").toLocalDate();
@@ -365,28 +373,41 @@ public class ReservationData {
                 int satisfactionRating = resultSet.getInt("satisfactionRating");
                 String additionalComments = resultSet.getString("additionalComments");
 
-
-                Book book = null;
-                if (bookId != 0) {
-                    book = loadBook(bookId);
-                }
-
-                CD cd = null;
-                if (cdId != 0) {
-                    cd = loadCD(cdId);
-                }
-
                 Member member = loadMemberById(memberId);
 
-                Reservation reservation;
-                if (book != null && cd != null) {
-                    reservation = new Reservation(id, book, cd, member, startDate, endDate, state, satisfactionRating, additionalComments);
-                } else if (book != null) {
-                    reservation = new Reservation(id, book, member, startDate, endDate, state, satisfactionRating, additionalComments);
-                } else if (cd != null) {
-                    reservation = new Reservation(id, cd, member, startDate, endDate, state, satisfactionRating, additionalComments);
-                } else {
-                    continue; // Skip this reservation if both book and CD are null
+                Reservation reservation = new Reservation(member, startDate, endDate);
+
+                reservation.setId(id);
+                reservation.setState(state);
+                reservation.setSatisfactionRating(satisfactionRating);
+                reservation.setAdditionalComments(additionalComments);
+
+                // Load associated books
+                try (PreparedStatement bookStatement = connection.prepareStatement("SELECT * FROM dbo.ReservationProduct WHERE reservationId = ? AND productId IN (SELECT id FROM dbo.Book)")) {
+                    bookStatement.setInt(1, id);
+                    try (ResultSet bookResultSet = bookStatement.executeQuery()) {
+                        while (bookResultSet.next()) {
+                            int bookId = bookResultSet.getInt("productId");
+                            Book book = loadBook(bookId);
+                            if (book != null) {
+                                reservation.addBook(book);
+                            }
+                        }
+                    }
+                }
+
+                // Load associated CDs
+                try (PreparedStatement cdStatement = connection.prepareStatement("SELECT * FROM dbo.ReservationProduct WHERE reservationId = ? AND productId IN (SELECT id FROM dbo.CD)")) {
+                    cdStatement.setInt(1, id);
+                    try (ResultSet cdResultSet = cdStatement.executeQuery()) {
+                        while (cdResultSet.next()) {
+                            int cdId = cdResultSet.getInt("productId");
+                            CD cd = loadCD(cdId);
+                            if (cd != null) {
+                                reservation.addCD(cd);
+                            }
+                        }
+                    }
                 }
 
                 reservations.add(reservation);
@@ -396,6 +417,7 @@ public class ReservationData {
         }
         return reservations;
     }
+
 
 
 }
