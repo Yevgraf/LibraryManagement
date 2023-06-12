@@ -58,7 +58,7 @@ public class BookData {
 
     public void updateBookQuantityDecrease(int bookId) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Book SET quantity = quantity - 1 WHERE id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Product SET quantity = quantity - 1 WHERE id = ?")) {
             statement.setInt(1, bookId);
             int affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {

@@ -17,20 +17,6 @@ public class Reservation {
     private int satisfactionRating;
     private String additionalComments;
 
-    public Reservation(Member member, Book book, LocalDate startDate, LocalDate endDate) {
-        this.member = member;
-        this.books = new ArrayList<>();
-        this.cds = new ArrayList<>();
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.state = State.PENDENTE;
-        this.satisfactionRating = 0;
-        this.additionalComments = "";
-
-        if (book != null) {
-            this.books.add(book);
-        }
-    }
     public Reservation(Member member, LocalDate startDate, LocalDate endDate) {
         this.member = member;
         this.startDate = startDate;
@@ -57,6 +43,39 @@ public class Reservation {
             this.cds.add(cd);
         }
     }
+    // Constructor when both books and CDs are selected
+    public Reservation(Member member, List<Book> books, List<CD> cds, LocalDate startDate, LocalDate endDate) {
+        this.member = member;
+        this.books = books;
+        this.cds = cds;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = null;
+    }
+
+
+
+    // Constructor when only CDs are selected
+    public Reservation(Member member, List<CD> cds, LocalDate startDate, LocalDate endDate) {
+        this.member = member;
+        this.books = new ArrayList<>();
+        this.cds = cds;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = null;
+    }
+
+
+    public Reservation(Member member, Book book, LocalDate startDate, LocalDate endDate) {
+        this.member = member;
+        this.books = new ArrayList<>();
+        this.books.add(book);
+        this.cds = new ArrayList<>();
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = null; // Initialize the state to null
+    }
+
 
     public int getId() {
         return id;

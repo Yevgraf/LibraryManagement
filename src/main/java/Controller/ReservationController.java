@@ -72,16 +72,15 @@ public class ReservationController {
         Reservation reservation;
 
         if (selectedBook != null && selectedCD != null) {
-            reservation = new Reservation(selectedMember, selectedBook, selectedCD, startDate, endDate);
+            reservation = new Reservation(selectedMember, List.of(selectedBook), List.of(selectedCD), startDate, endDate);
         } else if (selectedBook != null) {
-            reservation = new Reservation(selectedMember, selectedBook, startDate, endDate);
+            reservation = new Reservation(selectedMember, (CD) List.of(selectedBook), startDate, endDate);
         } else if (selectedCD != null) {
-            reservation = new Reservation(selectedMember, selectedCD, startDate, endDate);
+            reservation = new Reservation(selectedMember, List.of(selectedCD), startDate, endDate);
         } else {
             System.out.println("Erro: Nenhum item selecionado.");
             return;
         }
-
 
         reservation.setState(State.RESERVADO); // estado alterado para 'RESERVADO' em memória
         reservationData.save(reservation); // cria a reserva na base de dados
@@ -89,14 +88,15 @@ public class ReservationController {
         // Update quantidade do livro ou CD - 1
         if (selectedBook != null) {
             bookData.updateBookQuantityDecrease(selectedBook.getId());
-            memberData.addBookToBorrowedBooks(selectedMember, selectedBook);
+
         }
 
         if (selectedCD != null) {
             cdData.updateCDQuantityDecrease(selectedCD.getId());
-            memberData.addCDToBorrowedCDs(selectedMember, selectedCD);
+
         }
     }
+
 
 
     private CD selectCD(List<CD> cds) {
@@ -200,10 +200,11 @@ public class ReservationController {
         try {
             List<Reservation> reservations = reservationData.load();
 
-            List<Reservation> matchingReservations = reservations.stream()
-                    .filter(reservation -> reservation.getState() == State.RESERVADO && (reservation.getBook() != null || reservation.getCd() != null))
-                    .collect(Collectors.toList());
 
+            List<Reservation> matchingReservations = reservations.stream()
+                    .filter(reservation -> reservation.getState() == State.RESERVADO &&
+                            (!reservation.getBooks().isEmpty() || !reservation.getCds().isEmpty()))
+                    .collect(Collectors.toList());
 
             if (matchingReservations.isEmpty()) {
                 System.out.println("Nenhuma reserva encontrada para o livro ou CD.");
@@ -214,17 +215,17 @@ public class ReservationController {
             System.out.println("Reservas encontradas:");
             for (int i = 0; i < matchingReservations.size(); i++) {
                 Reservation reservation = matchingReservations.get(i);
-                Book book = reservation.getBook();
-                CD cd = reservation.getCd();
+                List<Book> books = reservation.getBooks();
+                List<CD> cds = reservation.getCds();
                 Member member = reservation.getMember();
 
                 String itemInfo;
-                if (book != null && cd != null) {
-                    itemInfo = String.format("%d. Livro: %s - %s\n   CD: %s - %s", (i + 1), book.getTitle(), member.getName(), cd.getTitle(), member.getName());
-                } else if (book != null) {
-                    itemInfo = String.format("%d. Livro: %s - %s", (i + 1), book.getTitle(), member.getName());
-                } else if (cd != null) {
-                    itemInfo = String.format("%d. CD: %s - %s", (i + 1), cd.getTitle(), member.getName());
+                if (!books.isEmpty() && !cds.isEmpty()) {
+                    itemInfo = String.format("%d. Livro: %s - %s\n   CD: %s - %s", (i + 1), books.get(0).getTitle(), member.getName(), cds.get(0).getTitle(), member.getName());
+                } else if (!books.isEmpty()) {
+                    itemInfo = String.format("%d. Livro: %s - %s", (i + 1), books.get(0).getTitle(), member.getName());
+                } else if (!cds.isEmpty()) {
+                    itemInfo = String.format("%d. CD: %s - %s", (i + 1), cds.get(0).getTitle(), member.getName());
                 } else {
                     itemInfo = String.format("%d. Reserva inválida", (i + 1));
                 }
@@ -233,6 +234,7 @@ public class ReservationController {
                 System.out.println("   - Email: " + member.getEmail());
                 System.out.println("   - Data de devolução: " + reservation.getEndDate());
             }
+
 
             // Prompt for item selection
             System.out.print("Selecione o item (digite o número correspondente): ");
@@ -256,18 +258,17 @@ public class ReservationController {
             // Update reservation with additional information
             reservationData.updateReservationAdditionalInfo(selectedReservation, satisfactionRating, additionalComments);
 
-            // Update quantity of book or CD + 1
-            Book selectedBook = selectedReservation.getBook();
-            CD selectedCD = selectedReservation.getCd();
+            // Update quantity of books or CDs + 1
+            List<Book> selectedBooks = selectedReservation.getBooks();
+            List<CD> selectedCDs = selectedReservation.getCds();
 
-            if (selectedBook != null) {
+            for (Book selectedBook : selectedBooks) {
                 updateBookQuantityIncrease(selectedBook);
                 memberData.removeBookFromBorrowedBooks(selectedReservation.getMember(), selectedBook);
             }
 
-            if (selectedCD != null) {
+            for (CD selectedCD : selectedCDs) {
                 cdData.updateCDQuantityIncrease(selectedCD);
-                memberData.removeCDFromBorrowedCDs(selectedReservation.getMember(), selectedCD);
             }
 
             System.out.println("Reserva atualizada para 'ENTREGUE': " + selectedReservation.toString());

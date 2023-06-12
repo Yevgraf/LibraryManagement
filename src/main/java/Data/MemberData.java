@@ -290,8 +290,6 @@ public class MemberData {
                 throw new SQLException("Falha ao adicionar o CD emprestado para o membro.");
             }
 
-            // Update the in-memory borrowed CDs list of the member
-            member.getBorrowedCDs().add(cd);
         } catch (SQLException e) {
             System.out.println("Erro ao adicionar CD à lista de CDs emprestados do membro: " + e.getMessage());
             // Reservation failed, remove the CD from borrowed CDs
@@ -337,8 +335,6 @@ public class MemberData {
                 throw new SQLException("Falha ao remover o CD emprestado do membro.");
             }
 
-            // Remove the CD from the in-memory borrowed CDs list of the member
-            member.getBorrowedCDs().remove(cd);
         } catch (SQLException e) {
             System.out.println("Erro ao remover CD emprestado do membro: " + e.getMessage());
         }
@@ -347,10 +343,9 @@ public class MemberData {
     public int getNumberOfBorrowedItems(int memberId) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement countStatement = connection.prepareStatement(
-                     "SELECT COUNT(*) FROM (SELECT bookId FROM BorrowedBook WHERE memberId = ? UNION ALL SELECT cdId FROM BorrowedCD WHERE memberId = ?) AS BorrowedItems")) {
+                     "SELECT COUNT(*) FROM (SELECT productId FROM ReservationProduct WHERE reservationId IN (SELECT id FROM Reservation WHERE memberId = ? AND state = 'RESERVADO')) AS BorrowedItems")) {
 
             countStatement.setInt(1, memberId);
-            countStatement.setInt(2, memberId);
 
             try (ResultSet resultSet = countStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -363,6 +358,7 @@ public class MemberData {
 
         return 0;
     }
+
 
 
 
