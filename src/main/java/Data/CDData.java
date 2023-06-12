@@ -105,5 +105,19 @@ public class CDData {
             System.err.println("Erro ao atualizar a quantidade do CD: " + e.getMessage());
         }
     }
+    public boolean deleteCD(int cdId) {
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM dbo.CD WHERE id = ?")) {
+
+            statement.setInt(1, cdId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao remover CD da base de dados: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 }
