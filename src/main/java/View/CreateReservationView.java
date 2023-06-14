@@ -97,6 +97,7 @@ public class CreateReservationView {
             while (itemsRemaining > 0) {
                 System.out.println("Itens restantes: " + itemsRemaining);
                 displayItems(items);
+                System.out.println("0. Nenhum " + itemType);
 
                 System.out.print("Digite o ID do " + itemType + " ou 0 para encerrar a seleção: ");
                 int itemId = scanner.nextInt();
