@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static Data.BookData.loadCategoryById;
+
 public class ReservationData {
 
     public void save(Reservation reservation) {
@@ -101,23 +103,22 @@ public class ReservationData {
         }
     }
 
-
     private boolean reservationExists(Reservation reservation) {
-        try (Connection connection = DBconn.getConn();
-             PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM ReservationProduct WHERE productId = ? AND memberId = ?")) {
-
+        try (Connection connection = DBconn.getConn()) {
             int memberId = reservation.getMember().getId();
 
             for (Book book : reservation.getBooks()) {
                 int bookId = book.getId();
-                countStatement.setInt(1, bookId);
-                countStatement.setInt(2, memberId);
+                try (PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM ReservationProduct WHERE productId = ? AND memberId = ? AND state = 'RESERVADO'")) {
+                    countStatement.setInt(1, bookId);
+                    countStatement.setInt(2, memberId);
 
-                try (ResultSet resultSet = countStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        int count = resultSet.getInt(1);
-                        if (count > 0) {
-                            return true; // Reservation already exists for this book and member
+                    try (ResultSet resultSet = countStatement.executeQuery()) {
+                        if (resultSet.next()) {
+                            int count = resultSet.getInt(1);
+                            if (count > 0) {
+                                return true; // Reservation already exists for this book and member
+                            }
                         }
                     }
                 }
@@ -125,14 +126,16 @@ public class ReservationData {
 
             for (CD cd : reservation.getCds()) {
                 int cdId = cd.getId();
-                countStatement.setInt(1, cdId);
-                countStatement.setInt(2, memberId);
+                try (PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM ReservationProduct WHERE productId = ? AND memberId = ? AND state = 'RESERVADO'")) {
+                    countStatement.setInt(1, cdId);
+                    countStatement.setInt(2, memberId);
 
-                try (ResultSet resultSet = countStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        int count = resultSet.getInt(1);
-                        if (count > 0) {
-                            return true; // Reservation already exists for this CD and member
+                    try (ResultSet resultSet = countStatement.executeQuery()) {
+                        if (resultSet.next()) {
+                            int count = resultSet.getInt(1);
+                            if (count > 0) {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -144,6 +147,7 @@ public class ReservationData {
 
         return false;
     }
+
 
 
 
@@ -191,7 +195,7 @@ public class ReservationData {
 
                 // Load the Author, Category, AgeRange, and Publisher objects
                 Author author = BookData.loadAuthorById(authorId);
-                Category category = BookData.loadCategoryById(categoryId);
+                Category category = loadCategoryById(categoryId);
                 AgeRange ageRange = BookData.loadAgeRangeById(ageRangeId);
                 Publisher publisher = BookData.loadPublisherById(publisherId);
 
@@ -276,7 +280,7 @@ public class ReservationData {
                 int quantity = resultSet.getInt("quantity");
 
                 // Load the Category object
-                Category category = BookData.loadCategoryById(categoryId);
+                Category category = loadCategoryById(categoryId);
 
                 // Create a CD object
                 cd = new CD(title, artist, releaseYear, numTracks, category, quantity);
@@ -361,7 +365,10 @@ public class ReservationData {
     public List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();
         try (Connection connection = DBconn.getConn();
-             PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Reservation");
+             PreparedStatement selectStatement = connection.prepareStatement("SELECT r.*, p.type " +
+                     "FROM dbo.Reservation AS r " +
+                     "INNER JOIN dbo.ReservationProduct AS rp ON r.id = rp.reservationId " +
+                     "INNER JOIN dbo.Product AS p ON rp.productId = p.id");
              ResultSet resultSet = selectStatement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -372,6 +379,7 @@ public class ReservationData {
                 State state = State.valueOf(resultSet.getString("state"));
                 int satisfactionRating = resultSet.getInt("satisfactionRating");
                 String additionalComments = resultSet.getString("additionalComments");
+                String productType = resultSet.getString("type");
 
                 Member member = loadMemberById(memberId);
 
@@ -382,29 +390,22 @@ public class ReservationData {
                 reservation.setSatisfactionRating(satisfactionRating);
                 reservation.setAdditionalComments(additionalComments);
 
-                // Load associated books
-                try (PreparedStatement bookStatement = connection.prepareStatement("SELECT * FROM dbo.ReservationProduct WHERE reservationId = ? AND productId IN (SELECT id FROM dbo.Book)")) {
-                    bookStatement.setInt(1, id);
-                    try (ResultSet bookResultSet = bookStatement.executeQuery()) {
-                        while (bookResultSet.next()) {
-                            int bookId = bookResultSet.getInt("productId");
-                            Book book = loadBook(bookId);
-                            if (book != null) {
-                                reservation.addBook(book);
-                            }
-                        }
-                    }
-                }
-
-                // Load associated CDs
-                try (PreparedStatement cdStatement = connection.prepareStatement("SELECT * FROM dbo.ReservationProduct WHERE reservationId = ? AND productId IN (SELECT id FROM dbo.CD)")) {
-                    cdStatement.setInt(1, id);
-                    try (ResultSet cdResultSet = cdStatement.executeQuery()) {
-                        while (cdResultSet.next()) {
-                            int cdId = cdResultSet.getInt("productId");
-                            CD cd = loadCD(cdId);
-                            if (cd != null) {
-                                reservation.addCD(cd);
+                // Load associated products
+                try (PreparedStatement productStatement = connection.prepareStatement("SELECT * FROM dbo.ReservationProduct WHERE reservationId = ?")) {
+                    productStatement.setInt(1, id);
+                    try (ResultSet productResultSet = productStatement.executeQuery()) {
+                        while (productResultSet.next()) {
+                            int productId = productResultSet.getInt("productId");
+                            if (productType.equals("book")) {
+                                Book book = loadBook(productId);
+                                if (book != null) {
+                                    reservation.addBook(book);
+                                }
+                            } else if (productType.equals("cd")) {
+                                CD cd = loadCD(productId);
+                                if (cd != null) {
+                                    reservation.addCD(cd);
+                                }
                             }
                         }
                     }
@@ -417,7 +418,5 @@ public class ReservationData {
         }
         return reservations;
     }
-
-
 
 }

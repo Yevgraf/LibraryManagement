@@ -98,7 +98,6 @@ public class MemberData {
         return false;
     }
 
-
     public static List<Member> load() {
         List<Member> memberList = new ArrayList<>();
 
@@ -117,26 +116,37 @@ public class MemberData {
 
                 Member member = new Member(id, name, address, birthDate, phone, email, maxBorrowedBooks);
 
-                // Load borrowed books for the member
-                PreparedStatement borrowedBooksStatement = connection.prepareStatement("SELECT b.id, b.title FROM BorrowedBook bb INNER JOIN Book b ON bb.bookId = b.id WHERE bb.memberId = ?");
-                borrowedBooksStatement.setInt(1, id);
-                ResultSet borrowedBooksResultSet = borrowedBooksStatement.executeQuery();
+                // Load reserved books for the member
+                PreparedStatement reservedBooksStatement = connection.prepareStatement(
+                        "SELECT p.id, p.title FROM Reservation r " +
+                                "INNER JOIN ReservationProduct rp ON r.id = rp.reservationId " +
+                                "INNER JOIN Product p ON rp.productId = p.id " +
+                                "WHERE r.memberId = ? AND r.state = 'RESERVADO' AND p.type = 'book'"
+                );
+                reservedBooksStatement.setInt(1, id);
+                ResultSet reservedBooksResultSet = reservedBooksStatement.executeQuery();
 
-                while (borrowedBooksResultSet.next()) {
-                    int bookId = borrowedBooksResultSet.getInt("id");
-                    String bookTitle = borrowedBooksResultSet.getString("title");
+                while (reservedBooksResultSet.next()) {
+                    int bookId = reservedBooksResultSet.getInt("id");
+                    String bookTitle = reservedBooksResultSet.getString("title");
 
                     Book book = new Book(bookId, bookTitle);
                     member.addBorrowedBook(book);
                 }
 
-                PreparedStatement borrowedCDsStatement = connection.prepareStatement("SELECT c.id, c.title FROM BorrowedCD bc INNER JOIN CD c ON bc.cdId = c.id WHERE bc.memberId = ?");
-                borrowedCDsStatement.setInt(1, id);
-                ResultSet borrowedCDsResultSet = borrowedCDsStatement.executeQuery();
+                // Load reserved CDs for the member
+                PreparedStatement reservedCDsStatement = connection.prepareStatement(
+                        "SELECT p.id, p.title FROM Reservation r " +
+                                "INNER JOIN ReservationProduct rp ON r.id = rp.reservationId " +
+                                "INNER JOIN Product p ON rp.productId = p.id " +
+                                "WHERE r.memberId = ? AND r.state = 'RESERVADO' AND p.type = 'cd'"
+                );
+                reservedCDsStatement.setInt(1, id);
+                ResultSet reservedCDsResultSet = reservedCDsStatement.executeQuery();
 
-                while (borrowedCDsResultSet.next()) {
-                    int cdId = borrowedCDsResultSet.getInt("id");
-                    String cdTitle = borrowedCDsResultSet.getString("title");
+                while (reservedCDsResultSet.next()) {
+                    int cdId = reservedCDsResultSet.getInt("id");
+                    String cdTitle = reservedCDsResultSet.getString("title");
 
                     CD cd = new CD(cdId, cdTitle);
                     member.addBorrowedCD(cd);
@@ -150,6 +160,7 @@ public class MemberData {
 
         return memberList;
     }
+
 
 
     public Optional<Member> findMemberByName(String memberName) {

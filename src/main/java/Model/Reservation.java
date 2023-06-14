@@ -28,6 +28,32 @@ public class Reservation {
         this.cds = new ArrayList<>();
     }
 
+    public Reservation(Member member, Book book, CD cd, LocalDate startDate, LocalDate endDate) {
+        this.member = member;
+        this.books = new ArrayList<>();
+        this.cds = new ArrayList<>();
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = State.RESERVADO;
+        this.satisfactionRating = 0;
+        this.additionalComments = "";
+
+        if (book != null) {
+            this.books.add(book);
+        }
+
+        if (cd != null) {
+            this.cds.add(cd);
+        }
+    }
+
+    public Reservation(List<Book> books, Member member, LocalDate startDate, LocalDate endDate) {
+        this.books = books;
+        this.member = member;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = null; // Initialize the state to null
+    }
 
     public Reservation(Member member, CD cd, LocalDate startDate, LocalDate endDate) {
         this.member = member;
@@ -43,6 +69,7 @@ public class Reservation {
             this.cds.add(cd);
         }
     }
+
     // Constructor when both books and CDs are selected
     public Reservation(Member member, List<Book> books, List<CD> cds, LocalDate startDate, LocalDate endDate) {
         this.member = member;
@@ -50,10 +77,8 @@ public class Reservation {
         this.cds = cds;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.state = null;
+        this.state = null; // Initialize the state to null
     }
-
-
 
     // Constructor when only CDs are selected
     public Reservation(Member member, List<CD> cds, LocalDate startDate, LocalDate endDate) {
@@ -62,9 +87,8 @@ public class Reservation {
         this.cds = cds;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.state = null;
+        this.state = null; // Initialize the state to null
     }
-
 
     public Reservation(Member member, Book book, LocalDate startDate, LocalDate endDate) {
         this.member = member;
@@ -75,6 +99,7 @@ public class Reservation {
         this.endDate = endDate;
         this.state = null; // Initialize the state to null
     }
+
 
 
     public int getId() {
