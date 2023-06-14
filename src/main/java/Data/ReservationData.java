@@ -107,40 +107,42 @@ public class ReservationData {
         try (Connection connection = DBconn.getConn()) {
             int memberId = reservation.getMember().getId();
 
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT COUNT(*) FROM ReservationProduct ");
+            queryBuilder.append("WHERE memberId = ? AND state = 'RESERVADO' AND productId IN (");
+
+            List<Integer> productIds = new ArrayList<>();
             for (Book book : reservation.getBooks()) {
-                int bookId = book.getId();
-                try (PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM ReservationProduct WHERE productId = ? AND memberId = ? AND state = 'RESERVADO'")) {
-                    countStatement.setInt(1, bookId);
-                    countStatement.setInt(2, memberId);
-
-                    try (ResultSet resultSet = countStatement.executeQuery()) {
-                        if (resultSet.next()) {
-                            int count = resultSet.getInt(1);
-                            if (count > 0) {
-                                return true; // Reservation already exists for this book and member
-                            }
-                        }
-                    }
-                }
+                productIds.add(book.getId());
             }
-
             for (CD cd : reservation.getCds()) {
-                int cdId = cd.getId();
-                try (PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM ReservationProduct WHERE productId = ? AND memberId = ? AND state = 'RESERVADO'")) {
-                    countStatement.setInt(1, cdId);
-                    countStatement.setInt(2, memberId);
+                productIds.add(cd.getId());
+            }
 
-                    try (ResultSet resultSet = countStatement.executeQuery()) {
-                        if (resultSet.next()) {
-                            int count = resultSet.getInt(1);
-                            if (count > 0) {
-                                return true;
-                            }
+            for (int i = 0; i < productIds.size(); i++) {
+                if (i > 0) {
+                    queryBuilder.append(", ");
+                }
+                queryBuilder.append("?");
+            }
+            queryBuilder.append(")");
+
+            try (PreparedStatement countStatement = connection.prepareStatement(queryBuilder.toString())) {
+                countStatement.setInt(1, memberId);
+
+                for (int i = 0; i < productIds.size(); i++) {
+                    countStatement.setInt(i + 2, productIds.get(i));
+                }
+
+                try (ResultSet resultSet = countStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        int count = resultSet.getInt(1);
+                        if (count > 0) {
+                            return true; // Reservation already exists for these products and member
                         }
                     }
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -148,10 +150,9 @@ public class ReservationData {
         return false;
     }
 
-
     private int getNumberOfReservations(int memberId, State state) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM Reservation JOIN ReservationProduct ON Reservation.id = ReservationProduct.reservationId WHERE Reservation.memberId = ? AND Reservation.state = ?")) {
+             PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM Reservation WHERE memberId = ? AND state = ?")) {
 
             countStatement.setInt(1, memberId);
             countStatement.setString(2, state.toString());
@@ -167,6 +168,7 @@ public class ReservationData {
 
         return 0;
     }
+
 
 
     private Book loadBook(int bookId) {
@@ -382,11 +384,10 @@ public class ReservationData {
             System.err.println("Erro ao atualizar estado de reserva: " + e.getMessage());
         }
     }
-
     public List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();
         try (Connection connection = DBconn.getConn();
-             PreparedStatement selectStatement = connection.prepareStatement("SELECT r.*, p.type " +
+             PreparedStatement selectStatement = connection.prepareStatement("SELECT r.*, p.type, rp.productId " +
                      "FROM dbo.Reservation AS r " +
                      "INNER JOIN dbo.ReservationProduct AS rp ON r.id = rp.reservationId " +
                      "INNER JOIN dbo.Product AS p ON rp.productId = p.id");
@@ -401,51 +402,49 @@ public class ReservationData {
                 int satisfactionRating = resultSet.getInt("satisfactionRating");
                 String additionalComments = resultSet.getString("additionalComments");
                 String productType = resultSet.getString("type");
+                int productId = resultSet.getInt("productId");
 
                 Member member = loadMemberById(memberId);
 
-                Reservation reservation = new Reservation(member, startDate, endDate);
-
-                reservation.setId(id);
-                reservation.setState(state);
-                reservation.setSatisfactionRating(satisfactionRating);
-                reservation.setAdditionalComments(additionalComments);
-
-                // Load associated products
-                List<Book> books = new ArrayList<>();
-                List<CD> cds = new ArrayList<>();
-
-                try (PreparedStatement productStatement = connection.prepareStatement("SELECT * FROM dbo.ReservationProduct WHERE reservationId = ?")) {
-                    productStatement.setInt(1, id);
-                    try (ResultSet productResultSet = productStatement.executeQuery()) {
-                        while (productResultSet.next()) {
-                            int productId = productResultSet.getInt("productId");
-                            if (productType.equals("book")) {
-                                Book book = loadBook(productId);
-                                if (book != null) {
-                                    books.add(book);
-                                }
-                            } else if (productType.equals("cd")) {
-                                CD cd = loadCD(productId);
-                                if (cd != null) {
-                                    cds.add(cd);
-                                }
-                            }
-                        }
-                    }
+                Reservation reservation = findReservationById(reservations, id);
+                if (reservation == null) {
+                    reservation = new Reservation(member, startDate, endDate);
+                    reservation.setId(id);
+                    reservation.setState(state);
+                    reservation.setSatisfactionRating(satisfactionRating);
+                    reservation.setAdditionalComments(additionalComments);
+                    reservations.add(reservation);
                 }
 
-                // Add the loaded books and CDs to the reservation
-                reservation.setBooks(books);
-                reservation.setCds(cds);
-
-                reservations.add(reservation);
+                // Load associated products
+                if (productType.equals("book")) {
+                    Book book = loadBook(productId);
+                    if (book != null) {
+                        reservation.addBook(book);
+                    }
+                } else if (productType.equals("cd")) {
+                    CD cd = loadCD(productId);
+                    if (cd != null) {
+                        reservation.addCD(cd);
+                    }
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error while loading reservations from the database: " + e.getMessage());
         }
         return reservations;
     }
+
+
+    private Reservation findReservationById(List<Reservation> reservations, int id) {
+        for (Reservation reservation : reservations) {
+            if (reservation.getId() == id) {
+                return reservation;
+            }
+        }
+        return null;
+    }
+
 
 
 }

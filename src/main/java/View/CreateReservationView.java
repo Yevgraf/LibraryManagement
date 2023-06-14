@@ -8,12 +8,9 @@ import Model.CD;
 import Model.Member;
 import Model.Reservation;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Collections;
-import java.util.List;
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class CreateReservationView {
@@ -32,140 +29,147 @@ public class CreateReservationView {
 
     public void createReservation() {
         // Obtain the necessary inputs
-        List<Member> members = getMembers();
-        List<Book> books = getBooks();
-        List<CD> cds = getCDs();
+        List<Member> members = reservationController.getAllMembers();
+        List<Book> books = reservationController.getAllBooks();
+        List<CD> cds = reservationController.getAllCDs();
 
         Member selectedMember = selectMember(members);
-        Optional<Book> selectedBookOption = selectBook(books);
-        Optional<CD> selectedCDOption = selectCD(cds);
+        List<Book> selectedBooks = selectItems("livro", books, 3);
+        List<CD> selectedCDs = selectItems("CD", cds, 3);
         LocalDate endDate = getEndDateInput();
 
         // Check if any of the inputs are null or empty
-        if (selectedMember == null || (!selectedBookOption.isPresent() && !selectedCDOption.isPresent()) || endDate == null) {
+        if (selectedMember == null || (selectedBooks.isEmpty() && selectedCDs.isEmpty()) || endDate == null) {
             System.out.println("Erro: Reserva não criada devido a inputs inválidos.");
             return;
         }
 
-        Book selectedBook = selectedBookOption.orElse(null);
-        CD selectedCD = selectedCDOption.orElse(null);
-
         // Pass the inputs to the addReservation() method
-        reservationController.addReservation(selectedMember, selectedBook, selectedCD, endDate);
+        reservationController.addReservation(selectedMember, selectedBooks, selectedCDs, endDate);
     }
 
+    private Member selectMember(List<Member> members) {
+        System.out.println("Selecione um membro:");
+        displayMembers(members);
 
-    public Optional<CD> selectCD(List<CD> cds) {
-        System.out.println("CDs disponíveis:");
-        for (CD cd : cds) {
-            System.out.println(cd.getId() + ". Título: " + cd.getTitle());
-        }
+        System.out.print("Digite o ID do membro: ");
+        int memberId = scanner.nextInt();
 
-        // Add the "none" option
-        System.out.println("0. Nenhum");
-
-        // Prompt user to select a CD by ID
-        int cdId = getUserInput("Selecione o ID do CD: ");
-
-        if (cdId == 0) {
-            return Optional.empty();
-        }
-
-        for (CD cd : cds) {
-            if (cd.getId() == cdId) {
-                return Optional.of(cd);
+        for (Member member : members) {
+            if (member.getId() == memberId) {
+                return member;
             }
         }
 
-        // Handle the case when no CD is selected
-        System.out.println("Erro: CD inválido. Nenhum CD selecionado.");
-        return selectCD(cds); // Prompt the user again for CD selection
+        System.out.println("Membro não encontrado. Tente novamente.");
+        return null;
+    }
+    private <T> List<T> selectItems(String itemType, List<T> items, int maxItems) {
+        List<T> selectedItems = new ArrayList<>();
+
+        System.out.println("Selecione os " + itemType + "s (até " + maxItems + "):");
+        int itemsRemaining = maxItems;
+
+        if (items.size() == 1) {
+            System.out.println("1. " + items.get(0).toString());
+            System.out.println("0. Nenhum " + itemType);
+            int choice;
+            while (true) {
+                System.out.print("Digite o número correspondente à opção desejada: ");
+                choice = scanner.nextInt();
+
+                if (choice == 1 || choice == 0) {
+                    break;
+                }
+
+                System.out.println("Opção inválida. Tente novamente.");
+            }
+
+            if (choice == 1) {
+                T selectedItem = items.get(0);
+                selectedItems.add(selectedItem);
+                items.remove(selectedItem);
+                itemsRemaining--;
+            } else if (choice == 0) {
+                return selectedItems; // No item selected
+            }
+        } else {
+            while (itemsRemaining > 0) {
+                System.out.println("Itens restantes: " + itemsRemaining);
+                displayItems(items);
+
+                System.out.print("Digite o ID do " + itemType + " ou 0 para encerrar a seleção: ");
+                int itemId = scanner.nextInt();
+
+                if (itemId == 0) {
+                    break;
+                }
+
+                T selectedItem = findItemById(items, itemId);
+
+                if (selectedItem == null) {
+                    System.out.println(itemType + " não encontrado. Tente novamente.");
+                    continue;
+                }
+
+                selectedItems.add(selectedItem);
+                items.remove(selectedItem);
+                itemsRemaining--;
+            }
+        }
+
+        return selectedItems;
     }
 
 
+    private <T> T findItemById(List<T> items, int itemId) {
+        for (T item : items) {
+            if (item instanceof Book && ((Book) item).getId() == itemId) {
+                return item;
+            } else if (item instanceof CD && ((CD) item).getId() == itemId) {
+                return item;
+            }
+        }
+        return null;
+    }
 
-
-
-    public LocalDate getEndDateInput() {
-        System.out.print("Digite a data final da reserva (dd/mm/yyyy): ");
-        scanner.nextLine(); // Consume the newline character
-
-        String endDateStr = scanner.nextLine();
+    private LocalDate getEndDateInput() {
+        System.out.print("Digite a data de término (AAAA-MM-DD): ");
+        String endDateString = scanner.next();
 
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            return LocalDate.parse(endDateStr, formatter);
-        } catch (DateTimeParseException e) {
-            System.out.println("Erro: Formato de data inválido. Use o formato dd/mm/yyyy.");
-            return getEndDateInput(); // Prompt the user again for input
-        }
-    }
-
-
-
-
-
-
-
-    public Member selectMember(List<Member> members) {
-        System.out.println("Selecione o membro:");
-        for (int i = 0; i < members.size(); i++) {
-            System.out.println((i + 1) + ". " + members.get(i).getName());
-        }
-
-        int selection = getUserInput("Opção: ");
-        if (selection >= 1 && selection <= members.size()) {
-            return members.get(selection - 1);
-        } else {
+            return LocalDate.parse(endDateString);
+        } catch (Exception e) {
+            System.out.println("Data inválida. Tente novamente.");
             return null;
         }
     }
 
-    public Optional<Book> selectBook(List<Book> books) {
-        System.out.println("Selecione o livro:");
-
-        for (int i = 0; i < books.size(); i++) {
-            System.out.println((i + 1) + ". " + books.get(i).getTitle());
-        }
-
-        System.out.println("0. Nenhum");
-
-        int selection = getUserInput("Opção: ");
-        if (selection == 0) {
-            return Optional.empty();
-        } else if (selection >= 1 && selection <= books.size()) {
-            return Optional.of(books.get(selection - 1));
-        } else {
-            System.out.println("Opção inválida. Por favor, selecione uma opção válida.");
-            return selectBook(books);
+    private void displayMembers(List<Member> members) {
+        for (Member member : members) {
+            System.out.println(member.getId() + ". " + member.getName());
         }
     }
 
-
-    public int getUserInput(String message) {
-        System.out.print(message);
-        return scanner.nextInt();
+    private <T> void displayItems(List<T> items) {
+        for (int i = 0; i < items.size(); i++) {
+            T item = items.get(i);
+            if (item instanceof Book) {
+                Book book = (Book) item;
+                System.out.println((i + 1) + ". " + book.getTitle());
+            } else if (item instanceof CD) {
+                CD cd = (CD) item;
+                System.out.println((i + 1) + ". " + cd.getTitle());
+            }
+        }
     }
 
 
-    public List<Member> getMembers() {
-        return reservationController.getAllMembers();
-    }
-
-    public List<Book> getBooks() {
-        return reservationController.getAllBooks();
-    }
-
-    public List<CD> getCDs() {
-        return reservationController.getAllCDs();
-    }
-
-
-    public void listAllReservations(){
+    public void listAllReservations() {
         List<Reservation> reservations = reservationController.getAllReservations();
 
         if (reservations.isEmpty()) {
-            System.out.println("Reservas não encotradas.");
+            System.out.println("Reservas não encontradas.");
         } else {
             System.out.println("Todas as reservas:");
             for (Reservation reservation : reservations) {
@@ -173,6 +177,5 @@ public class CreateReservationView {
             }
         }
     }
-
-
 }
+

@@ -41,13 +41,13 @@ public class ReservationController {
     }
 
 
-    public void addReservation(Member selectedMember, Book selectedBook, CD selectedCD, LocalDate endDate) {
+    public void addReservation(Member selectedMember, List<Book> selectedBooks, List<CD> selectedCDs, LocalDate endDate) {
         if (selectedMember == null) {
             System.out.println("Erro: Membro não selecionado.");
             return;
         }
 
-        if (selectedBook == null && selectedCD == null) {
+        if ((selectedBooks == null || selectedBooks.isEmpty()) && (selectedCDs == null || selectedCDs.isEmpty())) {
             System.out.println("Erro: Nenhum item selecionado.");
             return;
         }
@@ -55,19 +55,24 @@ public class ReservationController {
         LocalDate startDate = LocalDate.now();
         Reservation reservation = new Reservation(selectedMember, startDate, endDate);
 
-        if (selectedBook != null) {
-            reservation.addBook(selectedBook);
-            bookData.updateBookQuantityDecrease(selectedBook.getId());
+        if (selectedBooks != null) {
+            for (Book selectedBook : selectedBooks) {
+                reservation.addBook(selectedBook);
+                bookData.updateBookQuantityDecrease(selectedBook.getId());
+            }
         }
 
-        if (selectedCD != null) {
-            reservation.addCD(selectedCD);
-            cdData.updateCDQuantityDecrease(selectedCD.getId());
+        if (selectedCDs != null) {
+            for (CD selectedCD : selectedCDs) {
+                reservation.addCD(selectedCD);
+                cdData.updateCDQuantityDecrease(selectedCD.getId());
+            }
         }
 
         reservation.setState(State.RESERVADO); // Set state to 'RESERVADO'
         reservationData.save(reservation); // Save the reservation in the database
     }
+
 
 
     public List<Reservation> getReservationsForMember(Member member) {
