@@ -9,6 +9,8 @@ import Model.Member;
 import Model.Reservation;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -64,83 +66,48 @@ public class CreateReservationView {
         System.out.println("Membro não encontrado. Tente novamente.");
         return null;
     }
+
     private <T> List<T> selectItems(String itemType, List<T> items, int maxItems) {
         List<T> selectedItems = new ArrayList<>();
 
         System.out.println("Selecione os " + itemType + "s (até " + maxItems + "):");
         int itemsRemaining = maxItems;
 
-        if (items.size() == 1) {
-            System.out.println("1. " + items.get(0).toString());
+        while (itemsRemaining > 0 && !items.isEmpty()) {
+            System.out.println("Itens restantes: " + itemsRemaining);
+            displayItems(items);
             System.out.println("0. Nenhum " + itemType);
-            int choice;
-            while (true) {
-                System.out.print("Digite o número correspondente à opção desejada: ");
-                choice = scanner.nextInt();
 
-                if (choice == 1 || choice == 0) {
-                    break;
-                }
+            System.out.print("Digite o número do " + itemType + " ou 0 para encerrar a seleção: ");
+            int itemNumber = scanner.nextInt();
 
-                System.out.println("Opção inválida. Tente novamente.");
+            if (itemNumber == 0) {
+                break;
             }
 
-            if (choice == 1) {
-                T selectedItem = items.get(0);
-                selectedItems.add(selectedItem);
-                items.remove(selectedItem);
-                itemsRemaining--;
-            } else if (choice == 0) {
-                return selectedItems; // No item selected
+            if (itemNumber < 1 || itemNumber > items.size()) {
+                System.out.println("Número inválido. Tente novamente.");
+                continue;
             }
-        } else {
-            while (itemsRemaining > 0) {
-                System.out.println("Itens restantes: " + itemsRemaining);
-                displayItems(items);
-                System.out.println("0. Nenhum " + itemType);
 
-                System.out.print("Digite o ID do " + itemType + " ou 0 para encerrar a seleção: ");
-                int itemId = scanner.nextInt();
-
-                if (itemId == 0) {
-                    break;
-                }
-
-                T selectedItem = findItemById(items, itemId);
-
-                if (selectedItem == null) {
-                    System.out.println(itemType + " não encontrado. Tente novamente.");
-                    continue;
-                }
-
-                selectedItems.add(selectedItem);
-                items.remove(selectedItem);
-                itemsRemaining--;
-            }
+            T selectedItem = items.get(itemNumber - 1);
+            selectedItems.add(selectedItem);
+            items.remove(selectedItem);
+            itemsRemaining--;
         }
 
         return selectedItems;
     }
 
 
-    private <T> T findItemById(List<T> items, int itemId) {
-        for (T item : items) {
-            if (item instanceof Book && ((Book) item).getId() == itemId) {
-                return item;
-            } else if (item instanceof CD && ((CD) item).getId() == itemId) {
-                return item;
-            }
-        }
-        return null;
-    }
 
     private LocalDate getEndDateInput() {
-        System.out.print("Digite a data de término (AAAA-MM-DD): ");
+        System.out.print("Digite a data de término (DD/MM/AAAA): ");
         String endDateString = scanner.next();
 
         try {
-            return LocalDate.parse(endDateString);
-        } catch (Exception e) {
+            return LocalDate.parse(endDateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        } catch (DateTimeParseException e) {
             System.out.println("Data inválida. Tente novamente.");
             return null;
         }
@@ -165,7 +132,6 @@ public class CreateReservationView {
         }
     }
 
-
     public void listAllReservations() {
         List<Reservation> reservations = reservationController.getAllReservations();
 
@@ -179,4 +145,3 @@ public class CreateReservationView {
         }
     }
 }
-

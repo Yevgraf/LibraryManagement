@@ -129,42 +129,39 @@ public class ReservationController {
     private void displayReservations(List<Reservation> reservations) {
         System.out.println("Reservas encontradas:");
 
-        // Mapa para armazenar os itens de reserva agrupados pelo ID da reserva
-        Map<Integer, List<String>> reservationItems = new HashMap<>();
-
         for (Reservation reservation : reservations) {
             List<Book> books = reservation.getBooks();
             List<CD> cds = reservation.getCds();
             Member member = reservation.getMember();
 
-            String itemInfo;
-            if (!books.isEmpty() && !cds.isEmpty()) {
-                itemInfo = String.format("Livro: %s - %s\n   CD: %s - %s",
-                        books.get(0).getTitle(), member.getName(), cds.get(0).getTitle(), member.getName());
-            } else if (!books.isEmpty()) {
-                itemInfo = String.format("Livro: %s - %s", books.get(0).getTitle(), member.getName());
-            } else if (!cds.isEmpty()) {
-                itemInfo = String.format("CD: %s - %s", cds.get(0).getTitle(), member.getName());
-            } else {
-                itemInfo = "Reserva inválida";
+            StringBuilder reservationInfo = new StringBuilder();
+            reservationInfo.append(reservations.indexOf(reservation) + 1).append(". ");
+
+            if (!books.isEmpty()) {
+                reservationInfo.append("Livro(s): ");
+                for (Book book : books) {
+                    reservationInfo.append(book.getTitle()).append(", ");
+                }
+                reservationInfo.setLength(reservationInfo.length() - 2);
+                reservationInfo.append(" - ").append(member.getName()).append("\n");
             }
 
-            // Informações da reserva formatadas
-            String reservationInfo = String.format("%d. %s\n   - Email: %s\n   - Data de devolução: %s",
-                    reservations.indexOf(reservation) + 1, itemInfo, member.getEmail(),
-                    reservation.getEndDate() != null ? reservation.getEndDate() : "N/A");
+            if (!cds.isEmpty()) {
+                reservationInfo.append("CD(s): ");
+                for (CD cd : cds) {
+                    reservationInfo.append(cd.getTitle()).append(", ");
+                }
+                reservationInfo.setLength(reservationInfo.length() - 2);
+                reservationInfo.append(" - ").append(member.getName()).append("\n");
+            }
 
-            // Verificar se a lista de itens para o ID da reserva já existe no mapa, caso contrário, criar uma nova lista
-            List<String> items = reservationItems.getOrDefault(reservation.getId(), new ArrayList<>());
-            items.add(reservationInfo);
-            reservationItems.put(reservation.getId(), items);
-        }
+            reservationInfo.append("   - Email: ").append(member.getEmail()).append("\n");
+            reservationInfo.append("   - Data de devolução: ").append(reservation.getEndDate() != null ? reservation.getEndDate() : "N/A");
 
-        // Iterar sobre os itens de reserva agrupados por ID e imprimir na tela
-        for (List<String> items : reservationItems.values()) {
-            items.forEach(System.out::println);
+            System.out.println(reservationInfo.toString());
         }
     }
+
 
 
 
