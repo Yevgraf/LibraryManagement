@@ -31,7 +31,10 @@ public class MemberController {
             return;
         }
 
-        Member member = new Member(name, address, birthDate, phone, email);
+        // Generate a random password for the member
+        String password = generateRandomPassword();
+
+        Member member = new Member(name, address, birthDate, phone, email, password);
         boolean success = saveMember(member);
 
         if (success) {
@@ -43,11 +46,29 @@ public class MemberController {
             Card card = cardController.createCard(savedMember, cardNumber);
             savedMember.setCard(card);
 
-            System.out.println("Membro criado e guardado com sucesso.");
+
+            EmailController.sendEmail(savedMember.getEmail(), "Senha da sua conta", "Prezado(a) membro,\n\nA senha da sua conta é: " + password + "\n\nPor favor, mantenha-a em segurança.\n\nAtenciosamente,\nA Biblioteca");
+            System.out.println("Membro criado e guardado com sucesso. A senha foi enviada para o email do membro.");
         } else {
             System.out.println("Ocorreu um erro ao salvar o membro. Não foi possível criar o cartão.");
         }
     }
+
+
+    private String generateRandomPassword() {
+        // gera password random com tamanho 8
+        int length = 8;
+        String allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder password = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            int randomIndex = (int) (Math.random() * allowedChars.length());
+            password.append(allowedChars.charAt(randomIndex));
+        }
+
+        return password.toString();
+    }
+
 
     public Member getMemberByEmail(String email) {
         List<Member> members = listMembers();
