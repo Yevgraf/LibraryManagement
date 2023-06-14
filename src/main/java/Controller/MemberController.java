@@ -47,7 +47,7 @@ public class MemberController {
             savedMember.setCard(card);
 
 
-            EmailController.sendEmail(savedMember.getEmail(), "Senha da sua conta", "Prezado(a) membro,\n\nA senha da sua conta é: " + password + "\n\nPor favor, mantenha-a em segurança.\n\nAtenciosamente,\nA Biblioteca");
+            EmailController.sendEmail(savedMember.getEmail(), "Senha da sua conta", "Prezado(a) membro,\n\nA senha da sua conta é: " + password + "\n\nPor favor, mantenha-a em segurança.\n\nAtenciosamente,\nA BiblioSMF");
             System.out.println("Membro criado e guardado com sucesso. A senha foi enviada para o email do membro.");
         } else {
             System.out.println("Ocorreu um erro ao salvar o membro. Não foi possível criar o cartão.");
@@ -56,8 +56,8 @@ public class MemberController {
 
 
     private String generateRandomPassword() {
-        // gera password random com tamanho 8
-        int length = 8;
+        // gera password random com tamanho 12
+        int length = 12;
         String allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder password = new StringBuilder();
 
