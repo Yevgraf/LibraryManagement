@@ -25,7 +25,7 @@ public class ReservationMenu {
         while (true) {
             System.out.println("Escolha uma opção:");
             System.out.println("1. Criar reserva");
-            System.out.println("2. Devolver livro");
+            System.out.println("2. Devolver reserva");
             System.out.println("3. Listar reservas");
             System.out.println("4. Voltar");
 

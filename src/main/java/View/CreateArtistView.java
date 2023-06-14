@@ -44,4 +44,36 @@ public class CreateArtistView {
             System.out.println(artist);
         }
     }
+
+    public void start() {
+        boolean running = true;
+
+        while (running) {
+            System.out.println("Escolha uma opção:");
+            System.out.println("1. Criar artista");
+            System.out.println("2. Listar artistas");
+            System.out.println("3. Voltar");
+
+            int option = scanner.nextInt();
+            scanner.nextLine(); // consume new line
+
+            switch (option) {
+                case 1:
+                    createArtist();
+                    break;
+                case 2:
+                    listArtists();
+                    break;
+                case 3:
+                    System.out.println("Voltar...");
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        }
+        MainMenu mainMenu = new MainMenu();
+        mainMenu.displayMenu();
+
+    }
 }

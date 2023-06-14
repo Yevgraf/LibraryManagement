@@ -149,9 +149,6 @@ public class ReservationData {
     }
 
 
-
-
-
     private int getNumberOfReservations(int memberId, State state) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement countStatement = connection.prepareStatement("SELECT COUNT(*) FROM Reservation JOIN ReservationProduct ON Reservation.id = ReservationProduct.reservationId WHERE Reservation.memberId = ? AND Reservation.state = ?")) {
@@ -172,8 +169,6 @@ public class ReservationData {
     }
 
 
-
-
     private Book loadBook(int bookId) {
         Book book = null;
         try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE id = ?")) {
@@ -187,7 +182,7 @@ public class ReservationData {
                 int authorId = resultSet.getInt("authorId");
                 int numPages = resultSet.getInt("numPages");
                 int categoryId = resultSet.getInt("categoryId");
-                LocalDate publicationDate = resultSet.getDate("publicationDate").toLocalDate();
+                LocalDate publicationDate = resultSet.getDate("publicationDate") != null ? resultSet.getDate("publicationDate").toLocalDate() : null;
                 int ageRangeId = resultSet.getInt("ageRangeId");
                 int publisherId = resultSet.getInt("publisherId");
                 String isbn = resultSet.getString("isbn");
@@ -264,33 +259,27 @@ public class ReservationData {
         return libraryUser;
     }
 
-    private CD loadCD(int cdId) {
-        CD cd = null;
-        try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE id = ?")) {
+    private Artist loadArtistById(int artistId) {
+        Artist artist = null;
+        try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Artist WHERE id = ?")) {
 
-            selectStatement.setInt(1, cdId);
+            selectStatement.setInt(1, artistId);
             ResultSet resultSet = selectStatement.executeQuery();
 
             if (resultSet.next()) {
-                String title = resultSet.getString("title");
-                String artist = resultSet.getString("artist");
-                int releaseYear = resultSet.getInt("releaseYear");
-                int numTracks = resultSet.getInt("numTracks");
-                int categoryId = resultSet.getInt("categoryId");
-                int quantity = resultSet.getInt("quantity");
+                String name = resultSet.getString("name");
+                // You can load other attributes of the artist if needed
 
-                // Load the Category object
-                Category category = loadCategoryById(categoryId);
-
-                // Create a CD object
-                cd = new CD(title, artist, releaseYear, numTracks, category, quantity);
-                cd.setId(cdId);
+                // Create an Artist object
+                artist = new Artist(name);
+                artist.setId(artistId);
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao carregar CD do banco de dados: " + e.getMessage());
+            System.err.println("Erro ao carregar artista do banco de dados: " + e.getMessage());
         }
-        return cd;
+        return artist;
     }
+
 
     public void updateState(Reservation reservation, State newState) {
         try (Connection connection = DBconn.getConn(); PreparedStatement updateStatement = connection.prepareStatement("UPDATE dbo.Reservation SET state = ? WHERE id = ?")) {
@@ -310,7 +299,39 @@ public class ReservationData {
         }
     }
 
+    private CD loadCD(int cdId) {
+        CD cd = null;
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE id = ?")) {
 
+            selectStatement.setInt(1, cdId);
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String title = resultSet.getString("title");
+                int artistId = resultSet.getInt("artistId");
+                int releaseYear = resultSet.getInt("releaseYear");
+                int numTracks = resultSet.getInt("numTracks");
+                int categoryId = resultSet.getInt("categoryId");
+                int quantity = resultSet.getInt("quantity");
+
+                // Load the Artist object
+                Artist artist = loadArtistById(artistId);
+
+                // Load the Category object
+                Category category = loadCategoryById(categoryId);
+
+                // Create a CD object
+                cd = new CD(title, artist, releaseYear, numTracks, category, quantity);
+
+
+                cd.setId(cdId);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error while loading CD from the database: " + e.getMessage());
+        }
+        return cd;
+    }
 
 
     public List<Reservation> getReservationsForMember(Member member) {
@@ -391,6 +412,9 @@ public class ReservationData {
                 reservation.setAdditionalComments(additionalComments);
 
                 // Load associated products
+                List<Book> books = new ArrayList<>();
+                List<CD> cds = new ArrayList<>();
+
                 try (PreparedStatement productStatement = connection.prepareStatement("SELECT * FROM dbo.ReservationProduct WHERE reservationId = ?")) {
                     productStatement.setInt(1, id);
                     try (ResultSet productResultSet = productStatement.executeQuery()) {
@@ -399,24 +423,29 @@ public class ReservationData {
                             if (productType.equals("book")) {
                                 Book book = loadBook(productId);
                                 if (book != null) {
-                                    reservation.addBook(book);
+                                    books.add(book);
                                 }
                             } else if (productType.equals("cd")) {
                                 CD cd = loadCD(productId);
                                 if (cd != null) {
-                                    reservation.addCD(cd);
+                                    cds.add(cd);
                                 }
                             }
                         }
                     }
                 }
 
+                // Add the loaded books and CDs to the reservation
+                reservation.setBooks(books);
+                reservation.setCds(cds);
+
                 reservations.add(reservation);
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao carregar reservas do banco de dados: " + e.getMessage());
+            System.err.println("Error while loading reservations from the database: " + e.getMessage());
         }
         return reservations;
     }
+
 
 }

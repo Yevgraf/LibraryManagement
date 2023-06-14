@@ -1,16 +1,20 @@
 package Model;
 
+import java.time.LocalDate;
+
 public class CD {
     private int id;
     private String title;
-    private String artist;
+    private Artist artist;
     private int releaseYear;
     private int numTracks;
     private Category category;
     private int quantity;
 
+
+
     // Constructor
-    public CD(int id, String title, String artist, int releaseYear, int numTracks, Category category, int quantity) {
+    public CD(int id, String title, Artist artist, int releaseYear, int numTracks, Category category, int quantity) {
         this.id = id;
         this.title = title;
         this.artist = artist;
@@ -25,7 +29,9 @@ public class CD {
         this.title = cdTitle;
     }
 
-    public CD(String title, String artist, int releaseYear, int numTracks, Category category, int quantity) {
+
+
+    public CD(String title, Artist artist, int releaseYear, int numTracks, Category category, int quantity) {
         this.title = title;
         this.artist = artist;
         this.releaseYear = releaseYear;
@@ -33,6 +39,8 @@ public class CD {
         this.category = category;
         this.quantity = quantity;
     }
+
+
 
     public int getId() {
         return id;
@@ -50,11 +58,11 @@ public class CD {
         this.title = title;
     }
 
-    public String getArtist() {
+    public Artist getArtist() {
         return artist;
     }
 
-    public void setArtist(String artist) {
+    public void setArtist(Artist artist) {
         this.artist = artist;
     }
 
@@ -95,13 +103,11 @@ public class CD {
         return "CD{" + '\n' +
                 "id: " + id + '\n' +
                 "title: '" + title + '\'' + '\n' +
-                "artist: '" + artist + '\'' + '\n' +
+                "artist: " + artist + '\n' +
                 "releaseYear: " + releaseYear + '\n' +
                 "numTracks: " + numTracks + '\n' +
                 "category: " + category + '\n' +
                 "quantity: " + quantity + '\n' +
                 '}';
     }
-
-
 }

@@ -1,7 +1,7 @@
 package View;
 
+import Controller.ArtistController;
 import Controller.CDController;
-import Model.Category;
 
 import java.util.Scanner;
 
@@ -9,13 +9,19 @@ public class CDMenu {
     private Scanner scanner;
     private CDController cdController;
     private CreateCDView createCDView;
+
+    private ArtistController artistController;
     private MainMenu mainMenu;
 
     public CDMenu(MainMenu mainMenu, CDController cdController, Scanner scanner) {
         this.mainMenu = mainMenu;
         this.cdController = cdController;
         this.scanner = scanner;
-        createCDView = new CreateCDView(cdController, scanner);
+
+        // Initialize the artistController object
+        this.artistController = new ArtistController();
+
+        createCDView = new CreateCDView(cdController, artistController, scanner);
     }
 
     public void displayMenu() {
