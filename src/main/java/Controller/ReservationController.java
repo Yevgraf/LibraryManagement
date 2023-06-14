@@ -58,7 +58,6 @@ public class ReservationController {
         if (selectedBooks != null) {
             for (Book selectedBook : selectedBooks) {
                 reservation.addBook(selectedBook);
-                bookData.updateBookQuantityDecrease(selectedBook.getId());
             }
         }
 
@@ -69,8 +68,8 @@ public class ReservationController {
             }
         }
 
-        reservation.setState(State.RESERVADO); // Set state to 'RESERVADO'
-        reservationData.save(reservation); // Save the reservation in the database
+        reservation.setState(State.RESERVADO);
+        reservationData.save(reservation);
     }
 
 
@@ -216,10 +215,6 @@ public class ReservationController {
         }
     }
 
-
-    private void updateBookQuantityIncrease(Book book) {
-        bookData.updateBookQuantityIncrease(book.getId());
-    }
 
 
     public List<Member> getAllMembers() {

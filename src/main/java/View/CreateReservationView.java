@@ -67,6 +67,7 @@ public class CreateReservationView {
         return null;
     }
 
+    //TODO ao selecionar os itens os itemsRemaining não podem dar reset quando passa para os cds
     private <T> List<T> selectItems(String itemType, List<T> items, int maxItems) {
         List<T> selectedItems = new ArrayList<>();
 
@@ -113,6 +114,7 @@ public class CreateReservationView {
         }
     }
 
+    //TODO ALTERAR displayMembers para listar por ordem (1,2,3..) e não pelo id do membro
     private void displayMembers(List<Member> members) {
         for (Member member : members) {
             System.out.println(member.getId() + ". " + member.getName());

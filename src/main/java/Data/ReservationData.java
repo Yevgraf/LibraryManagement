@@ -43,12 +43,6 @@ public class ReservationData {
                 return;
             }
 
-            if (reservationExists(reservation)) {
-                System.out.println("A reserva já existe para o membro.");
-                System.out.println("A reserva não foi adicionada.");
-                return;
-            }
-
             try {
                 // Save the reservation
                 insertReservationStatement.setInt(1, memberId);
@@ -92,6 +86,12 @@ public class ReservationData {
                 // Execute the batch insert for reservation products
                 insertReservationProductStatement.executeBatch();
 
+                // Decrease book quantity after successful reservation
+                BookData bookData = new BookData();
+                for (Book book : reservation.getBooks()) {
+                    bookData.updateBookQuantityDecrease(book.getId());
+                }
+
                 System.out.println("Reserva adicionada com sucesso.");
             } catch (SQLException e) {
                 System.out.println("Erro ao salvar a reserva: " + e.getMessage());
@@ -103,52 +103,6 @@ public class ReservationData {
         }
     }
 
-    private boolean reservationExists(Reservation reservation) {
-        try (Connection connection = DBconn.getConn()) {
-            int memberId = reservation.getMember().getId();
-
-            StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append("SELECT COUNT(*) FROM ReservationProduct ");
-            queryBuilder.append("WHERE memberId = ? AND state = 'RESERVADO' AND productId IN (");
-
-            List<Integer> productIds = new ArrayList<>();
-            for (Book book : reservation.getBooks()) {
-                productIds.add(book.getId());
-            }
-            for (CD cd : reservation.getCds()) {
-                productIds.add(cd.getId());
-            }
-
-            for (int i = 0; i < productIds.size(); i++) {
-                if (i > 0) {
-                    queryBuilder.append(", ");
-                }
-                queryBuilder.append("?");
-            }
-            queryBuilder.append(")");
-
-            try (PreparedStatement countStatement = connection.prepareStatement(queryBuilder.toString())) {
-                countStatement.setInt(1, memberId);
-
-                for (int i = 0; i < productIds.size(); i++) {
-                    countStatement.setInt(i + 2, productIds.get(i));
-                }
-
-                try (ResultSet resultSet = countStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        int count = resultSet.getInt(1);
-                        if (count > 0) {
-                            return true; // Reservation already exists for these products and member
-                        }
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
 
     private int getNumberOfReservations(int memberId, State state) {
         try (Connection connection = DBconn.getConn();
@@ -282,24 +236,6 @@ public class ReservationData {
         return artist;
     }
 
-
-    public void updateState(Reservation reservation, State newState) {
-        try (Connection connection = DBconn.getConn(); PreparedStatement updateStatement = connection.prepareStatement("UPDATE dbo.Reservation SET state = ? WHERE id = ?")) {
-
-            updateStatement.setString(1, newState.toString());
-            updateStatement.setInt(2, reservation.getId());
-
-            int affectedRows = updateStatement.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Falha ao atualizar o estado da reserva, sem linhas afetadas.");
-            }
-
-            reservation.setState(newState); // Update the state of the reservation object
-
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar o estado da reserva no banco de dados: " + e.getMessage());
-        }
-    }
 
     private CD loadCD(int cdId) {
         CD cd = null;

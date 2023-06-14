@@ -47,7 +47,7 @@ public class MemberController {
             savedMember.setCard(card);
 
 
-            EmailController.sendEmail(savedMember.getEmail(), "Senha da sua conta", "Prezado(a) membro,\n\nA senha da sua conta é: " + password + "\n\nPor favor, mantenha-a em segurança.\n\nAtenciosamente,\nA Biblioteca");
+            EmailController.sendEmail(savedMember.getEmail(), "Senha da sua conta", "Prezado(a) membro,\n\nA senha da sua conta é: " + password + "\n\nPor favor, mantenha-a em segurança.\n\nAtenciosamente,\nA BiblioSMF");
             System.out.println("Membro criado e guardado com sucesso. A senha foi enviada para o email do membro.");
         } else {
             System.out.println("Ocorreu um erro ao salvar o membro. Não foi possível criar o cartão.");
@@ -56,8 +56,8 @@ public class MemberController {
 
 
     private String generateRandomPassword() {
-        // gera password random com tamanho 8
-        int length = 8;
+        // gera password random com tamanho 12
+        int length = 12;
         String allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder password = new StringBuilder();
 
@@ -98,30 +98,6 @@ public class MemberController {
     }
 
 
-
-    public Member getMemberByName(String name) {
-        List<Member> members = listMembers();
-        List<Member> matchingMembers = members.stream()
-                .filter(member -> member.getName().toLowerCase().contains(name.toLowerCase()))
-                .collect(Collectors.toList());
-        if (matchingMembers.isEmpty()) {
-            return null;
-        }
-        if (matchingMembers.size() == 1) {
-            return matchingMembers.get(0);
-        }
-        System.out.println("Há mais de um membro com esse nome, selecione o ID correto:");
-        for (Member member : matchingMembers) {
-            System.out.println("ID: " + member.getId() + ", Nome: " + member.getName() + ", Telefone: "
-                    + member.getPhone() + ", Email: " + member.getEmail());
-        }
-        int selectedId = scanner.nextInt();
-        scanner.nextLine();
-        return matchingMembers.stream()
-                .filter(member -> member.getId() == selectedId)
-                .findFirst()
-                .orElse(null);
-    }
 
     public List<Member> listMembers() {
         return memberData.load();

@@ -55,13 +55,6 @@ public class ArtistData {
         return false;
     }
 
-    public Artist findByName(String name) {
-        List<Artist> artistList = load();
-        return artistList.stream()
-                .filter(artist -> artist.getName().equals(name))
-                .findFirst()
-                .orElse(null);
-    }
 
     public List<Artist> listArtists() {
         return load();
