@@ -47,14 +47,6 @@ public class AuthorController {
     }
 
 
-    public void listAuthorsView() {
-        List<Author> authorList = authorData.load();
-        System.out.println("Lista de autores:");
-        for (int i = 0; i < authorList.size(); i++) {
-            System.out.println((i+1) + ". " + authorList.get(i).getName());
-        }
-    }
-
 
     public List<Author> listAuthors() {
         return authorData.load();

@@ -17,7 +17,8 @@ public class MainMenu {
     private AgeRangeMenu ageRangeMenu;
     private BookMenu bookMenu;
     private ReservationMenu reservationMenu;
-    private CDMenu cdMenu; // Add CDMenu reference
+    private CDMenu cdMenu;
+    private CreateArtistView createArtistView;
 
     public MainMenu() {
         scanner = new Scanner(System.in);
@@ -35,6 +36,8 @@ public class MainMenu {
         MemberController memberController = new MemberController(memberData, scanner);
         BookController bookController = new BookController(bookData, authorData, ageRangeData, categoryData, publisherData, scanner);
 
+        ArtistController artistController = new ArtistController();
+        createArtistView = new CreateArtistView(artistController);
         authorMenu = new AuthorMenu(this);
         librarianMenu = new LibrarianMenu(this);
         memberMenu = new MemberMenu(this, cardController);
@@ -54,13 +57,14 @@ public class MainMenu {
         System.out.println("===================================");
         System.out.println("| 1 - Gestão de reservas         |");
         System.out.println("| 2 - Gestão de autores          |");
-        System.out.println("| 3 - Gestão de bibliotecários   |");
-        System.out.println("| 4 - Gestão de membros          |");
-        System.out.println("| 5 - Gestão de editoras         |");
-        System.out.println("| 6 - Gestão de categorias       |");
-        System.out.println("| 7 - Gestão de faixa etária     |");
-        System.out.println("| 8 - Gestão de livros           |");
-        System.out.println("| 9 - Gestão de CDs              |"); // Add CD menu option
+        System.out.println("| 3 - Gestão de artistas         |");
+        System.out.println("| 4 - Gestão de bibliotecários   |");
+        System.out.println("| 5 - Gestão de membros          |");
+        System.out.println("| 6 - Gestão de editoras         |");
+        System.out.println("| 7 - Gestão de categorias       |");
+        System.out.println("| 8 - Gestão de faixa etária     |");
+        System.out.println("| 9 - Gestão de livros           |");
+        System.out.println("| 10 - Gestão de CDs             |"); // Add CD menu option
         System.out.println("| 0 - Sair                       |");
         System.out.println("===================================");
 
@@ -75,24 +79,27 @@ public class MainMenu {
                 authorMenu.start();
                 break;
             case 3:
+                createArtistView.start();
+
+            case 4:
                 librarianMenu.start();
                 break;
-            case 4:
+            case 5:
                 memberMenu.start();
                 break;
-            case 5:
+            case 6:
                 publisherMenu.start();
                 break;
-            case 6:
+            case 7:
                 categoryMenu.start();
                 break;
-            case 7:
+            case 8:
                 ageRangeMenu.start();
                 break;
-            case 8:
+            case 9:
                 bookMenu.displayMenu();
                 break;
-            case 9:
+            case 10:
                 cdMenu.displayMenu(); // Call displayMenu() from CDMenu
                 break;
             case 0:

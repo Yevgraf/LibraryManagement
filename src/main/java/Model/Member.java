@@ -14,6 +14,56 @@ public class Member extends User  {
     private List<Book> borrowedBooks;
 
     private List<CD> borrowedCDs;
+    private  String password;
+
+    public Member(String name, String address, LocalDate birthDate, String phone, String email, String password) {
+        super(name, address, birthDate, phone, email);
+        this.password = password;
+        this.maxBorrowedBooks = 3;
+        this.borrowedBooks = new ArrayList<>();
+        this.borrowedCDs = new ArrayList<>();
+    }
+    @Override
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Member(String name, String address, LocalDate birthDate, String phone, String email, int id, int maxBorrowedBooks, Card card, List<Book> borrowedBooks, List<CD> borrowedCDs, String password) {
+        super(name, address, birthDate, phone, email);
+        this.id = id;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = borrowedBooks;
+        this.borrowedCDs = borrowedCDs;
+        this.password = password;
+    }
+
+    public Member(int id, String name, String address, LocalDate birthDate, String phone, String email, int id1, int maxBorrowedBooks, Card card, List<Book> borrowedBooks, List<CD> borrowedCDs, String password) {
+        super(id, name, address, birthDate, phone, email);
+        this.id = id1;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = borrowedBooks;
+        this.borrowedCDs = borrowedCDs;
+        this.password = password;
+    }
+
+    public Member(int id, int maxBorrowedBooks, Card card, List<Book> borrowedBooks, List<CD> borrowedCDs, String password) {
+        this.id = id;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = borrowedBooks;
+        this.borrowedCDs = borrowedCDs;
+        this.password = password;
+    }
 
     public Member(int id, int maxBorrowedBooks, Card card) {
         this.id = id;
