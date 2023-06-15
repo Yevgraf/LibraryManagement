@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import Model.Book;
+import Model.CD;
 import Model.Member;
 import Model.User;
 
@@ -55,8 +56,6 @@ public class MemberData {
     }
 
 
-
-
     private static boolean isMemberExists(Connection connection, String email) throws SQLException {
         String query = "SELECT COUNT(*) FROM Member JOIN LibraryUser ON Member.id = LibraryUser.id WHERE LibraryUser.email = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -99,7 +98,6 @@ public class MemberData {
         return false;
     }
 
-
     public static List<Member> load() {
         List<Member> memberList = new ArrayList<>();
 
@@ -118,17 +116,40 @@ public class MemberData {
 
                 Member member = new Member(id, name, address, birthDate, phone, email, maxBorrowedBooks);
 
-                // Load borrowed books for the member
-                PreparedStatement borrowedBooksStatement = connection.prepareStatement("SELECT b.id, b.title FROM BorrowedBook bb INNER JOIN Book b ON bb.bookId = b.id WHERE bb.memberId = ?");
-                borrowedBooksStatement.setInt(1, id);
-                ResultSet borrowedBooksResultSet = borrowedBooksStatement.executeQuery();
+                // Load reserved books for the member
+                PreparedStatement reservedBooksStatement = connection.prepareStatement(
+                        "SELECT p.id, p.title FROM Reservation r " +
+                                "INNER JOIN ReservationProduct rp ON r.id = rp.reservationId " +
+                                "INNER JOIN Product p ON rp.productId = p.id " +
+                                "WHERE r.memberId = ? AND r.state = 'RESERVADO' AND p.type = 'book'"
+                );
+                reservedBooksStatement.setInt(1, id);
+                ResultSet reservedBooksResultSet = reservedBooksStatement.executeQuery();
 
-                while (borrowedBooksResultSet.next()) {
-                    int bookId = borrowedBooksResultSet.getInt("id");
-                    String bookTitle = borrowedBooksResultSet.getString("title");
+                while (reservedBooksResultSet.next()) {
+                    int bookId = reservedBooksResultSet.getInt("id");
+                    String bookTitle = reservedBooksResultSet.getString("title");
 
                     Book book = new Book(bookId, bookTitle);
                     member.addBorrowedBook(book);
+                }
+
+                // Load reserved CDs for the member
+                PreparedStatement reservedCDsStatement = connection.prepareStatement(
+                        "SELECT p.id, p.title FROM Reservation r " +
+                                "INNER JOIN ReservationProduct rp ON r.id = rp.reservationId " +
+                                "INNER JOIN Product p ON rp.productId = p.id " +
+                                "WHERE r.memberId = ? AND r.state = 'RESERVADO' AND p.type = 'cd'"
+                );
+                reservedCDsStatement.setInt(1, id);
+                ResultSet reservedCDsResultSet = reservedCDsStatement.executeQuery();
+
+                while (reservedCDsResultSet.next()) {
+                    int cdId = reservedCDsResultSet.getInt("id");
+                    String cdTitle = reservedCDsResultSet.getString("title");
+
+                    CD cd = new CD(cdId, cdTitle);
+                    member.addBorrowedCD(cd);
                 }
 
                 memberList.add(member);
@@ -141,12 +162,6 @@ public class MemberData {
     }
 
 
-    public Optional<Member> findMemberByName(String memberName) {
-        List<Member> memberList = load();
-        return memberList.stream()
-                .filter(m -> m.getName().equalsIgnoreCase(memberName))
-                .findFirst();
-    }
 
     public static Member getById(int memberId) {
         Member member = null;
@@ -176,73 +191,30 @@ public class MemberData {
 
         return member;
     }
-    public void removeBookFromBorrowedBooks(Member member, Book book) {
+
+
+
+
+    public int getNumberOfBorrowedItems(int memberId) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("DELETE FROM dbo.BorrowedBook WHERE memberId = ? AND bookId = ?")) {
+             PreparedStatement countStatement = connection.prepareStatement(
+                     "SELECT COUNT(*) FROM (SELECT productId FROM ReservationProduct WHERE reservationId IN (SELECT id FROM Reservation WHERE memberId = ? AND state = 'RESERVADO')) AS BorrowedItems")) {
 
-            statement.setInt(1, member.getId());
-            statement.setInt(2, book.getId());
+            countStatement.setInt(1, memberId);
 
-            int affectedRows = statement.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Falha ao remover o livro emprestado do membro.");
-            }
-
-
-            member.getBorrowedBooks().remove(book);
-        } catch (SQLException e) {
-            System.err.println("Erro ao remover livro emprestado do membro: " + e.getMessage());
-        }
-    }
-
-    public void addBookToBorrowedBooks(Member member, Book book) {
-        try (Connection connection = DBconn.getConn();
-             PreparedStatement selectStatement = connection.prepareStatement(
-                     "SELECT COUNT(*) FROM dbo.BorrowedBook WHERE memberId = ?");
-             PreparedStatement insertStatement = connection.prepareStatement(
-                     "INSERT INTO dbo.BorrowedBook (memberId, bookId, borrowedDate) VALUES (?, ?, ?)")) {
-
-
-            int memberId = member.getId();
-            int maxBorrowedBooks = 3;
-            int currentBorrowedBooks = getNumberOfBorrowedBooks(memberId);
-
-            if (currentBorrowedBooks >= maxBorrowedBooks) {
-                throw new SQLException("O membro já possui " + currentBorrowedBooks + " livros emprestados. Não é permitido ter mais de " + maxBorrowedBooks + " livros emprestados.");
-            }
-
-            insertStatement.setInt(1, memberId);
-            insertStatement.setInt(2, book.getId());
-            insertStatement.setDate(3, java.sql.Date.valueOf(LocalDate.now()));
-
-            int affectedRows = insertStatement.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Falha ao adicionar o livro emprestado para o membro.");
-            }
-
-            // Update the in-memory borrowed books list of the member
-            member.getBorrowedBooks().add(book);
-        } catch (SQLException e) {
-            System.err.println("Erro ao adicionar livro emprestado para o membro: " + e.getMessage());
-        }
-    }
-
-    private int getNumberOfBorrowedBooks(int memberId) throws SQLException {
-        try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement(
-                     "SELECT COUNT(*) FROM dbo.BorrowedBook WHERE memberId = ?")) {
-
-            statement.setInt(1, memberId);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
+            try (ResultSet resultSet = countStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt(1);
                 }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        throw new SQLException("Falha ao obter o número de livros emprestados para o membro.");
+        return 0;
     }
+
+
 
 
 }

@@ -40,13 +40,5 @@ public class AgeRangeController {
         return null;
     }
 
-    public void listAgeRangesView() {
-        List<AgeRange> ageRangeList = ageRangeData.load();
-        System.out.println("Lista de faixas etárias:");
-        for (int i = 0; i < ageRangeList.size(); i++) {
-            AgeRange ageRange = ageRangeList.get(i);
-            System.out.println((i+1) + ". " + ageRange.getDescription());
-        }
-    }
 
 }

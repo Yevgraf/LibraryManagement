@@ -28,27 +28,5 @@ public class CategoryController {
         return categoryData.load();
     }
 
-    public Category findByName(String name) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("O nome da categoria não pode ser vazio ou nulo.");
-        }
-
-        List<Category> categories = categoryData.load();
-        for (Category category : categories) {
-            if (category.getCategoryName().equalsIgnoreCase(name)) {
-                return category;
-            }
-        }
-        return null;
-    }
-
-    public void listCategoriesView() {
-        List<Category> categoryList = categoryData.load();
-        System.out.println("Lista de categorias:");
-        for (int i = 0; i < categoryList.size(); i++) {
-            Category category = categoryList.get(i);
-            System.out.println((i + 1) + ". " + category.getCategoryName());
-        }
-    }
 
 }

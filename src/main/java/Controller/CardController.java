@@ -17,11 +17,6 @@ public class CardController {
         this.cardData = cardData;
     }
 
-    public void saveCards(List<Card> cards) {
-        for (Card card : cards) {
-            cardData.save(card);
-        }
-    }
 
 
     public Card createCard(Member member, String cardNumber) {

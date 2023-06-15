@@ -13,6 +13,66 @@ public class Member extends User  {
     private Card card;
     private List<Book> borrowedBooks;
 
+    private List<CD> borrowedCDs;
+    private  String password;
+
+    public Member(String name, String address, LocalDate birthDate, String phone, String email, String password) {
+        super(name, address, birthDate, phone, email);
+        this.password = password;
+        this.maxBorrowedBooks = 3;
+        this.borrowedBooks = new ArrayList<>();
+        this.borrowedCDs = new ArrayList<>();
+    }
+    @Override
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Member(String name, String address, LocalDate birthDate, String phone, String email, int id, int maxBorrowedBooks, Card card, List<Book> borrowedBooks, List<CD> borrowedCDs, String password) {
+        super(name, address, birthDate, phone, email);
+        this.id = id;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = borrowedBooks;
+        this.borrowedCDs = borrowedCDs;
+        this.password = password;
+    }
+
+    public Member(int id, String name, String address, LocalDate birthDate, String phone, String email, int id1, int maxBorrowedBooks, Card card, List<Book> borrowedBooks, List<CD> borrowedCDs, String password) {
+        super(id, name, address, birthDate, phone, email);
+        this.id = id1;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = borrowedBooks;
+        this.borrowedCDs = borrowedCDs;
+        this.password = password;
+    }
+
+    public Member(int id, int maxBorrowedBooks, Card card, List<Book> borrowedBooks, List<CD> borrowedCDs, String password) {
+        this.id = id;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = borrowedBooks;
+        this.borrowedCDs = borrowedCDs;
+        this.password = password;
+    }
+
+    public Member(int id, int maxBorrowedBooks, Card card) {
+        this.id = id;
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.card = card;
+        this.borrowedBooks = new ArrayList<>();
+        this.borrowedCDs = new ArrayList<>();
+    }
+
     public Member(String name, String address, LocalDate birthDate, String phone, String email) {
         super(name, address, birthDate, phone, email);
         this.maxBorrowedBooks = 3;
@@ -25,6 +85,7 @@ public class Member extends User  {
         this.id = id;
         this.maxBorrowedBooks = maxBorrowedBooks;
         this.borrowedBooks = new ArrayList<>();
+        this.borrowedCDs = new ArrayList<>();
     }
 
     public Member(String name, String address, LocalDate birthDate, String phone, String email, int id, int maxBorrowedBooks, Card card, List<Book> borrowedBooks) {
@@ -33,12 +94,14 @@ public class Member extends User  {
         this.maxBorrowedBooks = maxBorrowedBooks;
         this.card = card;
         this.borrowedBooks = borrowedBooks;
+        this.borrowedCDs = new ArrayList<>();
     }
     public Member(int id, User user, String name, String address, LocalDate birthDate, String phone, String email, int maxBorrowedBooks) {
         super(user.getId(), name, address, birthDate, phone, email);
         this.id = id;
         this.maxBorrowedBooks = maxBorrowedBooks;
         this.borrowedBooks = new ArrayList<>();
+        this.borrowedCDs = new ArrayList<>();
     }
 
     public Member(int id, String name, String address, LocalDate birthDate, String phone, String email, int id1, int maxBorrowedBooks, Card card, List<Book> borrowedBooks) {
@@ -47,6 +110,7 @@ public class Member extends User  {
         this.maxBorrowedBooks = maxBorrowedBooks;
         this.card = card;
         this.borrowedBooks = borrowedBooks;
+        this.borrowedCDs = new ArrayList<>();
     }
 
     public Member(int id, int maxBorrowedBooks, Card card, List<Book> borrowedBooks) {
@@ -54,6 +118,7 @@ public class Member extends User  {
         this.maxBorrowedBooks = maxBorrowedBooks;
         this.card = card;
         this.borrowedBooks = borrowedBooks;
+        this.borrowedCDs = new ArrayList<>();
     }
 
     public int getId() {
@@ -84,20 +149,37 @@ public class Member extends User  {
         this.borrowedBooks = borrowedBooks;
     }
 
+    public List<CD> getBorrowedCDs() {
+        return borrowedCDs;
+    }
+
+    public void setBorrowedCDs(List<CD> borrowedCDs) {
+        this.borrowedCDs = borrowedCDs;
+    }
+
     @Override
     public String toString() {
-        return "Membro:\n" +
-                "  ID: " + id + "\n" +
-                "  Nome: " + getName() + "\n" +
-                "  Email: " + getEmail() + "\n" +
-                "  Livros emprestados: " + borrowedBooks.stream()
+        StringBuilder sb = new StringBuilder();
+        sb.append("Membro:\n");
+        sb.append("  ID: ").append(id).append("\n");
+        sb.append("  Nome: ").append(getName()).append("\n");
+        sb.append("  Email: ").append(getEmail()).append("\n");
+        sb.append("  Livros emprestados: ").append(borrowedBooks.stream()
                 .map(Book::getTitle)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(", "))).append("\n");
+        sb.append("  CDs emprestados: ").append(borrowedCDs.stream()
+                .map(CD::getTitle)
+                .collect(Collectors.joining(", ")));
+        return sb.toString();
     }
+
 
     public void addBorrowedBook(Book book) {
         borrowedBooks.add(book);
     }
 
+    public void addBorrowedCD(CD cd){
+        borrowedCDs.add(cd);
+    }
 }
 

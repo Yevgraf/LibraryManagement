@@ -15,8 +15,8 @@ public class RemoveReservationView {
     }
 
     public void deliverBook() {
-        System.out.println("Entregar livro:");
-        reservationController.deliverReservationByBookNameAndUserName();
+        System.out.println("Entregar livro/CD:");
+        reservationController.deliverReservation();
     }
 
 

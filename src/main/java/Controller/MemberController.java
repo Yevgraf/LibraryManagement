@@ -31,7 +31,10 @@ public class MemberController {
             return;
         }
 
-        Member member = new Member(name, address, birthDate, phone, email);
+        // Generate a random password for the member
+        String password = generateRandomPassword();
+
+        Member member = new Member(name, address, birthDate, phone, email, password);
         boolean success = saveMember(member);
 
         if (success) {
@@ -43,11 +46,29 @@ public class MemberController {
             Card card = cardController.createCard(savedMember, cardNumber);
             savedMember.setCard(card);
 
-            System.out.println("Membro criado e guardado com sucesso.");
+
+            EmailController.sendEmail(savedMember.getEmail(), "Senha da sua conta", "Prezado(a) membro,\n\nA senha da sua conta é: " + password + "\n\nPor favor, mantenha-a em segurança.\n\nAtenciosamente,\nA BiblioSMF");
+            System.out.println("Membro criado e guardado com sucesso. A senha foi enviada para o email do membro.");
         } else {
             System.out.println("Ocorreu um erro ao salvar o membro. Não foi possível criar o cartão.");
         }
     }
+
+
+    private String generateRandomPassword() {
+        // gera password random com tamanho 12
+        int length = 12;
+        String allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder password = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            int randomIndex = (int) (Math.random() * allowedChars.length());
+            password.append(allowedChars.charAt(randomIndex));
+        }
+
+        return password.toString();
+    }
+
 
     public Member getMemberByEmail(String email) {
         List<Member> members = listMembers();
@@ -77,30 +98,6 @@ public class MemberController {
     }
 
 
-
-    public Member getMemberByName(String name) {
-        List<Member> members = listMembers();
-        List<Member> matchingMembers = members.stream()
-                .filter(member -> member.getName().toLowerCase().contains(name.toLowerCase()))
-                .collect(Collectors.toList());
-        if (matchingMembers.isEmpty()) {
-            return null;
-        }
-        if (matchingMembers.size() == 1) {
-            return matchingMembers.get(0);
-        }
-        System.out.println("Há mais de um membro com esse nome, selecione o ID correto:");
-        for (Member member : matchingMembers) {
-            System.out.println("ID: " + member.getId() + ", Nome: " + member.getName() + ", Telefone: "
-                    + member.getPhone() + ", Email: " + member.getEmail());
-        }
-        int selectedId = scanner.nextInt();
-        scanner.nextLine();
-        return matchingMembers.stream()
-                .filter(member -> member.getId() == selectedId)
-                .findFirst()
-                .orElse(null);
-    }
 
     public List<Member> listMembers() {
         return memberData.load();

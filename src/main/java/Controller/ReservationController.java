@@ -1,6 +1,7 @@
 package Controller;
 
 import Data.BookData;
+import Data.CDData;
 import Data.ReservationData;
 import Data.MemberData;
 import Model.*;
@@ -9,10 +10,7 @@ import Model.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ReservationController {
@@ -20,12 +18,15 @@ public class ReservationController {
     private ReservationData reservationData;
     private MemberData memberData;
     private BookData bookData;
+    private CDData cdData;
 
-    public ReservationController(ReservationData reservationData, MemberData memberData, BookData bookData) {
+    public ReservationController(ReservationData reservationData, MemberData memberData, BookData bookData, CDData cdData) {
         this.reservationData = reservationData;
         this.memberData = memberData;
         this.bookData = bookData;
+        this.cdData = cdData;
     }
+
 
     public void setReservationData(ReservationData reservationData) {
         this.reservationData = reservationData;
@@ -39,100 +40,38 @@ public class ReservationController {
         this.bookData = bookData;
     }
 
-    public void addReservation() {
-        List<Member> members = memberData.load();
-        List<Book> books = bookData.listBooks();
 
-        Member selectedMember = selectMember(members);
+    public void addReservation(Member selectedMember, List<Book> selectedBooks, List<CD> selectedCDs, LocalDate endDate) {
         if (selectedMember == null) {
             System.out.println("Erro: Membro não selecionado.");
             return;
         }
 
-        Book selectedBook = selectBook(books);
-        if (selectedBook == null) {
-            System.out.println("Erro: Livro não selecionado.");
+        if ((selectedBooks == null || selectedBooks.isEmpty()) && (selectedCDs == null || selectedCDs.isEmpty())) {
+            System.out.println("Erro: Nenhum item selecionado.");
             return;
         }
 
         LocalDate startDate = LocalDate.now();
-        LocalDate endDate = getEndDateInput();
+        Reservation reservation = new Reservation(selectedMember, startDate, endDate);
 
-        if (endDate == null) {
-            System.out.println("Erro: Data final da reserva não fornecida.");
-            return;
-        }
-
-        Reservation reservation = new Reservation(selectedMember, selectedBook, startDate, endDate);
-        reservation.setState(State.RESERVADO); // estado alterado para 'RESERVADO' em memoria
-        reservationData.save(reservation); // cria a reserva na base dados
-
-        // Update qauntidade livro - 1
-        bookData.updateBookQuantityDecrease(selectedBook.getId());
-
-        //adiciona livro a lista de livros emprestados do membro - tabela BorrowedBook
-        memberData.addBookToBorrowedBooks(selectedMember, selectedBook);
-
-        System.out.println("Reserva adicionada com sucesso.");
-    }
-
-
-    private LocalDate getEndDateInput() {
-        System.out.print("Digite a data final da reserva (dd/mm/yyyy): ");
-        Scanner scanner = new Scanner(System.in);
-        String endDateStr = scanner.nextLine();
-
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            return LocalDate.parse(endDateStr, formatter);
-        } catch (DateTimeParseException e) {
-            System.out.println("Erro: Formato de data inválido. Use o formato dd/mm/yyyy.");
-            return null;
-        }
-    }
-
-
-    private Member selectMember(List<Member> members) {
-        System.out.println("Selecione o membro:");
-        for (int i = 0; i < members.size(); i++) {
-            System.out.println((i + 1) + ". " + members.get(i).getName());
-        }
-
-        int selection = getUserInput("Opção: ");
-        if (selection >= 1 && selection <= members.size()) {
-            return members.get(selection - 1);
-        } else {
-            return null;
-        }
-    }
-
-    private Book selectBook(List<Book> books) {
-        System.out.println("Selecione o livro:");
-        for (int i = 0; i < books.size(); i++) {
-            System.out.println((i + 1) + ". " + books.get(i).getTitle());
-        }
-
-        Book selectedBook = null;
-        boolean validSelection = false;
-        while (!validSelection) {
-            int selection = getUserInput("Opção: ");
-            if (selection >= 1 && selection <= books.size()) {
-                selectedBook = books.get(selection - 1);
-                validSelection = true;
-            } else {
-                System.out.println("Opção inválida. Por favor, selecione uma opção válida.");
+        if (selectedBooks != null) {
+            for (Book selectedBook : selectedBooks) {
+                reservation.addBook(selectedBook);
             }
         }
 
-        return selectedBook;
+        if (selectedCDs != null) {
+            for (CD selectedCD : selectedCDs) {
+                reservation.addCD(selectedCD);
+                cdData.updateCDQuantityDecrease(selectedCD.getId());
+            }
+        }
+
+        reservation.setState(State.RESERVADO);
+        reservationData.save(reservation);
     }
 
-
-    private int getUserInput(String prompt) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print(prompt);
-        return scanner.nextInt();
-    }
 
 
     public List<Reservation> getReservationsForMember(Member member) {
@@ -143,60 +82,42 @@ public class ReservationController {
         return reservationData.load();
     }
 
-    public void deliverReservationByBookNameAndUserName() {
+
+    private List<Reservation> filterMatchingReservations(List<Reservation> reservations) {
+        return reservations.stream()
+                .filter(reservation -> reservation.getState() == State.RESERVADO &&
+                        (!reservation.getBooks().isEmpty() || !reservation.getCds().isEmpty()))
+                .collect(Collectors.toList());
+    }
+
+    public void deliverReservation() {
         try {
             List<Reservation> reservations = reservationData.load();
 
-            List<Reservation> matchingReservations = reservations.stream()
-                    .filter(reservation -> reservation.getState() == State.RESERVADO)
-                    .collect(Collectors.toList());
+            List<Reservation> matchingReservations = filterMatchingReservations(reservations);
 
             if (matchingReservations.isEmpty()) {
-                System.out.println("Nenhuma reserva encontrada para o livro com título ou ISBN.");
+                System.out.println("Nenhuma reserva encontrada para o livro ou CD.");
                 return;
             }
 
-            // Display a list of books matching the criteria
-            System.out.println("Livros encontrados:");
-            for (int i = 0; i < matchingReservations.size(); i++) {
-                Reservation reservation = matchingReservations.get(i);
-                Book book = reservation.getBook();
-                Member member = reservation.getMember();
+            displayReservations(matchingReservations);
 
-                String bookInfo = String.format("%d. %s - %s", (i + 1), book.getTitle(), member.getName());
-                System.out.println(bookInfo);
-                System.out.println("   - Email: " + member.getEmail());
-                System.out.println("   - Data de devolução: " + reservation.getEndDate());
-            }
+            int itemSelection = getItemSelection(matchingReservations.size());
 
-            // Prompt seleção de livro
-            System.out.print("Selecione o livro (digite o número correspondente): ");
-            Scanner scanner = new Scanner(System.in);
-            int bookSelection = scanner.nextInt();
-
-            if (bookSelection < 1 || bookSelection > matchingReservations.size()) {
+            if (itemSelection < 1 || itemSelection > matchingReservations.size()) {
                 System.out.println("Seleção inválida.");
                 return;
             }
 
-            Reservation selectedReservation = matchingReservations.get(bookSelection - 1);
-            Book selectedBook = selectedReservation.getBook();
+            Reservation selectedReservation = matchingReservations.get(itemSelection - 1);
 
-            // Update estado reserva para 'ENTREGUE'
-            reservationData.updateReservationState(selectedReservation, State.ENTREGUE);
-
-            // Prompt para formulário statisfação
+            updateReservationState(selectedReservation, State.ENTREGUE);
             int satisfactionRating = getSatisfactionRatingInput();
             String additionalComments = getAdditionalCommentsInput();
 
-            //update reserva com a informação adicional
-            reservationData.updateReservationAdditionalInfo(selectedReservation, satisfactionRating, additionalComments);
-
-            // Update quantidade de livro +1
-            updateBookQuantityIncrease(selectedBook);
-
-            //remove livro da lista de livros emprestados do membro - remove da tabela BorrowedBook
-            memberData.removeBookFromBorrowedBooks(selectedReservation.getMember(), selectedBook);
+            updateReservationAdditionalInfo(selectedReservation, satisfactionRating, additionalComments);
+            updateItemQuantities(selectedReservation);
 
             System.out.println("Reserva atualizada para 'ENTREGUE': " + selectedReservation.toString());
         } catch (Exception e) {
@@ -204,27 +125,107 @@ public class ReservationController {
         }
     }
 
+    private void displayReservations(List<Reservation> reservations) {
+        System.out.println("Reservas encontradas:");
+
+        for (Reservation reservation : reservations) {
+            List<Book> books = reservation.getBooks();
+            List<CD> cds = reservation.getCds();
+            Member member = reservation.getMember();
+
+            StringBuilder reservationInfo = new StringBuilder();
+            reservationInfo.append(reservations.indexOf(reservation) + 1).append(". ");
+
+            if (!books.isEmpty()) {
+                reservationInfo.append("Livro(s): ");
+                for (Book book : books) {
+                    reservationInfo.append(book.getTitle()).append(", ");
+                }
+                reservationInfo.setLength(reservationInfo.length() - 2);
+                reservationInfo.append(" - ").append(member.getName()).append("\n");
+            }
+
+            if (!cds.isEmpty()) {
+                reservationInfo.append("CD(s): ");
+                for (CD cd : cds) {
+                    reservationInfo.append(cd.getTitle()).append(", ");
+                }
+                reservationInfo.setLength(reservationInfo.length() - 2);
+                reservationInfo.append(" - ").append(member.getName()).append("\n");
+            }
+
+            reservationInfo.append("   - Email: ").append(member.getEmail()).append("\n");
+            reservationInfo.append("   - Data de devolução: ").append(reservation.getEndDate() != null ? reservation.getEndDate() : "N/A");
+
+            System.out.println(reservationInfo.toString());
+        }
+    }
+
+
+
+
+
+    private int getItemSelection(int maxSelection) {
+        System.out.print("Selecione o item (digite o número correspondente): ");
+        Scanner scanner = new Scanner(System.in);
+        return scanner.nextInt();
+    }
+
+    private void updateReservationState(Reservation reservation, State newState) {
+        reservationData.updateReservationState(reservation, newState);
+    }
 
     private int getSatisfactionRatingInput() {
-
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Insira a avaliação de satisfação (1-5): ");
-        int rating = scanner.nextInt();
+        int rating;
+        while (true) {
+            System.out.print("Insira a avaliação de satisfação (1-5): ");
+            rating = scanner.nextInt();
+            if (rating >= 1 && rating <= 5) {
+                break;
+            }
+            System.out.println("Avaliação inválida. Insira um número entre 1 e 5.");
+        }
         return rating;
     }
 
     private String getAdditionalCommentsInput() {
-
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Insira os comentários adicionais: ");
-        String comments = scanner.nextLine();
-        return comments;
+        System.out.print("Insira comentários adicionais: ");
+        return scanner.nextLine();
+    }
+
+    private void updateReservationAdditionalInfo(Reservation reservation, int satisfactionRating, String additionalComments) {
+        reservationData.updateReservationAdditionalInfo(reservation, satisfactionRating, additionalComments);
+    }
+
+    private void updateItemQuantities(Reservation reservation) {
+        List<Book> books = reservation.getBooks();
+        List<CD> cds = reservation.getCds();
+
+        BookData bookData = new BookData();
+        CDData cdData = new CDData();
+
+        for (Book book : books) {
+            bookData.updateBookQuantityIncrease(book.getId());
+        }
+
+        for (CD cd : cds) {
+            cdData.updateCDQuantityIncrease(cd.getId());
+        }
     }
 
 
 
-    private void updateBookQuantityIncrease(Book book) {
-        bookData.updateBookQuantityIncrease(book.getId());
+    public List<Member> getAllMembers() {
+        return memberData.load();
     }
 
+    public List<Book> getAllBooks() {
+        return bookData.load();
+    }
+
+    public List<CD> getAllCDs() {
+        return cdData.load();
+    }
 }
