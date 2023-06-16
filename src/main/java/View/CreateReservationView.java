@@ -36,7 +36,7 @@ public class CreateReservationView {
         List<CD> cds = reservationController.getAllCDs();
 
         Member selectedMember = selectMember(members);
-        List<Book> selectedBooks = selectItems("livro", books, 3);
+        List<Book> selectedBooks = selectItems("Livro", books, 3);
         List<CD> selectedCDs = selectItems("CD", cds, 3);
         LocalDate endDate = getEndDateInput();
 
@@ -54,50 +54,113 @@ public class CreateReservationView {
         System.out.println("Selecione um membro:");
         displayMembers(members);
 
-        System.out.print("Digite o ID do membro: ");
-        int memberId = scanner.nextInt();
+        System.out.print("Digite o número do membro: ");
+        int memberNumber = scanner.nextInt();
 
-        for (Member member : members) {
-            if (member.getId() == memberId) {
-                return member;
-            }
+        if (memberNumber == 0) {
+            return null; // User canceled the selection
+        } else if (memberNumber < 1 || memberNumber > members.size()) {
+            System.out.println("Número inválido. Tente novamente.");
+            return selectMember(members); // Retry the selection
         }
 
-        System.out.println("Membro não encontrado. Tente novamente.");
-        return null;
+        return members.get(memberNumber - 1);
     }
 
-    //TODO ao selecionar os itens os itemsRemaining não podem dar reset quando passa para os cds
     private <T> List<T> selectItems(String itemType, List<T> items, int maxItems) {
         List<T> selectedItems = new ArrayList<>();
 
-        System.out.println("Selecione os " + itemType + "s (até " + maxItems + "):");
         int itemsRemaining = maxItems;
 
-        while (itemsRemaining > 0 && !items.isEmpty()) {
+        while (itemsRemaining > 0) {
             System.out.println("Itens restantes: " + itemsRemaining);
-            displayItems(items);
-            System.out.println("0. Nenhum " + itemType);
+            System.out.println("0. Cancelar e voltar");
+            System.out.println("1. Listar Livros");
+            System.out.println("2. Listar CDs");
+            System.out.println("3. Pesquisar Itens (Livros e CDs)");
+            System.out.println("4. Finalizar reserva");
 
-            System.out.print("Digite o número do " + itemType + " ou 0 para encerrar a seleção: ");
+            System.out.print("Digite o número da opção: ");
+            int optionNumber = scanner.nextInt();
+
+            if (optionNumber == 0) {
+                break; // Exit the loop and return the selected items so far
+            } else if (optionNumber == 1 && itemType.equals("Livro")) {
+                displayBooks((List<Book>) items, itemsRemaining);
+            } else if (optionNumber == 2 && itemType.equals("CD")) {
+                displayCDs((List<CD>) items, itemsRemaining);
+            } else if (optionNumber == 3) {
+                if (itemType.equals("Livro")) {
+                    displayBooks((List<Book>) items, itemsRemaining);
+                } else if (itemType.equals("CD")) {
+                    displayCDs((List<CD>) items, itemsRemaining);
+                }
+            } else if (optionNumber == 4) {
+                break; // Finalize the selection
+            } else {
+                System.out.println("Opção inválida. Tente novamente.");
+            }
+
+            if (items.isEmpty()) {
+                System.out.println("Nenhum item disponível.");
+                break; // Exit the loop and return the selected items so far
+            }
+
+            System.out.print("Digite o número do item: ");
             int itemNumber = scanner.nextInt();
 
             if (itemNumber == 0) {
-                break;
-            }
-
-            if (itemNumber < 1 || itemNumber > items.size()) {
+                break; // Exit the loop and return the selected items so far
+            } else if (itemNumber < 1 || itemNumber > items.size()) {
                 System.out.println("Número inválido. Tente novamente.");
-                continue;
+            } else {
+                T selectedItem = items.get(itemNumber - 1);
+                selectedItems.add(selectedItem);
+                items.remove(selectedItem);
+                itemsRemaining--;
             }
-
-            T selectedItem = items.get(itemNumber - 1);
-            selectedItems.add(selectedItem);
-            items.remove(selectedItem);
-            itemsRemaining--;
         }
 
         return selectedItems;
+    }
+
+
+
+    private void displayItems(List<?> items, String itemType, int itemsRemaining) {
+        System.out.println(itemType + "s disponíveis:");
+
+        for (int i = 0; i < items.size(); i++) {
+            Object item = items.get(i);
+            System.out.println((i + 1) + ".");
+
+            if (item instanceof Book) {
+                Book book = (Book) item;
+                System.out.println("   Título: " + book.getTitle());
+                System.out.println("   Autor: " + book.getAuthor().getName());
+                System.out.println("   ISBN: " + book.getIsbn());
+                System.out.println("   Quantidade: " + book.getQuantity());
+            } else if (item instanceof CD) {
+                CD cd = (CD) item;
+                System.out.println("   Título: " + cd.getTitle());
+                System.out.println("   Artista: " + cd.getArtist().getName());
+                System.out.println("   Género: " + cd.getCategory().getCategoryName());
+                System.out.println("   Quantidade: " + cd.getQuantity());
+            }
+            System.out.println();
+        }
+
+        System.out.println("0. Voltar");
+        System.out.println("Itens restantes: " + itemsRemaining);
+    }
+
+
+
+    private void displayBooks(List<Book> books, int itemsRemaining) {
+        displayItems(books, "Livro", itemsRemaining);
+    }
+
+    private void displayCDs(List<CD> cds, int itemsRemaining) {
+        displayItems(cds, "CD", itemsRemaining);
     }
 
 
@@ -110,27 +173,15 @@ public class CreateReservationView {
             return LocalDate.parse(endDateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         } catch (DateTimeParseException e) {
             System.out.println("Data inválida. Tente novamente.");
-            return null;
+            return getEndDateInput(); // Retry getting the end date
         }
     }
 
-    //TODO ALTERAR displayMembers para listar por ordem (1,2,3..) e não pelo id do membro
     private void displayMembers(List<Member> members) {
-        for (Member member : members) {
-            System.out.println(member.getId() + ". " + member.getName());
-        }
-    }
-
-    private <T> void displayItems(List<T> items) {
-        for (int i = 0; i < items.size(); i++) {
-            T item = items.get(i);
-            if (item instanceof Book) {
-                Book book = (Book) item;
-                System.out.println((i + 1) + ". " + book.getTitle());
-            } else if (item instanceof CD) {
-                CD cd = (CD) item;
-                System.out.println((i + 1) + ". " + cd.getTitle());
-            }
+        for (int i = 0; i < members.size(); i++) {
+            Member member = members.get(i);
+            int memberItemNumber = member.getBorrowedBooks().size() + member.getBorrowedCDs().size();
+            System.out.println((i + 1) + ". Name: " + member.getName() + ", Email: " + member.getEmail() + ", Itens reservados: " + memberItemNumber);
         }
     }
 
@@ -146,4 +197,5 @@ public class CreateReservationView {
             }
         }
     }
+
 }
