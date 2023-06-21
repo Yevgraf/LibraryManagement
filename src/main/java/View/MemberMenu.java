@@ -8,6 +8,9 @@ import Controller.MemberController;
 import Data.MemberData;
 import Model.Card;
 
+/**
+ * A classe MemberMenu representa o menu de opções relacionadas aos membros da biblioteca.
+ */
 public class MemberMenu {
     private Scanner scanner;
     private MemberController memberController;
@@ -15,6 +18,12 @@ public class MemberMenu {
     private CreateMemberView createMemberView;
     private MainMenu mainMenu;
 
+    /**
+     * Construtor da classe MemberMenu.
+     * Inicializa os controladores, a visualização de criação de membros e o menu principal.
+     * @param mainMenu O menu principal da aplicação.
+     * @param cardController O controlador de cartões.
+     */
     public MemberMenu(MainMenu mainMenu, CardController cardController) {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
@@ -24,7 +33,10 @@ public class MemberMenu {
         this.cardController = cardController;
     }
 
-
+    /**
+     * Inicia o menu de membros.
+     * Exibe as opções disponíveis e permite ao usuário interagir com elas.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");
@@ -56,6 +68,9 @@ public class MemberMenu {
         }
     }
 
+    /**
+     * Lista os cartões cadastrados.
+     */
     private void listCards() {
         List<Card> cards = cardController.getAllCards();
         System.out.println("Lista de cartões:");

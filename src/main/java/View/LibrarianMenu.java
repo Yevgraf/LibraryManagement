@@ -14,6 +14,11 @@ public class LibrarianMenu {
     private CreateLibrarianView createLibrarianView;
     private MainMenu mainMenu;
 
+    /**
+     * Cria uma instância de LibrarianMenu.
+     *
+     * @param mainMenu o menu principal associado ao menu do bibliotecário
+     */
     public LibrarianMenu(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
@@ -22,6 +27,9 @@ public class LibrarianMenu {
         createLibrarianView = new CreateLibrarianView(librarianController);
     }
 
+    /**
+     * Inicia o menu do bibliotecário.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");
@@ -31,7 +39,7 @@ public class LibrarianMenu {
             System.out.println("4. Voltar");
 
             int option = scanner.nextInt();
-            scanner.nextLine(); // consume new line
+            scanner.nextLine(); // consumir nova linha
 
             switch (option) {
                 case 1:

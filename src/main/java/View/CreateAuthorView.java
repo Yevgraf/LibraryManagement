@@ -13,10 +13,22 @@ public class CreateAuthorView {
     private Scanner scanner;
     private AuthorController authorController;
 
+    /**
+     * Cria uma instância da classe CreateAuthorView.
+     *
+     * @param controller O controlador de autores.
+     */
     public CreateAuthorView(AuthorController controller) {
         scanner = new Scanner(System.in);
         authorController = controller;
     }
+
+    /**
+     * Permite a criação de um novo autor.
+     * Solicita o nome, endereço e data de nascimento do autor ao usuário.
+     * Chama o controlador para criar o autor correspondente.
+     * Exibe uma mensagem de sucesso ou de erro, caso ocorra uma exceção.
+     */
     public void createAuthor() {
         String name = getNameInput();
         String address = getAddressInput();
@@ -32,6 +44,12 @@ public class CreateAuthorView {
         }
     }
 
+    /**
+     * Obtém a entrada do usuário para o nome do autor.
+     * Valida se o nome não está vazio e solicita novamente caso esteja.
+     *
+     * @return O nome do autor inserido pelo usuário.
+     */
     private String getNameInput() {
         String name;
         do {
@@ -44,6 +62,12 @@ public class CreateAuthorView {
         return name;
     }
 
+    /**
+     * Obtém a entrada do usuário para o endereço do autor.
+     * Valida se o endereço não está vazio e solicita novamente caso esteja.
+     *
+     * @return O endereço do autor inserido pelo usuário.
+     */
     private String getAddressInput() {
         String address;
         do {
@@ -56,6 +80,12 @@ public class CreateAuthorView {
         return address;
     }
 
+    /**
+     * Obtém a entrada do usuário para a data de nascimento do autor.
+     * Valida se o formato da data está correto (DD/MM/AAAA) e solicita novamente caso esteja incorreto.
+     *
+     * @return A data de nascimento do autor inserida pelo usuário.
+     */
     private LocalDate getDateOfBirthInput() {
         while (true) {
             try {
@@ -70,7 +100,13 @@ public class CreateAuthorView {
         }
     }
 
-
+    /**
+     * Valida se a data de nascimento é anterior à data atual.
+     * Caso seja posterior, lança uma exceção com uma mensagem de erro.
+     *
+     * @param dateOfBirth A data de nascimento a ser validada.
+     * @throws IllegalArgumentException Se a data de nascimento for inválida.
+     */
     private void validateDateOfBirth(LocalDate dateOfBirth) {
         LocalDate currentDate = LocalDate.now();
         if (dateOfBirth.isAfter(currentDate)) {
@@ -78,7 +114,10 @@ public class CreateAuthorView {
         }
     }
 
-
+    /**
+     * Lista todos os autores existentes.
+     * Obtém a lista de autores do controlador e os exibe no console.
+     */
     public void listAuthors() {
         List<Author> authors = authorController.listAuthors();
         for (Author author : authors) {

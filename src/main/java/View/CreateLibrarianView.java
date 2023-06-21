@@ -14,11 +14,19 @@ public class CreateLibrarianView {
     private Scanner scanner;
     private LibrarianController librarianController;
 
+    /**
+     * Cria uma instância de CreateLibrarianView.
+     *
+     * @param controller o controlador de bibliotecários associado à view
+     */
     public CreateLibrarianView(LibrarianController controller) {
         scanner = new Scanner(System.in);
         librarianController = controller;
     }
 
+    /**
+     * Executa o processo de criação de um novo bibliotecário.
+     */
     public void createLibrarian() {
         String name = getNameInput();
         String address = getAddressInput();
@@ -60,7 +68,6 @@ public class CreateLibrarianView {
         }
         return address;
     }
-
 
     private LocalDate getBirthDateInput() {
         LocalDate birthDate = null;
@@ -126,7 +133,6 @@ public class CreateLibrarianView {
         return password;
     }
 
-
     private void validateBirthDate(LocalDate birthDate) {
         LocalDate currentDate = LocalDate.now();
         if (birthDate.isAfter(currentDate)) {
@@ -140,6 +146,9 @@ public class CreateLibrarianView {
         }
     }
 
+    /**
+     * Lista os bibliotecários cadastrados.
+     */
     public void listLibrarians() {
         List<Librarian> librarians = librarianController.listLibrarians();
         for (Librarian librarian : librarians) {

@@ -13,6 +13,11 @@ public class CategoryMenu {
     private CreateCategoryView createCategoryView;
     private MainMenu mainMenu;
 
+    /**
+     * Cria um menu para categorias.
+     *
+     * @param mainMenu O menu principal do programa.
+     */
     public CategoryMenu(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
@@ -21,6 +26,10 @@ public class CategoryMenu {
         createCategoryView = new CreateCategoryView(categoryController);
     }
 
+    /**
+     * Inicia o menu de categorias.
+     * Permanece em um loop contínuo até que o usuário escolha a opção de voltar.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");
@@ -48,6 +57,9 @@ public class CategoryMenu {
         }
     }
 
+    /**
+     * Lista todas as categorias.
+     */
     private void listCategories() {
         List<Category> categories = categoryController.listCategories();
         System.out.println("Lista de categorias:");

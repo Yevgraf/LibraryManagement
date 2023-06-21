@@ -6,6 +6,9 @@ import Controller.ReservationController;
 
 import java.util.Scanner;
 
+/**
+ * A classe ReservationMenu representa o menu de reservas.
+ */
 public class ReservationMenu {
     private Scanner scanner;
     private ReservationController reservationController;
@@ -13,6 +16,13 @@ public class ReservationMenu {
     private RemoveReservationView removeReservationView;
     private MainMenu mainMenu;
 
+    /**
+     * Construtor da classe ReservationMenu.
+     * @param mainMenu O menu principal.
+     * @param memberController O controlador de membros.
+     * @param bookController O controlador de livros.
+     * @param reservationController O controlador de reservas.
+     */
     public ReservationMenu(MainMenu mainMenu, MemberController memberController, BookController bookController, ReservationController reservationController) {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
@@ -21,6 +31,10 @@ public class ReservationMenu {
         removeReservationView = new RemoveReservationView(reservationController, scanner);
     }
 
+    /**
+     * Inicia o menu de reservas.
+     * Exibe as opções disponíveis e processa a escolha do usuário.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");

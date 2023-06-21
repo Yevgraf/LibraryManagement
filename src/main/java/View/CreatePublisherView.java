@@ -8,11 +8,19 @@ public class CreatePublisherView {
     private Scanner scanner;
     private PublisherController publisherController;
 
+    /**
+     * Cria uma instância de CreatePublisherView.
+     *
+     * @param publisherController o controlador de editoras associado à view
+     */
     public CreatePublisherView(PublisherController publisherController) {
         scanner = new Scanner(System.in);
         this.publisherController = publisherController;
     }
 
+    /**
+     * Executa o processo de criação de uma nova editora.
+     */
     public void createPublisher() {
         String name = getNameInput();
         String address = getAddressInput();
@@ -36,5 +44,4 @@ public class CreatePublisherView {
         String address = scanner.nextLine().trim();
         return !address.isEmpty() ? address : null;
     }
-
 }

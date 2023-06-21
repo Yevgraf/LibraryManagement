@@ -22,6 +22,11 @@ public class BookMenu {
     private ReservationController reservationController;
 
 
+    /**
+     * Cria um menu de livros.
+     *
+     * @param mainMenu O menu principal do programa.
+     */
     public BookMenu(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
@@ -33,18 +38,22 @@ public class BookMenu {
         PublisherData publisherData = new PublisherData();
         ReservationData reservationData = new ReservationData();
         MemberData memberData = new MemberData();
-        CDData cdData = new CDData();  // Instantiate CDData
+        CDData cdData = new CDData();  // Instancia CDData
         bookController = new BookController(bookData, authorData, ageRangeData, categoryData, publisherData, scanner);
         authorController = new AuthorController(authorData);
         ageRangeController = new AgeRangeController(ageRangeData);
         categoryController = new CategoryController(categoryData);
         publisherController = new PublisherController(publisherData);
-        CDController cdController = new CDController(cdData, categoryData);  // Instantiate CDController
+        CDController cdController = new CDController(cdData, categoryData);  // Instancia CDController
         createBookView = new CreateBookView(bookController, authorController, ageRangeController, categoryController, publisherController, scanner);
-        reservationController = new ReservationController(reservationData, memberData, bookData, cdData);  // Pass cdData to ReservationController
+        reservationController = new ReservationController(reservationData, memberData, bookData, cdData);  // Passa cdData para ReservationController
     }
 
 
+    /**
+     * Exibe o menu de livros.
+     * Permanece em um loop contínuo até que o usuário escolha a opção de voltar ao menu principal.
+     */
     public void displayMenu() {
         int choice = -1;
         while (choice != 0) {
@@ -83,6 +92,9 @@ public class BookMenu {
         }
     }
 
+    /**
+     * Lista todos os livros disponíveis.
+     */
     private void listBooks() {
         List<Book> bookList = bookController.listBooks();
         if (bookList.isEmpty()) {
@@ -95,7 +107,9 @@ public class BookMenu {
         }
     }
 
-
+    /**
+     * Remove um livro da lista.
+     */
     public void removeBook() {
         List<Book> bookList = bookController.listBooks();
 
@@ -120,6 +134,11 @@ public class BookMenu {
         }
     }
 
+    /**
+     * Exibe a lista de livros disponíveis.
+     *
+     * @param bookList A lista de livros.
+     */
     public void displayBookList(List<Book> bookList) {
         if (bookList.isEmpty()) {
             System.out.println("Nenhum livro encontrado na base de dados.");
@@ -133,6 +152,11 @@ public class BookMenu {
         }
     }
 
+    /**
+     * Obtém o índice do livro selecionado pelo usuário.
+     *
+     * @return O índice do livro selecionado.
+     */
     public int getSelectedBookIndex() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Insira o índice do livro: ");
@@ -152,15 +176,21 @@ public class BookMenu {
         return selectedIndex;
     }
 
-
+    /**
+     * Exibe uma mensagem de sucesso ao remover um livro.
+     *
+     * @param bookTitle O título do livro removido.
+     */
     public void showSuccessMessage(String bookTitle) {
         System.out.println("O livro \"" + bookTitle + "\" foi removido com sucesso.");
     }
 
+    /**
+     * Exibe uma mensagem de falha ao remover um livro.
+     *
+     * @param bookTitle O título do livro que falhou ao remover.
+     */
     public void showFailureMessage(String bookTitle) {
         System.out.println("Falha ao remover o livro \"" + bookTitle + "\".");
     }
-
-
-
 }

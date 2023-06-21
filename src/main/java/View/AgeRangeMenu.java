@@ -13,6 +13,11 @@ public class AgeRangeMenu {
     private CreateAgeRangeView createAgeRangeView;
     private MainMenu mainMenu;
 
+    /**
+     * Cria um menu de faixas etárias.
+     *
+     * @param mainMenu O menu principal do programa.
+     */
     public AgeRangeMenu(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
@@ -21,6 +26,10 @@ public class AgeRangeMenu {
         createAgeRangeView = new CreateAgeRangeView(ageRangeController);
     }
 
+    /**
+     * Inicia o menu de faixas etárias.
+     * Permanece em um loop contínuo até que o usuário decida voltar ao menu principal.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");
@@ -29,7 +38,7 @@ public class AgeRangeMenu {
             System.out.println("3. Voltar");
 
             int option = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); // Consumir o caractere de nova linha
 
             switch (option) {
                 case 1:

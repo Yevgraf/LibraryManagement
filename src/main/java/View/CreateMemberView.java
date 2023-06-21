@@ -15,11 +15,19 @@ public class CreateMemberView {
     private Scanner scanner;
     private MemberController memberController;
 
+    /**
+     * Cria uma instância de CreateMemberView.
+     *
+     * @param controller o controlador de membros associado à view
+     */
     public CreateMemberView(MemberController controller) {
         scanner = new Scanner(System.in);
         memberController = controller;
     }
 
+    /**
+     * Executa o processo de criação de um novo membro.
+     */
     public void createMember() {
         String name = enterMemberName();
         String address = enterMemberAddress();
@@ -102,10 +110,9 @@ public class CreateMemberView {
         return matcher.matches();
     }
 
-
-
-
-
+    /**
+     * Lista os membros cadastrados.
+     */
     public void listMembers() {
         List<Member> members = memberController.listMembers();
         for (Member member : members) {

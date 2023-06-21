@@ -22,6 +22,14 @@ public class CreateReservationView {
     private ReservationController reservationController;
     private Scanner scanner;
 
+    /**
+     * Cria uma instância de CreateReservationView.
+     *
+     * @param memberController      o controlador de membros associado à view
+     * @param bookController        o controlador de livros associado à view
+     * @param reservationController o controlador de reservas associado à view
+     * @param scanner               o scanner utilizado para entrada de dados
+     */
     public CreateReservationView(MemberController memberController, BookController bookController, ReservationController reservationController, Scanner scanner) {
         this.memberController = memberController;
         this.bookController = bookController;
@@ -29,8 +37,11 @@ public class CreateReservationView {
         this.scanner = scanner;
     }
 
+    /**
+     * Executa o processo de criação de uma nova reserva.
+     */
     public void createReservation() {
-        // Obtain the necessary inputs
+        // Obter as entradas necessárias
         List<Member> members = reservationController.getAllMembers();
         List<Book> books = reservationController.getAllBooks();
         List<CD> cds = reservationController.getAllCDs();
@@ -40,13 +51,13 @@ public class CreateReservationView {
         List<CD> selectedCDs = selectItems("CD", cds, 3);
         LocalDate endDate = getEndDateInput();
 
-        // Check if any of the inputs are null or empty
+        // Verificar se alguma das entradas é nula ou vazia
         if (selectedMember == null || (selectedBooks.isEmpty() && selectedCDs.isEmpty()) || endDate == null) {
-            System.out.println("Erro: Reserva não criada devido a inputs inválidos.");
+            System.out.println("Erro: Reserva não criada devido a entradas inválidas.");
             return;
         }
 
-        // Pass the inputs to the addReservation() method
+        // Passar as entradas para o método addReservation()
         reservationController.addReservation(selectedMember, selectedBooks, selectedCDs, endDate);
     }
 
@@ -67,7 +78,15 @@ public class CreateReservationView {
         return null;
     }
 
-    //TODO ao selecionar os itens os itemsRemaining não podem dar reset quando passa para os cds
+    /**
+     * Seleciona os itens (livros ou CDs) para a reserva.
+     *
+     * @param itemType   o tipo de item a ser selecionado (livro ou CD)
+     * @param items      a lista de itens disponíveis para seleção
+     * @param maxItems   o número máximo de itens que podem ser selecionados
+     * @param <T>        o tipo genérico do item
+     * @return a lista de itens selecionados
+     */
     private <T> List<T> selectItems(String itemType, List<T> items, int maxItems) {
         List<T> selectedItems = new ArrayList<>();
 
@@ -100,8 +119,11 @@ public class CreateReservationView {
         return selectedItems;
     }
 
-
-
+    /**
+     * Obtém a entrada da data de término da reserva.
+     *
+     * @return a data de término da reserva
+     */
     private LocalDate getEndDateInput() {
         System.out.print("Digite a data de término (DD/MM/AAAA): ");
         String endDateString = scanner.next();
@@ -114,13 +136,23 @@ public class CreateReservationView {
         }
     }
 
-    //TODO ALTERAR displayMembers para listar por ordem (1,2,3..) e não pelo id do membro
+    /**
+     * Exibe na saída padrão a lista de membros disponíveis para seleção.
+     *
+     * @param members a lista de membros
+     */
     private void displayMembers(List<Member> members) {
         for (Member member : members) {
             System.out.println(member.getId() + ". " + member.getName());
         }
     }
 
+    /**
+     * Exibe na saída padrão a lista de itens disponíveis para seleção.
+     *
+     * @param items a lista de itens
+     * @param <T>   o tipo genérico do item
+     */
     private <T> void displayItems(List<T> items) {
         for (int i = 0; i < items.size(); i++) {
             T item = items.get(i);
@@ -134,6 +166,9 @@ public class CreateReservationView {
         }
     }
 
+    /**
+     * Lista todas as reservas.
+     */
     public void listAllReservations() {
         List<Reservation> reservations = reservationController.getAllReservations();
 

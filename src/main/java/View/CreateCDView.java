@@ -13,12 +13,22 @@ public class CreateCDView {
     private ArtistController artistController;
     private Scanner scanner;
 
+    /**
+     * Cria uma instância de CreateCDView.
+     *
+     * @param cdController      o controlador de CDs associado à view
+     * @param artistController  o controlador de artistas associado à view
+     * @param scanner           o scanner utilizado para entrada do usuário
+     */
     public CreateCDView(CDController cdController, ArtistController artistController, Scanner scanner) {
         this.cdController = cdController;
         this.artistController = artistController;
         this.scanner = scanner;
     }
 
+    /**
+     * Executa o processo de criação de um novo CD.
+     */
     public void createCD() {
         System.out.println("Criar novo CD:");
         System.out.print("Título: ");
@@ -33,7 +43,7 @@ public class CreateCDView {
 
         System.out.print("Artista (escolha o número): ");
         int artistIndex = scanner.nextInt();
-        scanner.nextLine(); // Consume the newline character
+        scanner.nextLine(); // Consumir o caractere de nova linha
 
         if (artistIndex >= 1 && artistIndex <= artists.size()) {
             Artist selectedArtist = artists.get(artistIndex - 1);
@@ -51,7 +61,7 @@ public class CreateCDView {
 
             System.out.print("Número de faixas: ");
             int numTracks = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
+            scanner.nextLine(); // Consumir o caractere de nova linha
 
             List<Category> categories = cdController.listCategories();
             System.out.println("Categorias disponíveis:");
@@ -62,14 +72,14 @@ public class CreateCDView {
 
             System.out.print("Categoria (escolha o número): ");
             int categoryIndex = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
+            scanner.nextLine(); // Consumir o caractere de nova linha
 
             if (categoryIndex >= 1 && categoryIndex <= categories.size()) {
                 Category selectedCategory = categories.get(categoryIndex - 1);
 
                 System.out.print("Quantidade: ");
                 int quantity = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline character
+                scanner.nextLine(); // Consumir o caractere de nova linha
 
                 try {
                     cdController.createCD(title, selectedArtist, releaseYear, numTracks, selectedCategory, quantity);
@@ -83,7 +93,4 @@ public class CreateCDView {
             System.out.println("Artista inválido. Operação cancelada.");
         }
     }
-
-
-
 }

@@ -13,17 +13,28 @@ public class CDMenu {
     private ArtistController artistController;
     private MainMenu mainMenu;
 
+    /**
+     * Cria um menu para CDs.
+     *
+     * @param mainMenu      O menu principal do programa.
+     * @param cdController  O controlador de CDs.
+     * @param scanner       O objeto Scanner para entrada de dados.
+     */
     public CDMenu(MainMenu mainMenu, CDController cdController, Scanner scanner) {
         this.mainMenu = mainMenu;
         this.cdController = cdController;
         this.scanner = scanner;
 
-        // Initialize the artistController object
+        // Inicializa o objeto artistController
         this.artistController = new ArtistController();
 
         createCDView = new CreateCDView(cdController, artistController, scanner);
     }
 
+    /**
+     * Exibe o menu de CDs.
+     * Permanece em um loop contínuo até que o usuário escolha a opção de voltar.
+     */
     public void displayMenu() {
         int choice = -1;
         while (choice != 0) {

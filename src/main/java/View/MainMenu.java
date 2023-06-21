@@ -6,6 +6,9 @@ import Model.*;
 
 import java.util.Scanner;
 
+/**
+ * A classe MainMenu representa o menu principal da aplicação da biblioteca.
+ */
 public class MainMenu {
     private Scanner scanner;
     private AuthorMenu authorMenu;
@@ -20,6 +23,10 @@ public class MainMenu {
     private CDMenu cdMenu;
     private CreateArtistView createArtistView;
 
+    /**
+     * Construtor da classe MainMenu.
+     * Inicializa as instâncias dos controladores, menus e dados necessários.
+     */
     public MainMenu() {
         scanner = new Scanner(System.in);
         MemberData memberData = new MemberData();
@@ -32,7 +39,7 @@ public class MainMenu {
         CDData cdData = new CDData();
         CardController cardController = new CardController(cardData);
         ReservationData reservationData = new ReservationData();
-        ReservationController reservationController = new ReservationController(reservationData, memberData, bookData, cdData); // Pass CDData instance
+        ReservationController reservationController = new ReservationController(reservationData, memberData, bookData, cdData);
         MemberController memberController = new MemberController(memberData, scanner);
         BookController bookController = new BookController(bookData, authorData, ageRangeData, categoryData, publisherData, scanner);
 
@@ -46,10 +53,12 @@ public class MainMenu {
         ageRangeMenu = new AgeRangeMenu(this);
         bookMenu = new BookMenu(this);
         reservationMenu = new ReservationMenu(this, memberController, bookController, reservationController);
-        cdMenu = new CDMenu(this, new CDController(cdData, categoryData), scanner); // Initialize CDMenu with CDController and scanner
+        cdMenu = new CDMenu(this, new CDController(cdData, categoryData), scanner);
     }
 
-
+    /**
+     * Exibe o menu principal da aplicação.
+     */
     public void displayMenu() {
         System.out.println("===================================");
         System.out.println("| Bem-vindo à biblioteca!        |");
@@ -64,7 +73,7 @@ public class MainMenu {
         System.out.println("| 7 - Gestão de categorias       |");
         System.out.println("| 8 - Gestão de faixa etária     |");
         System.out.println("| 9 - Gestão de livros           |");
-        System.out.println("| 10 - Gestão de CDs             |"); // Add CD menu option
+        System.out.println("| 10 - Gestão de CDs             |");
         System.out.println("| 0 - Sair                       |");
         System.out.println("===================================");
 
@@ -80,7 +89,7 @@ public class MainMenu {
                 break;
             case 3:
                 createArtistView.start();
-
+                break;
             case 4:
                 librarianMenu.start();
                 break;
@@ -100,7 +109,7 @@ public class MainMenu {
                 bookMenu.displayMenu();
                 break;
             case 10:
-                cdMenu.displayMenu(); // Call displayMenu() from CDMenu
+                cdMenu.displayMenu();
                 break;
             case 0:
                 System.out.println("Até logo!");
