@@ -125,7 +125,7 @@ public class ReservationData {
 
 
 
-    private Book loadBook(int bookId) {
+    private static Book loadBook(int bookId) {
         Book book = null;
         try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE id = ?")) {
 
@@ -160,7 +160,7 @@ public class ReservationData {
         return book;
     }
 
-    private Member loadMemberById(int memberId) {
+    private static Member loadMemberById(int memberId) {
         Member member = null;
 
         try (Connection connection = DBconn.getConn(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Member WHERE id = ?")) {
@@ -190,7 +190,7 @@ public class ReservationData {
         return member;
     }
 
-    private User loadLibraryUserById(int userId) {
+    private static User loadLibraryUserById(int userId) {
         User libraryUser = null;
 
         try (Connection connection = DBconn.getConn(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.LibraryUser WHERE id = ?")) {
@@ -215,7 +215,7 @@ public class ReservationData {
         return libraryUser;
     }
 
-    private Artist loadArtistById(int artistId) {
+    private static Artist loadArtistById(int artistId) {
         Artist artist = null;
         try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Artist WHERE id = ?")) {
 
@@ -237,7 +237,7 @@ public class ReservationData {
     }
 
 
-    private CD loadCD(int cdId) {
+    private static CD loadCD(int cdId) {
         CD cd = null;
         try (Connection connection = DBconn.getConn();
              PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE id = ?")) {
@@ -320,7 +320,7 @@ public class ReservationData {
             System.err.println("Erro ao atualizar estado de reserva: " + e.getMessage());
         }
     }
-    public List<Reservation> load() {
+    public static List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();
         try (Connection connection = DBconn.getConn();
              PreparedStatement selectStatement = connection.prepareStatement("SELECT r.*, p.type, rp.productId " +
@@ -423,7 +423,7 @@ public class ReservationData {
     }
 
 
-    private Reservation findReservationById(List<Reservation> reservations, int id) {
+    private static Reservation findReservationById(List<Reservation> reservations, int id) {
         for (Reservation reservation : reservations) {
             if (reservation.getId() == id) {
                 return reservation;

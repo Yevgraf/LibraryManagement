@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import Data.LibrarianData;
 import Model.Librarian;
+import Model.Member;
+import Model.User;
 
 public class LibrarianController {
     private LibrarianData librarianData;
@@ -90,16 +92,25 @@ public class LibrarianController {
     }
 
     public static boolean login(String email, String password) {
-        List<Librarian> userList = LibrarianData.load();
+        List<User> userList = LibrarianData.loadUsers();
 
-        for (Librarian user : userList) {
-            if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                return true;
+        for (User user : userList) {
+            if (user instanceof Librarian) {
+                Librarian librarian = (Librarian) user;
+                if (librarian.getEmail().equals(email) && librarian.getPassword().equals(password)) {
+                    return true;
+                }
+            } else if (user instanceof Member) {
+                Member member = (Member) user;
+                if (member.getEmail().equals(email) && member.getPassword().equals(password)) {
+                    return true;
+                }
             }
         }
 
         return false;
     }
+
 
     public void deleteLibrarian() {
         List<Librarian> librarianList = librarianData.load();

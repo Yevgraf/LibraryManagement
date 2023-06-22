@@ -1,5 +1,7 @@
 package Model;
 
+import Data.MemberData;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,10 +25,23 @@ public class Member extends User  {
         this.borrowedBooks = new ArrayList<>();
         this.borrowedCDs = new ArrayList<>();
     }
-    @Override
+
+    public Member(String name, String address, LocalDate birthDate, String phone, String email, int maxBorrowedBooks, String password) {
+        super(name, address, birthDate, phone, email);
+        this.maxBorrowedBooks = maxBorrowedBooks;
+        this.password = password;
+        this.borrowedBooks = new ArrayList<>();
+        this.borrowedCDs = new ArrayList<>();
+    }
+
+    public Member(int memberId) {
+        this.id = memberId;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
+
 
     public String getPassword() {
         return password;
@@ -157,6 +172,7 @@ public class Member extends User  {
         this.borrowedCDs = borrowedCDs;
     }
 
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -172,7 +188,6 @@ public class Member extends User  {
                 .collect(Collectors.joining(", ")));
         return sb.toString();
     }
-
 
     public void addBorrowedBook(Book book) {
         borrowedBooks.add(book);
