@@ -370,6 +370,57 @@ public class ReservationData {
         }
         return reservations;
     }
+    public List<Reservation> loadReserved() {
+        List<Reservation> reservations = new ArrayList<>();
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement selectStatement = connection.prepareStatement("SELECT r.*, p.type, rp.productId " +
+                     "FROM dbo.Reservation AS r " +
+                     "INNER JOIN dbo.ReservationProduct AS rp ON r.id = rp.reservationId " +
+                     "INNER JOIN dbo.Product AS p ON rp.productId = p.id " +
+                     "WHERE r.state = 'RESERVADO'");
+             ResultSet resultSet = selectStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int memberId = resultSet.getInt("memberId");
+                LocalDate startDate = resultSet.getDate("startDate").toLocalDate();
+                LocalDate endDate = resultSet.getDate("endDate").toLocalDate();
+                State state = State.valueOf(resultSet.getString("state"));
+                int satisfactionRating = resultSet.getInt("satisfactionRating");
+                String additionalComments = resultSet.getString("additionalComments");
+                String productType = resultSet.getString("type");
+                int productId = resultSet.getInt("productId");
+
+                Member member = loadMemberById(memberId);
+
+                Reservation reservation = findReservationById(reservations, id);
+                if (reservation == null) {
+                    reservation = new Reservation(member, startDate, endDate);
+                    reservation.setId(id);
+                    reservation.setState(state);
+                    reservation.setSatisfactionRating(satisfactionRating);
+                    reservation.setAdditionalComments(additionalComments);
+                    reservations.add(reservation);
+                }
+
+                // Load associated products
+                if (productType.equals("book")) {
+                    Book book = loadBook(productId);
+                    if (book != null) {
+                        reservation.addBook(book);
+                    }
+                } else if (productType.equals("cd")) {
+                    CD cd = loadCD(productId);
+                    if (cd != null) {
+                        reservation.addCD(cd);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error while loading reservations from the database: " + e.getMessage());
+        }
+        return reservations;
+    }
 
 
     private Reservation findReservationById(List<Reservation> reservations, int id) {

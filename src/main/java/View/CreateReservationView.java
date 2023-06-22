@@ -124,11 +124,11 @@ public class CreateReservationView {
         }
 
         if (itemsRemaining > 0) {
-            System.out.println("0. Voltar");
             System.out.println("Itens restantes: " + itemsRemaining);
-        } else {
-            System.out.println("0. Voltar");
         }
+
+        System.out.println("0. Voltar");
+        System.out.println();
     }
 
 
@@ -205,7 +205,14 @@ public class CreateReservationView {
             return selectMember(members); // Retry the selection
         }
 
-        return members.get(memberNumber - 1);
+        Member selectedMember = members.get(memberNumber - 1);
+        int memberItemNumber = selectedMember.getBorrowedBooks().size() + selectedMember.getBorrowedCDs().size();
+        if (memberItemNumber >= 3) {
+            System.out.println("Esse membro já atingiu o limite máximo de produtos reservados.");
+            return selectMember(members); // Retry the selection
+        }
+
+        return selectedMember;
     }
 
     private void displayMembers(List<Member> members) {
@@ -242,9 +249,8 @@ public class CreateReservationView {
 
         while (maxItems > 0) {
             System.out.println("Itens encontrados:");
-            displayItems(matchedBooks, "Livro", matchedBooks.size());
-            displayItems(matchedCDs, "CD", matchedCDs.size());
-            System.out.println("0. Voltar");
+            displayItems(matchedBooks, "Livro", maxItems);  // Ajuste feito aqui
+            displayItems(matchedCDs, "CD", maxItems);  // Ajuste feito aqui
 
             int option = readOptionNumber();
 
@@ -273,10 +279,8 @@ public class CreateReservationView {
             }
         }
 
-        return itemsSelected > 0 ? itemsSelected : 0; // Retorna 0 apenas se nenhum item foi selecionado
+        return itemsSelected > 0 ? itemsSelected : 0;
     }
-
-
 
 
     public void listAllReservations() {

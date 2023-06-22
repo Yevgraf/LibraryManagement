@@ -85,14 +85,15 @@ public class ReservationController {
 
     private List<Reservation> filterMatchingReservations(List<Reservation> reservations) {
         return reservations.stream()
-                .filter(reservation -> reservation.getState() == State.RESERVADO &&
-                        (!reservation.getBooks().isEmpty() || !reservation.getCds().isEmpty()))
+                .filter(reservation -> !reservation.getBooks().isEmpty() || !reservation.getCds().isEmpty())
                 .collect(Collectors.toList());
     }
 
+
+
     public void deliverReservation() {
         try {
-            List<Reservation> reservations = reservationData.load();
+            List<Reservation> reservations = reservationData.loadReserved();
 
             List<Reservation> matchingReservations = filterMatchingReservations(reservations);
 
@@ -125,6 +126,7 @@ public class ReservationController {
         }
     }
 
+
     private void displayReservations(List<Reservation> reservations) {
         System.out.println("Reservas encontradas:");
 
@@ -156,6 +158,8 @@ public class ReservationController {
 
             reservationInfo.append("   - Email: ").append(member.getEmail()).append("\n");
             reservationInfo.append("   - Data de devolução: ").append(reservation.getEndDate() != null ? reservation.getEndDate() : "N/A");
+
+            reservationInfo.append("\n"); // Add a line break after each reservation
 
             System.out.println(reservationInfo.toString());
         }
