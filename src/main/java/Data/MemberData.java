@@ -12,16 +12,14 @@ import Model.*;
 
 public class MemberData {
 
-
     public static void save(List<? extends User> userList) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement userStatement = connection.prepareStatement("INSERT INTO LibraryUser (name, address, birthDate, phone, email) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement memberStatement = connection.prepareStatement("INSERT INTO Member (userId, name, address, birthDate, phone, email, maxBorrowedBooks) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+             PreparedStatement memberStatement = connection.prepareStatement("INSERT INTO Member (userId, name, address, birthDate, phone, email, maxBorrowedBooks, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
 
             for (User user : userList) {
                 // Check if user, librarian, or member already exists
                 if (isUserExists(connection, user.getEmail()) || isLibrarianExists(connection, user.getEmail()) || isMemberExists(connection, user.getEmail())) {
-
                     continue; // Skip this user and proceed to the next
                 }
 
@@ -44,6 +42,7 @@ public class MemberData {
                         memberStatement.setString(5, member.getPhone());
                         memberStatement.setString(6, member.getEmail());
                         memberStatement.setInt(7, member.getMaxBorrowedBooks());
+                        memberStatement.setString(8, member.getPassword());
                         memberStatement.executeUpdate();
                     }
                 }
@@ -52,6 +51,8 @@ public class MemberData {
             System.err.println("Erro ao guardar utilizadores na base de dados: " + e.getMessage());
         }
     }
+
+
 
 
     private static boolean isMemberExists(Connection connection, String email) throws SQLException {

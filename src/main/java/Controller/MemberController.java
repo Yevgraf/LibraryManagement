@@ -24,7 +24,6 @@ public class MemberController {
     }
 
 
-
     public void createMember(String name, String address, LocalDate birthDate, String phone, String email) {
         if (isInvalidInput(name, address, birthDate, phone, email)) {
             System.out.println("Os dados de membro são inválidos. Não foi possível criar o membro.");
@@ -45,7 +44,6 @@ public class MemberController {
             String cardNumber = cardController.generateCardNumber(savedMember.getId());
             Card card = cardController.createCard(savedMember, cardNumber);
             savedMember.setCard(card);
-
 
             EmailController.sendEmail(savedMember.getEmail(), "Senha da sua conta", "Prezado(a) membro,\n\nA senha da sua conta é: " + password + "\n\nPor favor, mantenha-a em segurança.\n\nAtenciosamente,\nA BiblioSMF");
             System.out.println("Membro criado e guardado com sucesso. A senha foi enviada para o email do membro.");

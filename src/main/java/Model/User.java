@@ -18,7 +18,25 @@ public class User {
     private LocalDate birthDate;
     private String phone;
     private String email;
+    private String password;
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public User(int id, String name, String address, LocalDate birthDate, String phone, String email, String password) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.birthDate = birthDate;
+        this.phone = phone;
+        this.email = email;
+        this.password = password;
+    }
 
     public User(String name, String address, LocalDate birthDate, String phone, String email) {
         this.name = name;
@@ -101,6 +119,5 @@ public class User {
                         "\tEmail: %s\n",
                 name, address, birthDate, phone, email);
     }
-
 
 }
