@@ -64,15 +64,15 @@ public class CreateReservationView {
                     totalItemsSelected += cdsSelected;
                     break;
                 case 3:
-                    searchAndSelectItem(books, cds, selectedBooks, selectedCDs, totalItemsSelected);
+                    totalItemsSelected += searchAndSelectItem(books, cds, selectedBooks, selectedCDs, totalItemsSelected);
                     break;
                 case 4:
                     finalizeReservation(selectedMember, LocalDate.now().plusDays(7));
 
-                    return; // Exit the method after finalizing the reservation
+                    return;
                 case 0:
                     System.out.println("Seleção cancelada.");
-                    return; // Exit the method without creating a reservation
+                    return;
                 default:
                     System.out.println("Opção inválida. Tente novamente.");
                     break;
@@ -123,8 +123,12 @@ public class CreateReservationView {
             displayItemDetails(item);
         }
 
-        System.out.println("0. Voltar");
-        System.out.println("Itens restantes: " + itemsRemaining);
+        if (itemsRemaining > 0) {
+            System.out.println("0. Voltar");
+            System.out.println("Itens restantes: " + itemsRemaining);
+        } else {
+            System.out.println("0. Voltar");
+        }
     }
 
 
@@ -220,7 +224,8 @@ public class CreateReservationView {
 
         System.out.println("0. Voltar");
     }
-    private void searchAndSelectItem(List<Book> books, List<CD> cds, List<Book> selectedBooks, List<CD> selectedCDs, int totalItemsSelected) {
+
+    private int searchAndSelectItem(List<Book> books, List<CD> cds, List<Book> selectedBooks, List<CD> selectedCDs, int totalItemsSelected) {
         System.out.println("Digite o termo de pesquisa:");
         String searchTerm = scanner.nextLine();
 
@@ -229,42 +234,50 @@ public class CreateReservationView {
 
         if (matchedBooks.isEmpty() && matchedCDs.isEmpty()) {
             System.out.println("Nenhum item encontrado. Tente novamente.");
-            return;
+            return 0;
         }
 
-        while (true) {
-            System.out.println("Selecione uma opção:");
-            System.out.println("1. Listar Livros Encontrados");
-            System.out.println("2. Listar CDs Encontrados");
+        int itemsSelected = 0;
+        int maxItems = 3 - totalItemsSelected;
+
+        while (maxItems > 0) {
+            System.out.println("Itens encontrados:");
+            displayItems(matchedBooks, "Livro", matchedBooks.size());
+            displayItems(matchedCDs, "CD", matchedCDs.size());
             System.out.println("0. Voltar");
 
             int option = readOptionNumber();
 
-            switch (option) {
-                case 1:
-                    int booksSelected = selectItems(matchedBooks, "Livro", 3 - totalItemsSelected);
-                    totalItemsSelected += booksSelected;
-                    books.removeAll(selectedBooks);
-                    if (totalItemsSelected >= 3) {
-                        return;
-                    }
-                    break;
-                case 2:
-                    int cdsSelected = selectItems(matchedCDs, "CD", 3 - totalItemsSelected);
-                    totalItemsSelected += cdsSelected;
-                    cds.removeAll(selectedCDs);
-                    if (totalItemsSelected >= 3) {
-                        return;
-                    }
-                    break;
-                case 0:
-                    return;
-                default:
-                    System.out.println("Opção inválida. Tente novamente.");
-                    break;
+            if (option == 0) {
+                break;
+            } else if (option > 0 && option <= matchedBooks.size()) {
+                Book selectedBook = matchedBooks.get(option - 1);
+                selectedBooks.add(selectedBook);
+                books.remove(selectedBook);
+                itemsSelected++;
+                maxItems--;
+                System.out.println("Livro selecionado: " + selectedBook.toString());
+            } else if (option > matchedBooks.size() && option <= (matchedBooks.size() + matchedCDs.size())) {
+                CD selectedCD = matchedCDs.get(option - matchedBooks.size() - 1);
+                selectedCDs.add(selectedCD);
+                cds.remove(selectedCD);
+                itemsSelected++;
+                maxItems--;
+                System.out.println("CD selecionado: " + selectedCD.toString());
+            } else {
+                System.out.println("Opção inválida. Tente novamente.");
+            }
+
+            if (itemsSelected >= 3) {
+                break;
             }
         }
+
+        return itemsSelected > 0 ? itemsSelected : 0; // Retorna 0 apenas se nenhum item foi selecionado
     }
+
+
+
 
     public void listAllReservations() {
         List<Reservation> reservations = reservationController.getAllReservations();
