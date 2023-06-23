@@ -12,6 +12,11 @@ import static Data.BookData.loadCategoryById;
 
 public class ReservationData {
 
+    /**
+     * Saves a Reservation object to the database.
+     *
+     * @param reservation The Reservation object to be saved.
+     */
     public void save(Reservation reservation) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement selectStatement = connection.prepareStatement(

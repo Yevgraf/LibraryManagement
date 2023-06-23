@@ -13,6 +13,11 @@ import java.util.List;
 
 public class CDData {
 
+    /**
+     * Saves a CD to the database.
+     *
+     * @param cd The CD object to be saved.
+     */
     public void save(CD cd) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO dbo.Product (title, type, artistId, releaseYear, numTracks, categoryId, quantity) VALUES (?, 'cd', ?, ?, ?, ?, ?)")) {
@@ -115,6 +120,11 @@ public class CDData {
         return category;
     }
 
+    /**
+     * Decreases the quantity of a CD in the database by 1.
+     *
+     * @param cdId The ID of the CD.
+     */
     public void updateCDQuantityDecrease(int cdId) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Product SET quantity = quantity - 1 WHERE id = ?")) {
@@ -128,7 +138,11 @@ public class CDData {
         }
     }
 
-
+    /**
+     * Increases the quantity of a CD in the database by 1.
+     *
+     * @param productId The ID of the CD.
+     */
     public void updateCDQuantityIncrease(int productId) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Product SET quantity = quantity + 1 WHERE id = ?")) {

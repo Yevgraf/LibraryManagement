@@ -102,10 +102,6 @@ public class CreateMemberView {
         return matcher.matches();
     }
 
-
-
-
-
     public void listMembers() {
         List<Member> members = memberController.listMembers();
         for (Member member : members) {

@@ -10,12 +10,20 @@ import java.util.Scanner;
 public class SearchBooksView {
     private final BookController bookController;
     private final Scanner scanner;
-
+    /**
+     * Constructs a SearchBooksView object with the specified BookController and Scanner.
+     *
+     * @param bookController The BookController used to interact with book data.
+     * @param scanner        The Scanner used to read user input.
+     */
     public SearchBooksView(BookController bookController, Scanner scanner) {
         this.bookController = bookController;
         this.scanner = scanner;
     }
 
+    /**
+     * Displays the search options and handles the user's choice.
+     */
     public void searchBooks() {
         int option = -1;
         while (option != 0) {
@@ -47,7 +55,10 @@ public class SearchBooksView {
             }
         }
     }
-
+    /**
+     * Searches a book by ID or name entered by the user.
+     * Displays the search result or a message if the book is not found.
+     */
     private void searchBookByIdOrName() {
         System.out.println("Digite o titulo ou ISBN do livro para procurar:");
         String searchTerm = scanner.nextLine();
@@ -61,7 +72,10 @@ public class SearchBooksView {
             System.out.println(result);
         }
     }
-
+    /**
+     * Searches books by category chosen by the user.
+     * Displays the search result or a message if no books are found in the category.
+     */
     private void searchBooksByCategory() {
         System.out.println("Categorias:");
 
@@ -73,6 +87,10 @@ public class SearchBooksView {
         }
     }
 
+    /**
+     * Searches books by author chosen by the user.
+     * Displays the search result or a message if no books are found for the author.
+     */
     private void searchBooksByAuthor() {
         System.out.println("Autores:");
 

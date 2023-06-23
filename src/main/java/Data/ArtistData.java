@@ -9,6 +9,11 @@ import java.util.List;
 
 public class ArtistData {
 
+    /**
+     * Saves the given list of artists to the database.
+     *
+     * @param artistList The list of artists to be saved.
+     */
     public static void save(List<Artist> artistList) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("INSERT INTO Artist (name) VALUES (?)")) {
@@ -24,7 +29,11 @@ public class ArtistData {
             System.err.println("Erro ao guardar artistas na base de dados: " + e.getMessage());
         }
     }
-
+    /**
+     * Loads all artists from the database.
+     *
+     * @return A list of artists loaded from the database.
+     */
     public static List<Artist> load() {
         List<Artist> artistList = new ArrayList<>();
         try (Connection connection = DBconn.getConn();
@@ -44,6 +53,14 @@ public class ArtistData {
         return artistList;
     }
 
+    /**
+     * Checks if an artist with the same name already exists in the database.
+     *
+     * @param connection The database connection.
+     * @param artist     The artist to check for existence.
+     * @return true if the artist exists, false otherwise.
+     * @throws SQLException if a database access error occurs.
+     */
     private static boolean isArtistExists(Connection connection, Artist artist) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM Artist WHERE name = ?");
         statement.setString(1, artist.getName());
@@ -55,7 +72,11 @@ public class ArtistData {
         return false;
     }
 
-
+    /**
+     * Retrieves a list of all artists from the database.
+     *
+     * @return A list of all artists.
+     */
     public List<Artist> listArtists() {
         return load();
     }

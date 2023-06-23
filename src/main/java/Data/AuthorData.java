@@ -11,7 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AuthorData {
-
+    /**
+     * Saves the given list of authors to the database.
+     *
+     * @param authorList The list of authors to be saved.
+     */
     public static void save(List<Author> authorList) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("INSERT INTO " + "Author" + " (name, address, birthDate) VALUES (?, ?, ?)")) {
@@ -30,6 +34,11 @@ public class AuthorData {
         }
     }
 
+    /**
+     * Loads all authors from the database.
+     *
+     * @return A list of authors loaded from the database.
+     */
     public static List<Author> load() {
         List<Author> authorList = new ArrayList<>();
         try (Connection connection = DBconn.getConn();
@@ -51,7 +60,14 @@ public class AuthorData {
         }
         return authorList;
     }
-
+    /**
+     * Checks if an author with the same name, address, and birth date already exists in the database.
+     *
+     * @param connection The database connection.
+     * @param author     The author to check for existence.
+     * @return true if the author exists, false otherwise.
+     * @throws SQLException if a database access error occurs.
+     */
     private static boolean isAuthorExists(Connection connection, Author author) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM " + "Author" + " WHERE name = ? AND address = ? AND birthDate = ?");
         statement.setString(1, author.getName());
@@ -64,6 +80,13 @@ public class AuthorData {
         }
         return false;
     }
+
+    /**
+     * Retrieves an author with the specified name from the list of authors.
+     *
+     * @param name The name of the author to find.
+     * @return The author with the specified name, or null if not found.
+     */
     public Author findByName(String name) {
         List<Author> authorList = load();
         return authorList.stream()
@@ -71,6 +94,11 @@ public class AuthorData {
                 .findFirst()
                 .orElse(null);
     }
+    /**
+     * Retrieves a list of all authors from the database.
+     *
+     * @return A list of all authors.
+     */
     public List<Author> listAuthors() {
         return load();
     }

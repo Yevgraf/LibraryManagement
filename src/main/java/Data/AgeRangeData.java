@@ -15,6 +15,11 @@ import java.util.stream.Collectors;
 
 public class AgeRangeData {
 
+    /**
+     * Saves the given list of age ranges to the database.
+     *
+     * @param ageRanges The list of age ranges to be saved.
+     */
     public static void save(List<AgeRange> ageRanges) {
         try (Connection connection = DBconn.getConn()) {
             String query = "INSERT INTO AgeRange (description) VALUES (?)";
@@ -32,6 +37,14 @@ public class AgeRangeData {
             System.err.println("Erro ao guardar faixas etárias na base de dados: " + e.getMessage());
         }
     }
+    /**
+     * Checks if an age range with the specified description already exists in the database.
+     *
+     * @param connection  The database connection.
+     * @param description The description of the age range.
+     * @return true if the age range exists, false otherwise.
+     * @throws SQLException if a database access error occurs.
+     */
 
     private static boolean isAgeRangeExists(Connection connection, String description) throws SQLException {
         String query = "SELECT COUNT(*) FROM AgeRange WHERE description = ?";
@@ -45,7 +58,11 @@ public class AgeRangeData {
         return count > 0;
     }
 
-
+    /**
+     * Loads all age ranges from the database.
+     *
+     * @return A list of age ranges loaded from the database.
+     */
     public static List<AgeRange> load() {
         List<AgeRange> ageRanges = new ArrayList<>();
         try (Connection connection = DBconn.getConn();
@@ -63,6 +80,12 @@ public class AgeRangeData {
         return ageRanges;
     }
 
+    /**
+     * Finds an age range by its name.
+     *
+     * @param name The name of the age range to find.
+     * @return The age range with the specified name, or null if not found.
+     */
     public AgeRange findByName(String name) {
         List<AgeRange> ageRangeList = load();
         for (AgeRange ageRange : ageRangeList) {

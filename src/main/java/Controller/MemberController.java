@@ -23,7 +23,18 @@ public class MemberController {
         this.scanner = scanner;
     }
 
-
+    /**
+     * Creates a new member with the given information and saves it.
+     * Generates a random password for the member and sends it to their email address.
+     * Additionally, creates a card for the member and associates it with their account.
+     * If any error occurs during the process, appropriate error messages are displayed.
+     *
+     * @param name      The name of the member.
+     * @param address   The address of the member.
+     * @param birthDate The birth date of the member.
+     * @param phone     The phone number of the member.
+     * @param email     The email address of the member.
+     */
     public void createMember(String name, String address, LocalDate birthDate, String phone, String email) {
         if (isInvalidInput(name, address, birthDate, phone, email)) {
             System.out.println("Os dados de membro são inválidos. Não foi possível criar o membro.");
@@ -52,7 +63,11 @@ public class MemberController {
         }
     }
 
-
+    /**
+     * Generates a random password with a length of 12 characters.
+     *
+     * @return The randomly generated password.
+     */
     private String generateRandomPassword() {
         // gera password random com tamanho 12
         int length = 12;
@@ -67,7 +82,12 @@ public class MemberController {
         return password.toString();
     }
 
-
+    /**
+     * Retrieves a member with the given email address from the list of members.
+     *
+     * @param email The email address of the member to retrieve.
+     * @return The member object if found, or null if not found.
+     */
     public Member getMemberByEmail(String email) {
         List<Member> members = listMembers();
         for (Member member : members) {

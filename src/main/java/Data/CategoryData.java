@@ -8,7 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryData {
-
+    /**
+     * Saves the given list of categories to the database.
+     *
+     * @param categoryList The list of categories to be saved.
+     */
     public static void save(List<Category> categoryList) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("INSERT INTO " + "Category" + " (categoryName) VALUES (?)")) {
@@ -25,6 +29,11 @@ public class CategoryData {
         }
     }
 
+    /**
+     * Loads all categories from the database.
+     *
+     * @return A list of categories loaded from the database.
+     */
     public static List<Category> load() {
         List<Category> categoryList = new ArrayList<>();
         try (Connection connection = DBconn.getConn();

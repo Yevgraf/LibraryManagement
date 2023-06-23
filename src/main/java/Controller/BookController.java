@@ -36,6 +36,21 @@ public class BookController {
         this.scanner = scanner;
     }
 
+    /**
+     * Creates a new book with the specified details and saves it.
+     *
+     * @param title           The title of the book.
+     * @param subtitle        The subtitle of the book.
+     * @param authorName      The name of the author of the book.
+     * @param numPages        The number of pages in the book.
+     * @param categoryName    The name of the category to which the book belongs.
+     * @param publicationDate The publication date of the book.
+     * @param ageRangeName    The name of the age range for which the book is suitable.
+     * @param publisherName   The name of the publisher of the book.
+     * @param isbn            The ISBN (International Standard Book Number) of the book.
+     * @param quantity        The quantity of books to be created.
+     * @throws IllegalArgumentException if any of the input parameters are invalid or if a book with the same ISBN already exists.
+     */
     public void createBook(String title, String subtitle, String authorName, int numPages, String categoryName,
                            LocalDate publicationDate, String ageRangeName, String publisherName, String isbn, int quantity) {
         // Validations
@@ -105,8 +120,6 @@ public class BookController {
     }
 
 
-
-
     public Book findBookByIdOrName(String searchTerm) {
         List<Book> books = listBooks();
         Book bookByIsbn = null;
@@ -139,7 +152,11 @@ public class BookController {
                 .orElse(null);
     }
 
-
+    /**
+     * Searches for books based on a selected category and displays the results.
+     *
+     * @return A list of books belonging to the selected category.
+     */
     public List<Book> searchBooksByCategory() {
         List<Category> categories = categoryData.listCategories();
 
@@ -178,6 +195,13 @@ public class BookController {
         return books;
     }
 
+
+    /**
+     * Searches for books belonging to the specified category by category name.
+     *
+     * @param category The category for which to search books.
+     * @return A list of books belonging to the specified category.
+     */
     private List<Book> searchBooksByCategoryWithName(Category category) {
         List<Book> allBooks = bookData.listBooks();
 
@@ -188,10 +212,11 @@ public class BookController {
     }
 
 
-
-
-
-
+    /**
+     * Searches for books written by a selected author and displays the results.
+     *
+     * @return A list of books written by the selected author.
+     */
 
     public List<Book> searchBooksByAuthor() {
         List<Author> authors = authorData.listAuthors();
@@ -244,8 +269,6 @@ public class BookController {
 
         return books;
     }
-
-
 
 
 }

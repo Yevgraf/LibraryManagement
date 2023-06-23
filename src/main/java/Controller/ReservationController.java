@@ -90,7 +90,15 @@ public class ReservationController {
     }
 
 
-
+    /**
+     * Performs the delivery of a reservation.
+     * Retrieves the reserved reservations, filters the reservations with associated items,
+     * displays the reservations, prompts the user for selecting a reservation to update,
+     * updates the reservation state to 'ENTREGUE' (delivered), prompts the user for satisfaction rating and additional comments,
+     * updates the reservation with the provided information, updates the quantities of the associated items,
+     * and prints the updated reservation information.
+     * If any error occurs during the process, an error message is displayed.
+     */
     public void deliverReservation() {
         try {
             List<Reservation> reservations = reservationData.loadReserved();
@@ -126,7 +134,13 @@ public class ReservationController {
         }
     }
 
-
+    /**
+     * Displays the information of the given reservations.
+     * The reservation information includes the books and CDs associated with each reservation,
+     * the member's name and email, and the return date.
+     *
+     * @param reservations The list of reservations to display.
+     */
     private void displayReservations(List<Reservation> reservations) {
         System.out.println("Reservas encontradas:");
 

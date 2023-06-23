@@ -12,12 +12,23 @@ import java.util.Scanner;
 
 import static Data.MemberData.*;
 
+/**
+ * The main menu for a library member.
+ */
 public class MemberMainMenu {
     private Member member;
 
+    /**
+     * Constructs a new instance of the MemberMainMenu class with the specified member.
+     * @param member The library member.
+     */
     public MemberMainMenu(Member member) {
         this.member = member;
     }
+
+    /**
+     * Displays the main menu for the library member and handles user input.
+     */
     public void displayMenu() {
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
@@ -52,6 +63,10 @@ public class MemberMainMenu {
         displayMainMenu();
     }
 
+    /**
+     * Displays the reservation history for the member.
+     * @param member The library member.
+     */
     private void displayReservationHistory(Member member) {
         System.out.println("Histórico de Reservas para o Membro: " + member.getName());
 
@@ -70,6 +85,10 @@ public class MemberMainMenu {
         }
     }
 
+    /**
+     * Displays the satisfaction form responses for the member.
+     * @param member The library member.
+     */
     private void displaySatisfactionFormResponses(Member member) {
         System.out.println("Formulários de Satisfação para o Membro: " + member.getName());
 
@@ -85,6 +104,9 @@ public class MemberMainMenu {
         }
     }
 
+    /**
+     * Displays the main menu options.
+     */
     private void displayMainMenu() {
         System.out.println("---- Menu Principal do Membro ----");
         System.out.println("1. Visualizar Histórico de Reservas");
