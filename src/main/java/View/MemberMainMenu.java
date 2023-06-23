@@ -1,5 +1,7 @@
 package View;
 
+import Controller.LibrarianController;
+import Data.LibrarianData;
 import Data.MemberData;
 import Model.Member;
 import Model.Reservation;
@@ -39,7 +41,8 @@ public class MemberMainMenu {
                     displaySatisfactionFormResponses(member);
                     break;
                 case 0:
-                    exit = true;
+                    LoginView login = new LoginView(new LibrarianController(new LibrarianData()));
+                    login.login();
                     break;
                 default:
                     System.out.println("Opção inválida. Por favor, tente novamente.");

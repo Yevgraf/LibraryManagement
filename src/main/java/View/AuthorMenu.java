@@ -1,4 +1,3 @@
-
 package View;
 
 import java.util.Scanner;
@@ -20,6 +19,9 @@ public class AuthorMenu {
         createAuthorView = new CreateAuthorView(authorController);
     }
 
+    /**
+     * Starts the author menu and handles user input.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");

@@ -15,6 +15,9 @@ public class CreateAgeRangeView {
         ageRangeController = controller;
     }
 
+    /**
+     * Prompts the user to enter the description for a new age range and creates it using the ageRangeController.
+     */
     public void createAgeRange() {
         System.out.print("Descrição: ");
         String description = scanner.nextLine();
@@ -28,7 +31,9 @@ public class CreateAgeRangeView {
         }
     }
 
-
+    /**
+     * Lists all the age ranges using the ageRangeController.
+     */
     public void listAgeRanges() {
         List<AgeRange> ageRanges = ageRangeController.listAgeRanges();
         for (AgeRange ageRange : ageRanges) {

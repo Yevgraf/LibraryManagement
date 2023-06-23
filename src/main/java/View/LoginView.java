@@ -17,12 +17,16 @@ public class LoginView {
         this.librarianController = librarianController;
     }
 
+    /**
+     * Allows a user to log in.
+     */
     public void login() {
         Scanner scanner = new Scanner(System.in);
         boolean success = false;
         Member member = null; // Initialize the member variable
 
         while (!success) {
+            System.out.println("==== BiblioSMF Login ====");
             System.out.println("Por favor, insira seu email: ");
             String email = scanner.nextLine();
 
@@ -39,11 +43,11 @@ public class LoginView {
                     MainMenu mainMenu = new MainMenu();
                     mainMenu.displayMenu();
                 } else if (user instanceof Member) {
-                    System.out.println("Login successful as a member!");
+                    System.out.println("Login bem sucedido como membro!");
                     int userId = user.getId();
                     int memberId = MemberData.getMemberIdByUserId(userId);
-                    member = (Member) user; // Cast User to Member
-                    member.setId(memberId); // Set the memberId in the Member object
+                    member = (Member) user;
+                    member.setId(memberId);
                     MemberMainMenu memberMainMenu = new MemberMainMenu(member);
                     memberMainMenu.displayMenu();
                 }
@@ -53,7 +57,12 @@ public class LoginView {
         }
     }
 
-
+    /**
+     * Retrieves a user based on their email.
+     *
+     * @param email The email of the user.
+     * @return The user object if found, or null otherwise.
+     */
     private User getUserByEmail(String email) {
         List<User> userList = LibrarianData.loadUsers();
 
@@ -65,5 +74,4 @@ public class LoginView {
 
         return null;
     }
-
 }

@@ -21,6 +21,9 @@ public class CategoryMenu {
         createCategoryView = new CreateCategoryView(categoryController);
     }
 
+    /**
+     * Starts the category menu and handles user input.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");
@@ -48,6 +51,9 @@ public class CategoryMenu {
         }
     }
 
+    /**
+     * Lists all the categories.
+     */
     private void listCategories() {
         List<Category> categories = categoryController.listCategories();
         System.out.println("Lista de categorias:");

@@ -44,7 +44,9 @@ public class BookMenu {
         reservationController = new ReservationController(reservationData, memberData, bookData, cdData);  // Pass cdData to ReservationController
     }
 
-
+    /**
+     * Displays the book menu and handles user input.
+     */
     public void displayMenu() {
         int choice = -1;
         while (choice != 0) {
@@ -72,7 +74,6 @@ public class BookMenu {
                     SearchBooksView searchBooksView = new SearchBooksView(bookController, scanner);
                     searchBooksView.searchBooks();
                     break;
-
                 case 0:
                     mainMenu.displayMenu();
                     break;
@@ -83,6 +84,9 @@ public class BookMenu {
         }
     }
 
+    /**
+     * Lists all the books in the database.
+     */
     private void listBooks() {
         List<Book> bookList = bookController.listBooks();
         if (bookList.isEmpty()) {
@@ -95,7 +99,9 @@ public class BookMenu {
         }
     }
 
-
+    /**
+     * Removes a book from the database.
+     */
     public void removeBook() {
         List<Book> bookList = bookController.listBooks();
 
@@ -120,6 +126,11 @@ public class BookMenu {
         }
     }
 
+    /**
+     * Displays the list of books.
+     *
+     * @param bookList The list of books to display.
+     */
     public void displayBookList(List<Book> bookList) {
         if (bookList.isEmpty()) {
             System.out.println("Nenhum livro encontrado na base de dados.");
@@ -133,6 +144,11 @@ public class BookMenu {
         }
     }
 
+    /**
+     * Gets the index of the book selected by the user.
+     *
+     * @return The index of the selected book.
+     */
     public int getSelectedBookIndex() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Insira o índice do livro: ");
@@ -152,15 +168,22 @@ public class BookMenu {
         return selectedIndex;
     }
 
-
+    /**
+     * Displays a success message for book removal.
+     *
+     * @param bookTitle The title of the removed book.
+     */
     public void showSuccessMessage(String bookTitle) {
         System.out.println("O livro \"" + bookTitle + "\" foi removido com sucesso.");
     }
 
+    /**
+     * Displays a failure message for book removal.
+     *
+     * @param bookTitle The title of the book that failed to be removed.
+     */
     public void showFailureMessage(String bookTitle) {
         System.out.println("Falha ao remover o livro \"" + bookTitle + "\".");
     }
-
-
 
 }

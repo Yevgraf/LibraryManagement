@@ -17,6 +17,10 @@ public class CreateAuthorView {
         scanner = new Scanner(System.in);
         authorController = controller;
     }
+
+    /**
+     * Prompts the user to enter the details of a new author and creates it using the authorController.
+     */
     public void createAuthor() {
         String name = getNameInput();
         String address = getAddressInput();
@@ -32,6 +36,12 @@ public class CreateAuthorView {
         }
     }
 
+    /**
+     * Prompts the user to enter the name of the author.
+     * Keeps prompting until a non-empty name is entered.
+     *
+     * @return The name of the author.
+     */
     private String getNameInput() {
         String name;
         do {
@@ -44,6 +54,12 @@ public class CreateAuthorView {
         return name;
     }
 
+    /**
+     * Prompts the user to enter the address of the author.
+     * Keeps prompting until a non-empty address is entered.
+     *
+     * @return The address of the author.
+     */
     private String getAddressInput() {
         String address;
         do {
@@ -56,6 +72,12 @@ public class CreateAuthorView {
         return address;
     }
 
+    /**
+     * Prompts the user to enter the date of birth of the author.
+     * Keeps prompting until a valid date in the format "DD/MM/YYYY" is entered.
+     *
+     * @return The date of birth of the author.
+     */
     private LocalDate getDateOfBirthInput() {
         while (true) {
             try {
@@ -70,7 +92,12 @@ public class CreateAuthorView {
         }
     }
 
-
+    /**
+     * Validates the date of birth of the author.
+     * Throws an IllegalArgumentException if the date of birth is after the current date.
+     *
+     * @param dateOfBirth The date of birth to validate.
+     */
     private void validateDateOfBirth(LocalDate dateOfBirth) {
         LocalDate currentDate = LocalDate.now();
         if (dateOfBirth.isAfter(currentDate)) {
@@ -78,7 +105,9 @@ public class CreateAuthorView {
         }
     }
 
-
+    /**
+     * Lists all the authors using the authorController.
+     */
     public void listAuthors() {
         List<Author> authors = authorController.listAuthors();
         for (Author author : authors) {

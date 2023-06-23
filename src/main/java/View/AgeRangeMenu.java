@@ -21,6 +21,9 @@ public class AgeRangeMenu {
         createAgeRangeView = new CreateAgeRangeView(ageRangeController);
     }
 
+    /**
+     * Starts the age range menu and handles user input.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");
