@@ -17,7 +17,14 @@ public class CardController {
         this.cardData = cardData;
     }
 
-
+    /**
+     * Creates a new card for the specified member with the given card number.
+     *
+     * @param member     The member for whom the card is being created.
+     * @param cardNumber The card number to assign to the card.
+     * @return The newly created card.
+     * @throws IllegalArgumentException if the member is null.
+     */
 
     public Card createCard(Member member, String cardNumber) {
         if (member == null) {
@@ -34,7 +41,12 @@ public class CardController {
         return card;
     }
 
-
+    /**
+     * Generates a unique card number for a new card based on the member ID and current year.
+     *
+     * @param memberId The ID of the member.
+     * @return A unique card number.
+     */
     public String generateCardNumber(int memberId) {
         List<Card> cards = cardData.load();
         if (cards == null) {

@@ -13,6 +13,11 @@ public class DBconn {
     private static String pass = "Equipa_vfr3";
 
 
+    /**
+     * Establishes a connection to the database.
+     *
+     * @return The database connection.
+     */
     public static Connection getConn() {
         Connection conn = null;
         try {

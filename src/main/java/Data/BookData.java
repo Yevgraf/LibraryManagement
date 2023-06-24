@@ -10,7 +10,11 @@ import java.util.Collection;
 import java.util.List;
 
 public class BookData {
-
+    /**
+     * Saves the given book to the database.
+     *
+     * @param book The book to be saved.
+     */
     public void save(Book book) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement checkStatement = connection.prepareStatement("SELECT id FROM dbo.Product WHERE isbn = ? AND type = 'book'");
@@ -56,6 +60,11 @@ public class BookData {
         }
     }
 
+    /**
+     * Updates the quantity of a book in the database by decreasing it by 1.
+     *
+     * @param bookId The ID of the book to update.
+     */
     public void updateBookQuantityDecrease(int bookId) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Product SET quantity = quantity - 1 WHERE id = ?")) {
@@ -68,7 +77,11 @@ public class BookData {
             System.out.println("Erro ao atualizar a quantidade do livro no banco de dados: " + e.getMessage());
         }
     }
-
+    /**
+     * Updates the quantity of a book in the database by increasing it by 1.
+     *
+     * @param productId The ID of the product to update.
+     */
     public void updateBookQuantityIncrease(int productId) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("UPDATE dbo.Product SET quantity = quantity + 1 WHERE id = ?")) {
@@ -85,7 +98,11 @@ public class BookData {
             System.err.println("Erro ao atualizar a quantidade do produto: " + e.getMessage());
         }
     }
-
+    /**
+     * Updates the details of a book in the database.
+     *
+     * @param book The book with updated details.
+     */
     private void updateBookDetails(Book book) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("UPDATE Product SET title = ?, subtitle = ?, authorId = ?, numPages = ?, categoryId = ?, publicationDate = ?, ageRangeId = ?, publisherId = ?, isbn = ?, quantity = ? WHERE id = ?")) {
@@ -116,6 +133,11 @@ public class BookData {
 
 
 
+    /**
+     * Loads all books from the database.
+     *
+     * @return A list of books loaded from the database.
+     */
     public List<Book> load() {
         List<Book> books = new ArrayList<>();
 
@@ -247,6 +269,13 @@ public class BookData {
 
         return publisher;
     }
+
+    /**
+     * Deletes a book from the database by ID.
+     *
+     * @param bookId The ID of the book to delete.
+     * @return true if the book is successfully deleted, false otherwise.
+     */
     public boolean deleteBook(int bookId) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement statement = connection.prepareStatement("DELETE FROM Product WHERE id = ?")) {
@@ -262,7 +291,11 @@ public class BookData {
     }
 
 
-
+    /**
+     * Retrieves a list of all books from the database.
+     *
+     * @return A list of all books.
+     */
     public List<Book> listBooks() {
         return load();
     }

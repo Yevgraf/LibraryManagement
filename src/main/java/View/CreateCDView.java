@@ -8,17 +8,31 @@ import Model.Category;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * The CreateCDView class represents the view for creating a new CD.
+ */
 public class CreateCDView {
     private CDController cdController;
     private ArtistController artistController;
     private Scanner scanner;
 
+    /**
+     * Constructs a CreateCDView object.
+     *
+     * @param cdController      the CDController object
+     * @param artistController  the ArtistController object
+     * @param scanner           the Scanner object for user input
+     */
     public CreateCDView(CDController cdController, ArtistController artistController, Scanner scanner) {
         this.cdController = cdController;
         this.artistController = artistController;
         this.scanner = scanner;
     }
 
+    /**
+     * Prompts the user to enter the details of a new CD and creates it.
+     * Displays appropriate messages based on the outcome.
+     */
     public void createCD() {
         System.out.println("Criar novo CD:");
         System.out.print("Título: ");
@@ -51,7 +65,7 @@ public class CreateCDView {
 
             System.out.print("Número de faixas: ");
             int numTracks = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
+            scanner.nextLine();
 
             List<Category> categories = cdController.listCategories();
             System.out.println("Categorias disponíveis:");
@@ -62,14 +76,14 @@ public class CreateCDView {
 
             System.out.print("Categoria (escolha o número): ");
             int categoryIndex = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
+            scanner.nextLine();
 
             if (categoryIndex >= 1 && categoryIndex <= categories.size()) {
                 Category selectedCategory = categories.get(categoryIndex - 1);
 
                 System.out.print("Quantidade: ");
                 int quantity = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline character
+                scanner.nextLine();
 
                 try {
                     cdController.createCD(title, selectedArtist, releaseYear, numTracks, selectedCategory, quantity);
@@ -83,7 +97,4 @@ public class CreateCDView {
             System.out.println("Artista inválido. Operação cancelada.");
         }
     }
-
-
-
 }

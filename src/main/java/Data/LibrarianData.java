@@ -1,6 +1,7 @@
 package Data;
 
 import Model.Librarian;
+import Model.Member;
 import Model.Reservation;
 import Model.User;
 
@@ -128,6 +129,49 @@ public class LibrarianData {
         } catch (SQLException e) {
             System.err.println("Erro ao remover o bibliotecário: " + e.getMessage());
         }
+    }
+
+
+    public static List<User> loadUsers() {
+        List<User> userList = new ArrayList<>();
+        try (Connection connection = DBconn.getConn();
+             Statement statement = connection.createStatement()) {
+            // Load Librarians
+            ResultSet librarianResultSet = statement.executeQuery("SELECT LibraryUser.*, Librarian.password FROM LibraryUser JOIN Librarian ON LibraryUser.id = Librarian.userId");
+            while (librarianResultSet.next()) {
+                int id = librarianResultSet.getInt("id");
+                String name = librarianResultSet.getString("name");
+                String address = librarianResultSet.getString("address");
+                LocalDate birthDate = librarianResultSet.getDate("birthDate").toLocalDate();
+                String phone = librarianResultSet.getString("phone");
+                String email = librarianResultSet.getString("email");
+                String password = librarianResultSet.getString("password");
+
+                Librarian librarian = new Librarian(name, address, birthDate, phone, email, password);
+                librarian.setId(id);
+                userList.add(librarian);
+            }
+
+            // Load Members
+            ResultSet memberResultSet = statement.executeQuery("SELECT LibraryUser.*, Member.maxBorrowedBooks, Member.password FROM LibraryUser JOIN Member ON LibraryUser.id = Member.userId");
+            while (memberResultSet.next()) {
+                int id = memberResultSet.getInt("id");
+                String name = memberResultSet.getString("name");
+                String address = memberResultSet.getString("address");
+                LocalDate birthDate = memberResultSet.getDate("birthDate").toLocalDate();
+                String phone = memberResultSet.getString("phone");
+                String email = memberResultSet.getString("email");
+                int maxBorrowedBooks = memberResultSet.getInt("maxBorrowedBooks");
+                String password = memberResultSet.getString("password");
+
+                Member member = new Member(name, address, birthDate, phone, email, maxBorrowedBooks, password);
+                member.setId(id);
+                userList.add(member);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar utilizadores da base de dados: " + e.getMessage());
+        }
+        return userList;
     }
 
 

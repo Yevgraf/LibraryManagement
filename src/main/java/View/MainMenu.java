@@ -6,6 +6,9 @@ import Model.*;
 
 import java.util.Scanner;
 
+/**
+ * The main menu of the library system.
+ */
 public class MainMenu {
     private Scanner scanner;
     private AuthorMenu authorMenu;
@@ -20,6 +23,9 @@ public class MainMenu {
     private CDMenu cdMenu;
     private CreateArtistView createArtistView;
 
+    /**
+     * Constructs a new instance of the MainMenu.
+     */
     public MainMenu() {
         scanner = new Scanner(System.in);
         MemberData memberData = new MemberData();
@@ -49,7 +55,9 @@ public class MainMenu {
         cdMenu = new CDMenu(this, new CDController(cdData, categoryData), scanner); // Initialize CDMenu with CDController and scanner
     }
 
-
+    /**
+     * Displays the main menu and handles user input.
+     */
     public void displayMenu() {
         System.out.println("===================================");
         System.out.println("| Bem-vindo à biblioteca!        |");
@@ -80,7 +88,7 @@ public class MainMenu {
                 break;
             case 3:
                 createArtistView.start();
-
+                break;
             case 4:
                 librarianMenu.start();
                 break;

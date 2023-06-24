@@ -17,6 +17,28 @@ public class Reservation {
     private int satisfactionRating;
     private String additionalComments;
 
+    public Reservation(LocalDate startDate, LocalDate endDate, String itemTitle) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.books = new ArrayList<>();
+        this.cds = new ArrayList<>();
+        this.state = null;
+        this.satisfactionRating = 0;
+        this.additionalComments = "";
+
+        // Check if the item is a book or a CD
+        if (itemTitle.startsWith("B-")) {
+            Book book = new Book(); // Replace with actual book instantiation
+            book.setTitle(itemTitle);
+            this.books.add(book);
+        } else if (itemTitle.startsWith("CD-")) {
+            String cdTitle = itemTitle.substring(3); // Extract the CD title from the itemTitle (excluding the "CD-" prefix)
+            CD cd = new CD(); // Replace with actual CD instantiation
+            cd.setTitle(cdTitle);
+            this.cds.add(cd);
+        }
+    }
+
     public Reservation(Member member, LocalDate startDate, LocalDate endDate) {
         this.member = member;
         this.startDate = startDate;
@@ -27,6 +49,18 @@ public class Reservation {
         this.books = new ArrayList<>();
         this.cds = new ArrayList<>();
     }
+    public Reservation(int id, Member member, LocalDate startDate, LocalDate endDate, State state, int satisfactionRating, String additionalComments) {
+        this.id = id;
+        this.member = member;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = state;
+        this.satisfactionRating = satisfactionRating;
+        this.additionalComments = additionalComments;
+        this.books = new ArrayList<>();
+        this.cds = new ArrayList<>();
+    }
+
 
     public Reservation(Member member, Book book, CD cd, LocalDate startDate, LocalDate endDate) {
         this.member = member;
@@ -46,6 +80,7 @@ public class Reservation {
             this.cds.add(cd);
         }
     }
+
 
     public Reservation(List<Book> books, Member member, LocalDate startDate, LocalDate endDate) {
         this.books = books;
@@ -100,6 +135,18 @@ public class Reservation {
         this.state = null; // Initialize the state to null
     }
 
+
+    public Reservation(int reservationId, int memberId, LocalDate startDate, LocalDate endDate) {
+        this.id = reservationId;
+        this.member = new Member(memberId);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.books = new ArrayList<>();
+        this.cds = new ArrayList<>();
+        this.state = null;
+        this.satisfactionRating = 0;
+        this.additionalComments = "";
+    }
 
 
     public int getId() {

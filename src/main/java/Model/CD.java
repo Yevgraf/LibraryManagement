@@ -40,6 +40,9 @@ public class CD {
         this.quantity = quantity;
     }
 
+    public CD() {
+
+    }
 
 
     public int getId() {

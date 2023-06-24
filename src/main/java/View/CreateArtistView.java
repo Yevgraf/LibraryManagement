@@ -15,6 +15,9 @@ public class CreateArtistView {
         artistController = controller;
     }
 
+    /**
+     * Prompts the user to enter the name of a new artist and creates it using the artistController.
+     */
     public void createArtist() {
         String name = getNameInput();
 
@@ -26,6 +29,12 @@ public class CreateArtistView {
         }
     }
 
+    /**
+     * Prompts the user to enter the name of the artist.
+     * Keeps prompting until a non-empty name is entered.
+     *
+     * @return The name of the artist.
+     */
     private String getNameInput() {
         String name;
         do {
@@ -38,6 +47,9 @@ public class CreateArtistView {
         return name;
     }
 
+    /**
+     * Lists all the artists using the artistController.
+     */
     public void listArtists() {
         List<Artist> artists = artistController.listArtists();
         for (Artist artist : artists) {
@@ -45,6 +57,10 @@ public class CreateArtistView {
         }
     }
 
+    /**
+     * Starts the artist menu loop, allowing the user to create artists, list artists, or go back.
+     * The loop continues until the user chooses to go back.
+     */
     public void start() {
         boolean running = true;
 
@@ -74,6 +90,6 @@ public class CreateArtistView {
         }
         MainMenu mainMenu = new MainMenu();
         mainMenu.displayMenu();
-
     }
 }
+

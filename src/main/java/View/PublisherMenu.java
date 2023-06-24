@@ -13,6 +13,10 @@ public class PublisherMenu {
     private CreatePublisherView createPublisherView;
     private MainMenu mainMenu;
 
+    /**
+     * Constructs a new instance of the PublisherMenu class with the specified MainMenu.
+     * @param mainMenu The main menu.
+     */
     public PublisherMenu(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
@@ -21,6 +25,9 @@ public class PublisherMenu {
         createPublisherView = new CreatePublisherView(publisherController);
     }
 
+    /**
+     * Starts the publisher menu and handles user input.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");
@@ -48,6 +55,9 @@ public class PublisherMenu {
         }
     }
 
+    /**
+     * Lists all the publishers.
+     */
     private void listPublishers() {
         List<Publisher> publishers = publisherController.listPublishers();
         System.out.println("Lista de editoras:");

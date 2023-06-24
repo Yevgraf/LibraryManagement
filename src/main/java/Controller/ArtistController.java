@@ -11,7 +11,11 @@ public class ArtistController {
     public ArtistController() {
         artistData = new ArtistData();
     }
-
+    /**
+     * Creates a new artist with the specified name and saves it to the data source.
+     *
+     * @param name The name of the artist.
+     */
     public void createArtist(String name) {
         Artist artist = new Artist(name);
         artistData.save(List.of(artist));

@@ -24,6 +24,9 @@ public class CDMenu {
         createCDView = new CreateCDView(cdController, artistController, scanner);
     }
 
+    /**
+     * Displays the CD menu and handles user input.
+     */
     public void displayMenu() {
         int choice = -1;
         while (choice != 0) {

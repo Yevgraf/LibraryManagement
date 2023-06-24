@@ -10,8 +10,6 @@ import Model.AgeRange;
 import Model.Author;
 import Model.Category;
 import Model.Publisher;
-import Controller.AgeRangeController;
-
 
 public class CreateBookView {
     private BookController bookController;
@@ -30,6 +28,9 @@ public class CreateBookView {
         this.scanner = scanner;
     }
 
+    /**
+     * Prompts the user to enter the details of a new book and creates it using the bookController.
+     */
     public void createBook() {
         System.out.println("Criação de novo livro:");
 
@@ -47,16 +48,31 @@ public class CreateBookView {
         bookController.createBook(title, subtitle, author.getName(), numPages, category.getCategoryName(), publicationDate, ageRange.getDescription(), publisher.getName(), isbn, quantity);
     }
 
+    /**
+     * Prompts the user to enter the title of the book.
+     *
+     * @return The title of the book.
+     */
     private String getTitle() {
         System.out.print("Título: ");
         return scanner.nextLine();
     }
 
+    /**
+     * Prompts the user to enter the subtitle of the book.
+     *
+     * @return The subtitle of the book.
+     */
     private String getSubtitle() {
         System.out.print("Subtítulo: ");
         return scanner.nextLine();
     }
 
+    /**
+     * Displays the list of authors and prompts the user to select an author.
+     *
+     * @return The selected author.
+     */
     public Author getAuthor() {
         List<Author> authorList = authorController.listAuthors();
         System.out.println("Lista de autores:");
@@ -73,18 +89,31 @@ public class CreateBookView {
         return authorList.get(selection - 1);
     }
 
-
+    /**
+     * Prompts the user to enter the number of pages of the book.
+     *
+     * @return The number of pages of the book.
+     */
     private int getNumPages() {
         System.out.print("Número de páginas: ");
         return Integer.parseInt(scanner.nextLine());
     }
 
+    /**
+     * Prompts the user to enter the quantity of books.
+     *
+     * @return The quantity of books.
+     */
     private int getQuantity() {
         System.out.print("Número de livros: ");
         return Integer.parseInt(scanner.nextLine());
     }
 
-
+    /**
+     * Displays the list of categories and prompts the user to select a category.
+     *
+     * @return The selected category.
+     */
     public Category getCategory() {
         List<Category> categoryList = categoryController.listCategories();
         System.out.println("Lista de categorias:");
@@ -101,13 +130,22 @@ public class CreateBookView {
         return categoryList.get(selection - 1);
     }
 
-
+    /**
+     * Prompts the user to enter the publication date of the book.
+     *
+     * @return The publication date of the book.
+     */
     private LocalDate getPublicationDate() {
         System.out.print("Data de publicação (dd/mm/aaaa): ");
         String publicationDateStr = scanner.nextLine();
         return LocalDate.parse(publicationDateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
+    /**
+     * Displays the list of age ranges and prompts the user to select an age range.
+     *
+     * @return The selected age range.
+     */
     public AgeRange getAgeRange() {
         List<AgeRange> ageRangeList = ageRangeController.listAgeRanges();
         System.out.println("Lista de faixas etárias:");
@@ -124,7 +162,11 @@ public class CreateBookView {
         return ageRangeList.get(selection - 1);
     }
 
-
+    /**
+     * Displays the list of publishers and prompts the user to select a publisher.
+     *
+     * @return The selected publisher.
+     */
     public Publisher getPublisher() {
         List<Publisher> publisherList = publisherController.listPublishers();
         System.out.println("Lista de editoras:");
@@ -141,7 +183,11 @@ public class CreateBookView {
         return publisherList.get(selection - 1);
     }
 
-
+    /**
+     * Prompts the user to enter the ISBN of the book.
+     *
+     * @return The ISBN of the book.
+     */
     private String getIsbn() {
         System.out.print("ISBN: ");
         String isbn = scanner.nextLine();
@@ -156,6 +202,12 @@ public class CreateBookView {
         return isbn;
     }
 
+    /**
+     * Validates the ISBN format.
+     *
+     * @param isbn The ISBN to validate.
+     * @throws IllegalArgumentException if the ISBN is invalid.
+     */
     private void validateIsbn(String isbn) {
         if (isbn.length() != 13) {
             throw new IllegalArgumentException("O ISBN deve ter 13 dígitos.");

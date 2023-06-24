@@ -12,6 +12,11 @@ import static Data.BookData.loadCategoryById;
 
 public class ReservationData {
 
+    /**
+     * Saves a Reservation object to the database.
+     *
+     * @param reservation The Reservation object to be saved.
+     */
     public void save(Reservation reservation) {
         try (Connection connection = DBconn.getConn();
              PreparedStatement selectStatement = connection.prepareStatement(
@@ -125,7 +130,7 @@ public class ReservationData {
 
 
 
-    private Book loadBook(int bookId) {
+    private static Book loadBook(int bookId) {
         Book book = null;
         try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE id = ?")) {
 
@@ -160,7 +165,7 @@ public class ReservationData {
         return book;
     }
 
-    private Member loadMemberById(int memberId) {
+    private static Member loadMemberById(int memberId) {
         Member member = null;
 
         try (Connection connection = DBconn.getConn(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.Member WHERE id = ?")) {
@@ -190,7 +195,7 @@ public class ReservationData {
         return member;
     }
 
-    private User loadLibraryUserById(int userId) {
+    private static User loadLibraryUserById(int userId) {
         User libraryUser = null;
 
         try (Connection connection = DBconn.getConn(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM dbo.LibraryUser WHERE id = ?")) {
@@ -215,7 +220,7 @@ public class ReservationData {
         return libraryUser;
     }
 
-    private Artist loadArtistById(int artistId) {
+    private static Artist loadArtistById(int artistId) {
         Artist artist = null;
         try (Connection connection = DBconn.getConn(); PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Artist WHERE id = ?")) {
 
@@ -237,7 +242,7 @@ public class ReservationData {
     }
 
 
-    private CD loadCD(int cdId) {
+    private static CD loadCD(int cdId) {
         CD cd = null;
         try (Connection connection = DBconn.getConn();
              PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM dbo.Product WHERE id = ?")) {
@@ -320,7 +325,7 @@ public class ReservationData {
             System.err.println("Erro ao atualizar estado de reserva: " + e.getMessage());
         }
     }
-    public List<Reservation> load() {
+    public static List<Reservation> load() {
         List<Reservation> reservations = new ArrayList<>();
         try (Connection connection = DBconn.getConn();
              PreparedStatement selectStatement = connection.prepareStatement("SELECT r.*, p.type, rp.productId " +
@@ -370,9 +375,60 @@ public class ReservationData {
         }
         return reservations;
     }
+    public List<Reservation> loadReserved() {
+        List<Reservation> reservations = new ArrayList<>();
+        try (Connection connection = DBconn.getConn();
+             PreparedStatement selectStatement = connection.prepareStatement("SELECT r.*, p.type, rp.productId " +
+                     "FROM dbo.Reservation AS r " +
+                     "INNER JOIN dbo.ReservationProduct AS rp ON r.id = rp.reservationId " +
+                     "INNER JOIN dbo.Product AS p ON rp.productId = p.id " +
+                     "WHERE r.state = 'RESERVADO'");
+             ResultSet resultSet = selectStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int memberId = resultSet.getInt("memberId");
+                LocalDate startDate = resultSet.getDate("startDate").toLocalDate();
+                LocalDate endDate = resultSet.getDate("endDate").toLocalDate();
+                State state = State.valueOf(resultSet.getString("state"));
+                int satisfactionRating = resultSet.getInt("satisfactionRating");
+                String additionalComments = resultSet.getString("additionalComments");
+                String productType = resultSet.getString("type");
+                int productId = resultSet.getInt("productId");
+
+                Member member = loadMemberById(memberId);
+
+                Reservation reservation = findReservationById(reservations, id);
+                if (reservation == null) {
+                    reservation = new Reservation(member, startDate, endDate);
+                    reservation.setId(id);
+                    reservation.setState(state);
+                    reservation.setSatisfactionRating(satisfactionRating);
+                    reservation.setAdditionalComments(additionalComments);
+                    reservations.add(reservation);
+                }
+
+                // Load associated products
+                if (productType.equals("book")) {
+                    Book book = loadBook(productId);
+                    if (book != null) {
+                        reservation.addBook(book);
+                    }
+                } else if (productType.equals("cd")) {
+                    CD cd = loadCD(productId);
+                    if (cd != null) {
+                        reservation.addCD(cd);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error while loading reservations from the database: " + e.getMessage());
+        }
+        return reservations;
+    }
 
 
-    private Reservation findReservationById(List<Reservation> reservations, int id) {
+    private static Reservation findReservationById(List<Reservation> reservations, int id) {
         for (Reservation reservation : reservations) {
             if (reservation.getId() == id) {
                 return reservation;

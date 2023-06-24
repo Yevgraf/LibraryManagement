@@ -8,7 +8,20 @@ import jakarta.mail.internet.MimeMessage;
 import java.net.Authenticator;
 import java.util.Properties;
 
+
+/**
+ * The EmailController class provides functionality for sending emails using the SMTP protocol.
+ * It uses the JavaMail API to send emails through a configured SMTP server.
+ */
 public class EmailController {
+
+    /**
+     * Sends an email to the specified recipient email address.
+     *
+     * @param recipientEmail The email address of the recipient.
+     * @param subject        The subject of the email.
+     * @param body           The body content of the email.
+     */
     public static void sendEmail(String recipientEmail, String subject, String body) {
         final String SENDER_EMAIL = "1210510MailApi@gmail.com";
         final String SENDER_PASSWORD = "lpgrbbpoxbimpayz";

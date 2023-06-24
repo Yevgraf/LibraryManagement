@@ -10,15 +10,27 @@ import java.util.regex.Pattern;
 import Controller.LibrarianController;
 import Model.Librarian;
 
+/**
+ * The CreateLibrarianView class represents the view for creating a new librarian.
+ */
 public class CreateLibrarianView {
     private Scanner scanner;
     private LibrarianController librarianController;
 
+    /**
+     * Constructs a CreateLibrarianView object.
+     *
+     * @param controller the LibrarianController object
+     */
     public CreateLibrarianView(LibrarianController controller) {
         scanner = new Scanner(System.in);
         librarianController = controller;
     }
 
+    /**
+     * Prompts the user to enter the details of a new librarian and creates it.
+     * Displays appropriate messages based on the outcome.
+     */
     public void createLibrarian() {
         String name = getNameInput();
         String address = getAddressInput();
@@ -31,6 +43,11 @@ public class CreateLibrarianView {
         System.out.println("Bibliotecário criado e guardado com sucesso.");
     }
 
+    /**
+     * Retrieves the name input from the user.
+     *
+     * @return the name input
+     */
     private String getNameInput() {
         String name = null;
         boolean validInput = false;
@@ -46,6 +63,11 @@ public class CreateLibrarianView {
         return name;
     }
 
+    /**
+     * Retrieves the address input from the user.
+     *
+     * @return the address input
+     */
     private String getAddressInput() {
         String address = null;
         boolean validInput = false;
@@ -62,6 +84,11 @@ public class CreateLibrarianView {
     }
 
 
+    /**
+     * Retrieves the birth date input from the user.
+     *
+     * @return the birth date input
+     */
     private LocalDate getBirthDateInput() {
         LocalDate birthDate = null;
         boolean validInput = false;
@@ -81,6 +108,11 @@ public class CreateLibrarianView {
         return birthDate;
     }
 
+    /**
+     * Retrieves the phone input from the user.
+     *
+     * @return the phone input
+     */
     private String getPhoneInput() {
         String phone = null;
         boolean validInput = false;
@@ -96,6 +128,11 @@ public class CreateLibrarianView {
         return phone;
     }
 
+    /**
+     * Retrieves the email input from the user.
+     *
+     * @return the email input
+     */
     private String getEmailInput() {
         String email = null;
         boolean validInput = false;
@@ -111,6 +148,11 @@ public class CreateLibrarianView {
         return email;
     }
 
+    /**
+     * Retrieves the password input from the user.
+     *
+     * @return the password input
+     */
     private String getPasswordInput() {
         String password = null;
         boolean validInput = false;
@@ -127,6 +169,12 @@ public class CreateLibrarianView {
     }
 
 
+    /**
+     * Validates the birth date input.
+     *
+     * @param birthDate the birth date to validate
+     * @throws IllegalArgumentException if the birth date is invalid
+     */
     private void validateBirthDate(LocalDate birthDate) {
         LocalDate currentDate = LocalDate.now();
         if (birthDate.isAfter(currentDate)) {
@@ -134,12 +182,9 @@ public class CreateLibrarianView {
         }
     }
 
-    private void validatePhone(String phone) {
-        if (!Pattern.matches("^(9[1236]\\d{7})$", phone)) {
-            throw new IllegalArgumentException("Telefone inválido. Deve ter 9 dígitos começando com 91, 92, 93, 96 ou 96.");
-        }
-    }
-
+    /**
+     * Lists all librarians.
+     */
     public void listLibrarians() {
         List<Librarian> librarians = librarianController.listLibrarians();
         for (Librarian librarian : librarians) {
@@ -147,3 +192,4 @@ public class CreateLibrarianView {
         }
     }
 }
+

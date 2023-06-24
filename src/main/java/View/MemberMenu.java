@@ -15,6 +15,11 @@ public class MemberMenu {
     private CreateMemberView createMemberView;
     private MainMenu mainMenu;
 
+    /**
+     * Constructs a new instance of the MemberMenu class with the specified MainMenu and CardController.
+     * @param mainMenu The main menu.
+     * @param cardController The card controller.
+     */
     public MemberMenu(MainMenu mainMenu, CardController cardController) {
         this.mainMenu = mainMenu;
         scanner = new Scanner(System.in);
@@ -24,7 +29,9 @@ public class MemberMenu {
         this.cardController = cardController;
     }
 
-
+    /**
+     * Starts the member menu and handles user input.
+     */
     public void start() {
         while (true) {
             System.out.println("Escolha uma opção:");
@@ -56,6 +63,9 @@ public class MemberMenu {
         }
     }
 
+    /**
+     * Lists all the cards.
+     */
     private void listCards() {
         List<Card> cards = cardController.getAllCards();
         System.out.println("Lista de cartões:");
