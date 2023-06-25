@@ -1,6 +1,7 @@
 package View;
 
 import Controller.CDController;
+import Model.Artist;
 import Model.CD;
 
 import java.util.List;
@@ -76,16 +77,17 @@ public class SearchCDsView {
     }
 
     private void searchCDsByArtist() {
-        System.out.println("Artistas:");
 
         List<CD> result = cdController.searchCDsByArtist();
 
         if (result.isEmpty()) {
-            System.out.println("Nenhum CD encontrado para este artista.");
+            System.out.println("Nenhum CD encontrado para o artista. ");
         } else {
+            System.out.println("CDs do artista" + ":");
             for (CD cd : result) {
                 System.out.println(cd);
             }
         }
     }
+
 }

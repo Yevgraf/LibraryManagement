@@ -9,7 +9,6 @@ import Model.Category;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CDController {
@@ -20,7 +19,7 @@ public class CDController {
     public CDController(CDData cdData, CategoryData categoryData) {
         this.cdData = cdData;
         this.categoryData = categoryData;
-        this.scanner = scanner;
+        this.scanner = new Scanner(System.in);
     }
 
     public void createCD(String title, Artist artist, int releaseYear, int numTracks, Category category, int quantity) {
@@ -159,52 +158,56 @@ public class CDController {
     public List<CD> searchCDsByArtist() {
         List<CD> allCDs = cdData.load();
 
-        if (allCDs.isEmpty()) {
-            System.out.println("Não há CDs cadastrados.");
+        List<Artist> artists = getAllArtists();
+        if (artists.isEmpty()) {
+            System.out.println("Não há artistas cadastrados.");
             return Collections.emptyList();
         }
 
-        System.out.println("Selecione um artista:");
-        Set<Artist> artists = allCDs.stream()
-                .map(CD::getArtist)
-                .collect(Collectors.toSet());
-        int index = 1;
-        for (Artist artist : artists) {
-            System.out.println(index + ". " + artist);
-            index++;
+        System.out.println("Artistas disponíveis:");
+        for (int i = 0; i < artists.size(); i++) {
+            System.out.println((i + 1) + ". " + artists.get(i).getName());
         }
 
+        System.out.println("Selecione um artista pelo número:");
         int selectedArtistIndex = scanner.nextInt();
-        scanner.nextLine();
+        scanner.nextLine(); // consume newline character
 
         if (selectedArtistIndex < 1 || selectedArtistIndex > artists.size()) {
             System.out.println("Opção inválida.");
             return Collections.emptyList();
         }
 
-        String selectedArtist = (String) artists.toArray()[selectedArtistIndex - 1];
+        Artist selectedArtist = artists.get(selectedArtistIndex - 1);
 
-        List<CD> cds = searchCDsByArtistWithName(selectedArtist);
+        List<CD> result = searchCDsByArtistWithName(selectedArtist.getName());
 
-        if (cds.isEmpty()) {
-            System.out.println("Não há CDs cadastrados para este artista.");
-            return Collections.emptyList();
+        if (result.isEmpty()) {
+            System.out.println("Nenhum CD encontrado para o artista " + selectedArtist.getName() + ".");
+        } else {
+            System.out.println("CDs do artista " + selectedArtist.getName() + ":");
+            for (CD cd : result) {
+                System.out.println(cd);
+            }
         }
-
-        System.out.println("CDs do artista " + selectedArtist + ":");
-        for (CD cd : cds) {
-            System.out.println(cd);
-        }
-
-        return cds;
+        return result;
     }
+
+
+
 
     private List<CD> searchCDsByArtistWithName(String artistName) {
         List<CD> allCDs = cdData.load();
 
         return allCDs.stream()
-                .filter(cd -> cd.getArtist() != null && cd.getArtist().equals(artistName))
+                .filter(cd -> cd.getArtist() != null && cd.getArtist().getName().equals(artistName))
                 .distinct()
                 .collect(Collectors.toList());
     }
+
+
+    public List<Artist> getAllArtists() {
+        return CDData.getAllArtists();
+    }
+
 }

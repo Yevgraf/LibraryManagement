@@ -4,10 +4,7 @@ import Model.Artist;
 import Model.CD;
 import Model.Category;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -161,17 +158,47 @@ public class CDData {
     }
     public boolean deleteCD(int cdId) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("DELETE FROM Product WHERE id = ?")) {
+             PreparedStatement reservationCheckStatement = connection.prepareStatement("SELECT COUNT(*) FROM ReservationProduct WHERE productId = ?");
+             PreparedStatement deleteStatement = connection.prepareStatement("DELETE FROM Product WHERE id = ?")) {
 
-            statement.setInt(1, cdId);
-            int affectedRows = statement.executeUpdate();
+            // Check if there are reservations for the CD
+            reservationCheckStatement.setInt(1, cdId);
+            ResultSet reservationCheckResult = reservationCheckStatement.executeQuery();
+            reservationCheckResult.next();
+            int reservationCount = reservationCheckResult.getInt(1);
+
+            if (reservationCount > 0) {
+                System.out.println("Não pode apagar cds reserva associada");
+                return false;
+            }
+
+            // Delete the CD
+            deleteStatement.setInt(1, cdId);
+            int affectedRows = deleteStatement.executeUpdate();
             return affectedRows > 0;
 
         } catch (SQLException e) {
-            System.err.println("Erro ao remover CD da base de dados: " + e.getMessage());
+            System.out.println("Erro ao remover CD da base de dados: " + e.getMessage());
             return false;
         }
     }
 
+    public static List<Artist> getAllArtists() {
+        List<Artist> artistList = new ArrayList<>();
+        try (Connection connection = DBconn.getConn();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM Artist")) {
 
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                Artist artist = new Artist(id, name);
+                artistList.add(artist);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao carregar artistas da base de dados: " + e.getMessage());
+        }
+        return artistList;
+    }
 }
