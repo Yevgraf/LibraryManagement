@@ -165,11 +165,11 @@ public class CDController {
         }
 
         System.out.println("Selecione um artista:");
-        Set<String> artists = allCDs.stream()
+        Set<Artist> artists = allCDs.stream()
                 .map(CD::getArtist)
                 .collect(Collectors.toSet());
         int index = 1;
-        for (String artist : artists) {
+        for (Artist artist : artists) {
             System.out.println(index + ". " + artist);
             index++;
         }

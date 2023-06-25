@@ -161,7 +161,7 @@ public class CDData {
     }
     public boolean deleteCD(int cdId) {
         try (Connection connection = DBconn.getConn();
-             PreparedStatement statement = connection.prepareStatement("DELETE FROM dbo.CD WHERE id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM Product WHERE id = ?")) {
 
             statement.setInt(1, cdId);
             int affectedRows = statement.executeUpdate();
