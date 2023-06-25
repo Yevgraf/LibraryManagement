@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact build-on-make="true" name="Biblioteca:jar">
+  <artifact name="Biblioteca:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Biblioteca_jar</output-path>
     <root id="root">
       <element id="archive" name="Biblioteca.jar">
@@ -8,10 +8,12 @@
         </element>
         <element id="module-output" name="Biblioteca" />
       </element>
-      <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:3.0.2" />
-      <element id="library" level="project" name="jakarta.mail.api" />
-      <element id="library" level="project" name="Maven: com.sun.activation:jakarta.activation:2.0.1" />
       <element id="library" level="project" name="Maven: com.sun.mail:jakarta.mail:2.0.1" />
+      <element id="library" level="project" name="Maven: me.minidigger:MiniMessage:2.1.0" />
+      <element id="library" level="project" name="Maven: com.sun.activation:jakarta.activation:2.0.1" />
+      <element id="library" level="project" name="jakarta.mail.api" />
+      <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:3.0.2" />
+      <element id="library" level="project" name="mssql-jdbc-12.2.0.jre11" />
     </root>
   </artifact>
 </component>

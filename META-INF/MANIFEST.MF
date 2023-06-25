@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Main-Class: com.mycompany.biblioteca.Biblioteca
-Class-Path: mssql-jdbc-12.2.0.jre11.jar jsr305-3.0.2.jar jakarta.mail-ap
- i-2.1.1.jar jakarta.activation-api-2.1.1.jar jakarta.activation-2.0.1.j
- ar jakarta.mail-2.0.1.jar
+Class-Path: jakarta.mail-2.0.1.jar jakarta.activation-2.0.1.jar jakarta.
+ mail-api-2.1.1.jar jakarta.activation-api-2.1.1.jar jsr305-3.0.2.jar ms
+ sql-jdbc-12.2.0.jre11.jar
 
