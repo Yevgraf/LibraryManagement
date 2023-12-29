@@ -8,9 +8,9 @@ import java.sql.Connection;
 
 public class DBconn {
 
-    private static String url = "jdbc:sqlserver://ctespbd.dei.isep.ipp.pt;databaseName=2023_f_lp2_g5;TrustServerCertificate=True";
-    private static String user = "2023_f_lp2_g5";
-    private static String pass = "Equipa_vfr3";
+    private static String url = "";
+    private static String user = "";
+    private static String pass = "";
 
 
     /**
